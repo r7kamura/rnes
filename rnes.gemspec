@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Ryo Nakamura"]
   spec.email         = ["r7kamura@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because RubyGems requires one.}
+  spec.summary       = "A NES emulator written in Ruby."
   spec.homepage      = "https://github.com/r7kamura/rnes"
   spec.license       = "MIT"
 
