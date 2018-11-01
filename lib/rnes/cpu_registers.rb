@@ -10,7 +10,7 @@ module Rnes
     NEGATIVE_BIT_INDEX = 7
 
     # @note program counter
-    # @param [Integer] word
+    # @param [Integer]
     # @return [Integer]
     attr_accessor :pc
 
