@@ -30,24 +30,24 @@ module Rnes
     end
 
     # @return [Boolean]
-    def has_battery_backed_program_rom?
+    def has_battery_backed_program_rom_bit?
       flags1[1] == 1
+    end
+
+    # @return [Boolean]
+    def has_mirror_ignoring_bit?
+      flags1[3] == 1
     end
 
     # @note Trainers are 512 bytes of code which is loaded into $7000 before the game starts for hacker use.
     # @return [Boolean]
-    def has_trainer?
+    def has_trainer_bit?
       flags1[2] == 1
     end
 
     # @return [Boolean]
-    def has_vertical_mirroring?
+    def has_vertical_mirroring_bit?
       flags1[0] == 1
-    end
-
-    # @return [Boolean]
-    def has_mirror_ignoring?
-      flags1[3] == 1
     end
 
     # @return [Integer]
@@ -62,7 +62,7 @@ module Rnes
 
     # @return [Integer]
     def trainer_bytesize
-      if has_trainer?
+      if has_trainer_bit?
         512
       else
         0
