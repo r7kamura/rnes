@@ -4,7 +4,19 @@ RSpec.describe Rnes::Cpu do
   end
 
   let(:cpu_bus) do
-    Rnes::CpuBus.new
+    Rnes::CpuBus.new(ppu: ppu, ram: ram)
+  end
+
+  let(:ppu) do
+    Rnes::Ppu.new
+  end
+
+  let(:program_rom) do
+    Rnes::ProgramRom.new
+  end
+
+  let(:ram) do
+    Rnes::Ram.new
   end
 
   describe '#fetch_operation' do
@@ -13,6 +25,7 @@ RSpec.describe Rnes::Cpu do
     end
 
     before do
+      cpu_bus.program_rom = program_rom
       cpu.reset
     end
 
@@ -27,6 +40,7 @@ RSpec.describe Rnes::Cpu do
 
   describe '#reset' do
     subject do
+      cpu_bus.program_rom = program_rom
       cpu.reset
     end
 
@@ -43,11 +57,11 @@ RSpec.describe Rnes::Cpu do
     end
 
     it 'reads address from 0xFFFC and asssigns it to program counter ' do
-      dummy_byte = 0x01
-      allow(cpu).to receive(:read).and_return(dummy_byte)
+      allow(program_rom).to receive(:read).and_return(0x01)
       subject
       expect(cpu.registers.pc).to eq(0x0101)
-      expect(cpu).to have_received(:read).with(0xFFFC)
+      expect(program_rom).to have_received(:read).with(0x3FFC)
+      expect(program_rom).to have_received(:read).with(0x3FFD)
     end
   end
 end
