@@ -60,6 +60,15 @@ module Rnes
       @data[4] * 16 * 2 ** 10
     end
 
+    # @return [Integer]
+    def trainer_bytesize
+      if has_trainer?
+        512
+      else
+        0
+      end
+    end
+
     # @return [Boolean]
     def valid?
       @data[0..3] == PREFIX_BYTES
