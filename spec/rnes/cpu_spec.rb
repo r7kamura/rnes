@@ -31,8 +31,11 @@ RSpec.describe Rnes::Cpu do
 
   describe '#reset' do
     subject do
-      cpu_bus.program_rom = program_rom
       cpu.reset
+    end
+
+    before do
+      cpu_bus.program_rom = program_rom
     end
 
     it 'resets registers and updates program counter' do
