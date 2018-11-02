@@ -23,6 +23,33 @@ module Rnes
 
     VISIBLE_WINDOW_WIDTH = 256
 
+    class << self
+      # @return [Array<Array<Integer>>]
+      def generate_empty_image
+        ::Array.new(visible_window_area).map do
+          [
+            0, # Red
+            0, # Green
+            0, # Blue
+          ]
+        end
+      end
+
+      # @return [Array<Integer>]
+      def generate_empty_palette
+        ::Array.new(PALETTE_SIZE).map do
+          0
+        end
+      end
+
+      private
+
+      # @return [Integer]
+      def visible_window_area
+        VISIBLE_WINDOW_WIDTH * VISIBLE_WINDOW_HEIGHT
+      end
+    end
+
     # @param [Integer]
     # @return [Integer]
     attr_accessor :cycle
@@ -39,17 +66,9 @@ module Rnes
       @attribute_table_byte = 0x0
       @bus = bus
       @cycle = 0
-      @image = ::Array.new(VISIBLE_WINDOW_WIDTH * VISIBLE_WINDOW_HEIGHT).map do
-        [
-          0, # Red
-          0, # Green
-          0, # Blue
-        ]
-      end
+      @image = self.class.generate_empty_image
       @line = 0
-      @palette = ::Array.new(PALETTE_SIZE).map do
-        0
-      end
+      @palette = self.class.generate_empty_palette
       @registers = ::Rnes::PpuRegisters.new
       @sprite_ram = ::Rnes::Ram.new
       @tile_bitmap_high_byte = 0x0
