@@ -1,6 +1,7 @@
 # Rnes
 
 [![CircleCI](https://circleci.com/gh/r7kamura/rnes.svg?style=svg)](https://circleci.com/gh/r7kamura/workflows/rnes)
+[![Documentation](http://img.shields.io/badge/docs-rdoc.info-blue.svg)](http://www.rubydoc.info/github/r7kamura/rnes)
 
 A NES emulator written in Ruby.
 
