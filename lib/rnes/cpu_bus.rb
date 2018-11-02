@@ -35,17 +35,17 @@ module Rnes
         if @program_rom
           @program_rom.read(address - 0x8000)
         else
-          raise ::Rnes::Errors::ProgramRomNotConnectedError.new
+          raise ::Rnes::Errors::ProgramRomNotConnectedError
         end
       when 0xC000..0xFFFF
         if @program_rom
           delta = attatched_to_large_program_rom? ? 0x8000 : 0xC000
           @program_rom.read(address - delta)
         else
-          raise ::Rnes::Errors::ProgramRomNotConnectedError.new
+          raise ::Rnes::Errors::ProgramRomNotConnectedError
         end
       else
-        raise ::Rnes::Errors::InvalidAddressError.new
+        raise ::Rnes::Errors::InvalidAddressError
       end
     end
 
@@ -59,7 +59,7 @@ module Rnes
 
     # @return [Boolean]
     def attatched_to_large_program_rom?
-      @program_rom.bytesize > 16 * 2 ** 10
+      @program_rom.bytesize > 16 * 2**10
     end
   end
 end

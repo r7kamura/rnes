@@ -4,7 +4,7 @@ RSpec.describe Rnes::Emulator do
   end
 
   let(:program_rom_bytes) do
-    Array.new(16 * 2 ** 10).map do
+    Array.new(16 * 2**10).map do
       0
     end
   end

@@ -7,7 +7,7 @@ module Rnes
       0x45, # E
       0x53, # S
       0x1A, # end-of-file in MS-DOS
-    ]
+    ].freeze
 
     # @param [Array<Integer>] bytes
     def initialize(bytes)
@@ -26,7 +26,7 @@ module Rnes
 
     # @return [Integer]
     def character_rom_bytesize
-      @bytes[5] * 8 * 2 ** 10
+      @bytes[5] * 8 * 2**10
     end
 
     # @return [Boolean]
@@ -57,7 +57,7 @@ module Rnes
 
     # @return [Integer]
     def program_rom_bytesize
-      @bytes[4] * 16 * 2 ** 10
+      @bytes[4] * 16 * 2**10
     end
 
     # @return [Integer]

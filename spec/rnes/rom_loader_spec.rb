@@ -1,6 +1,6 @@
 RSpec.describe Rnes::RomLoader do
   let(:rom_bytes) do
-     ines_header_bytes + trainer_bytes + program_rom_bytes + character_rom_bytes
+    ines_header_bytes + trainer_bytes + program_rom_bytes + character_rom_bytes
   end
 
   let(:rom_loader) do
@@ -50,7 +50,7 @@ RSpec.describe Rnes::RomLoader do
 
   shared_context 'with 512 byte trainer, 16 byte program ROM, and 8 byte character ROM' do
     let(:character_rom_bytes) do
-      Array.new(8 * 2 ** 10).map do
+      Array.new(8 * 2**10).map do
         0x03
       end
     end
@@ -77,7 +77,7 @@ RSpec.describe Rnes::RomLoader do
     end
 
     let(:program_rom_bytes) do
-      Array.new(16 * 2 ** 10).map do
+      Array.new(16 * 2**10).map do
         0x02
       end
     end

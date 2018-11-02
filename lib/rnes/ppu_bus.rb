@@ -7,7 +7,7 @@ module Rnes
     # @todo
     # @param [Integer] address
     # @return [Integer]
-    def read(address)
+    def read(_address)
       0
     end
   end

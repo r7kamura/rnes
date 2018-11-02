@@ -32,12 +32,12 @@ module Rnes
       when :BRK
         execute_operation_brk(operation)
       else
-        raise ::Rnes::Errors::UnknownOperationError.new
+        raise ::Rnes::Errors::UnknownOperationError
       end
     end
 
     # @param [Rnes::Operation] operation
-    def execute_operation_brk(operation)
+    def execute_operation_brk(_operation)
       registers.set_break_bit
       stack_program_counter
       stack_status

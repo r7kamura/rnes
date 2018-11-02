@@ -1471,7 +1471,7 @@ module Rnes
         name: :ISB,
         addressing_mode: :absoluteX,
         cycle: 7,
-      }
-    ]
+      },
+    ].freeze
   end
 end

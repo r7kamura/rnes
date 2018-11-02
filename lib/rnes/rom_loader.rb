@@ -1,5 +1,5 @@
-require "rnes/errors"
-require "rnes/ines_header"
+require 'rnes/errors'
+require 'rnes/ines_header'
 
 module Rnes
   class RomLoader
@@ -71,7 +71,7 @@ module Rnes
     # @raise [Rnes::Errors::InvalidInesFormatError]
     def validate!
       unless valid?
-        raise ::Rnes::Errors::InvalidInesFormatError.new
+        raise ::Rnes::Errors::InvalidInesFormatError
       end
     end
   end
