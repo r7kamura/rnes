@@ -129,6 +129,21 @@ RSpec.describe Rnes::Cpu do
       end
     end
 
+    # Program ROM state
+    #
+    # | address | value |
+    # | ------- | ----- |
+    # | 0x0000  | 0xA5  | <- cpu.cpu_bus.read(0x8000) will return 0xA5 (LDA_ZERO)
+    # | 0x0001  | 0x00  | <- value address
+    # | ...     | ...   |
+    # | 0x3FFC  | 0x00  |
+    # | 0x3FFD  | 0x80  | <- program counter will be 0x8000 after reset
+    #
+    # RAM state
+    #
+    # | address | value |
+    # | ------- | ----- |
+    # | 0x0000  | 0x01  | <- value
     context 'with LDA_ZERO operation' do
       before do
         program_rom_bytes[0x0001] = value_address
