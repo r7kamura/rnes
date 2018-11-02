@@ -218,5 +218,29 @@ RSpec.describe Rnes::Cpu do
         expect(cpu.registers.a).to eq(value)
       end
     end
+
+    context 'with STA_ZERO' do
+      before do
+        program_rom_bytes[0x0001] = address
+        cpu.registers.a = accumulator_value
+      end
+
+      let(:accumulator_value) do
+        0x01
+      end
+
+      let(:address) do
+        0x00
+      end
+
+      let(:operation_full_name) do
+        :STA_ZERO
+      end
+
+      it 'writes accumulator value into fetched address' do
+        expect { subject }.to change(cpu.registers, :pc).by(2)
+        expect(ram.read(address)).to eq(accumulator_value)
+      end
+    end
   end
 end

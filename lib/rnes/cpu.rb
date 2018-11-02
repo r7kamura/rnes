@@ -34,6 +34,8 @@ module Rnes
         execute_operation_brk(operation)
       when :LDA
         execute_operation_lda(operation)
+      when :STA
+        execute_operation_sta(operation)
       else
         raise ::Rnes::Errors::UnknownOperationError, "Unknown operation: #{operation.name}"
       end
@@ -56,7 +58,14 @@ module Rnes
     # @param [Rnes::Operation] operation
     def execute_operation_lda(operation)
       value = fetch_value_by_addressing_mode(operation.addressing_mode)
+      value = read(value) if operation.addressing_mode != :immediate
       registers.a = value
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_sta(operation)
+      value = fetch_value_by_addressing_mode(operation.addressing_mode)
+      write(value, registers.a)
     end
 
     # @return [Integer]
@@ -109,28 +118,73 @@ module Rnes
     end
 
     # @return [Integer]
+    def fetch_value_by_addressing_mode_absolute
+      fetch_word
+    end
+
+    # @return [Integer]
+    def fetch_value_by_addressing_mode_absolute_x
+      (fetch_word + registers.x) & 0xFFFF
+    end
+
+    # @return [Integer]
+    def fetch_value_by_addressing_mode_absolute_y
+      (fetch_word + registers.y) & 0xFFFF
+    end
+
+    # @return [nil]
+    def fetch_value_by_addressing_mode_accumulator
+    end
+
+    # @return [Integer]
     def fetch_value_by_addressing_mode_immediate
       fetch
     end
 
+    # @return [nil]
+    def fetch_value_by_addressing_mode_implied
+    end
+
+    # @return [Integer]
+    def fetch_value_by_addressing_mode_indirect_absolute
+      read_word(fetch_word)
+    end
+
+    # @return [Integer]
+    def fetch_value_by_addressing_mode_pre_indexed_indirect
+      read_word((fetch + registers.x) & 0xFF)
+    end
+
+    # @return [Integer]
+    def fetch_value_by_addressing_mode_post_indexed_indirect
+      (read_word(fetch) + registers.y) & 0xFF
+    end
+
+    # @return [Integer]
+    def fetch_value_by_addressing_mode_relative
+      offset = fetch
+      offset -= 256 if offset >= 128
+      this.registers.pc + offset
+    end
+
     # @return [Integer]
     def fetch_value_by_addressing_mode_zero_page
-      address = fetch
-      read(address)
+      fetch
     end
 
     # @return [Integer]
     def fetch_value_by_addressing_mode_zero_page_x
-      address = fetch
-      address = (address + registers.x) & 0xFF
-      read(address)
+      (fetch + registers.x) & 0xFF
     end
 
     # @return [Integer]
     def fetch_value_by_addressing_mode_zero_page_y
-      address = fetch
-      address = (address + registers.y) & 0xFF
-      read(address)
+      (fetch + registers.y) & 0xFF
+    end
+
+    # @return [Integer]
+    def fetch_word
+      fetch | (fetch << 8)
     end
 
     # @param [Integer] address
@@ -139,11 +193,10 @@ module Rnes
       @bus.read(address)
     end
 
-    # Read lower-byte and upper-byte, then return them as a word (2 bytes data).
     # @param [Integer] address
     # @return [Integer]
     def read_word(address)
-      read(address) | read(address + 1) << 8
+      read(address) | read((address + 1) & 0xFFFF) << 8
     end
 
     # @param [Integer] value

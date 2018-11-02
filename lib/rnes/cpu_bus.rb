@@ -53,6 +53,24 @@ module Rnes
     # @param [Integer] address
     # @param [Integer] value
     def write(address, value)
+      case address
+      when 0x0000..0x07FF
+        @ram.write(address, value)
+      when 0x0800..0x1FFF
+        @ram.write(address - 0x0800, value)
+      when 0x2000..0x2007
+        @ppu.write(address - 0x2000, value)
+      when 0x2008..0x3FFF
+        @ppu.write(address - 0x2008, value)
+      when 0x4000..0x401F
+        # TODO
+      when 0x4020..0x5FFF
+        # TODO
+      when 0x6000..0x7FFF
+        # TODO
+      else
+        raise ::Rnes::Errors::InvalidAddressError
+      end
     end
 
     private
