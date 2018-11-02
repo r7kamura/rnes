@@ -4,7 +4,7 @@ RSpec.describe Rnes::Cpu do
   end
 
   let(:cpu_bus) do
-    Rnes::CpuBus.new(ppu: ppu, ram: ram)
+    Rnes::CpuBus.new(ppu: ppu, ram: working_ram)
   end
 
   let(:ppu) do
@@ -12,7 +12,7 @@ RSpec.describe Rnes::Cpu do
   end
 
   let(:ppu_bus) do
-    Rnes::PpuBus.new
+    Rnes::PpuBus.new(ram: video_ram)
   end
 
   let(:program_rom) do
@@ -25,7 +25,11 @@ RSpec.describe Rnes::Cpu do
     end
   end
 
-  let(:ram) do
+  let(:video_ram) do
+    Rnes::Ram.new
+  end
+
+  let(:working_ram) do
     Rnes::Ram.new
   end
 
@@ -148,7 +152,7 @@ RSpec.describe Rnes::Cpu do
     context 'with LDA_ZERO operation' do
       before do
         program_rom_bytes[0x0001] = value_address
-        ram.write(value_address, value)
+        working_ram.write(value_address, value)
       end
 
       let(:operation_full_name) do
@@ -194,7 +198,7 @@ RSpec.describe Rnes::Cpu do
     context 'with LDA_ZEROX operation' do
       before do
         program_rom_bytes[0x0001] = value_base_address
-        ram.write(value_base_address + x, value)
+        working_ram.write(value_base_address + x, value)
         cpu.registers.x = x
       end
 
@@ -240,7 +244,7 @@ RSpec.describe Rnes::Cpu do
 
       it 'sets value from accumulator to fetched address' do
         expect { subject }.to change(cpu.registers, :pc).by(2)
-        expect(ram.read(address)).to eq(accumulator_value)
+        expect(working_ram.read(address)).to eq(accumulator_value)
       end
     end
   end

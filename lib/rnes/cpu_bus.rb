@@ -32,20 +32,11 @@ module Rnes
       when 0x6000..0x7FFF
         # TODO
       when 0x8000..0xBFFF
-        if @program_rom
-          @program_rom.read(address - 0x8000)
-        else
-          raise ::Rnes::Errors::ProgramRomNotConnectedError
-        end
+        try_to_read_program_rom(address - 0x8000)
       when 0xC000..0xFFFF
-        if @program_rom
-          delta = attatched_to_large_program_rom? ? 0x8000 : 0xC000
-          @program_rom.read(address - delta)
-        else
-          raise ::Rnes::Errors::ProgramRomNotConnectedError
-        end
+        try_to_read_program_rom(address - offset_on_reading_program_rom_higher_region)
       else
-        raise ::Rnes::Errors::InvalidAddressError
+        raise ::Rnes::Errors::InvalidCpuBusAddressError, "Invalid address: #{address}"
       end
     end
 
@@ -69,7 +60,7 @@ module Rnes
       when 0x6000..0x7FFF
         # TODO
       else
-        raise ::Rnes::Errors::InvalidAddressError
+        raise ::Rnes::Errors::InvalidCpuBusAddressError, "Invalid address: #{address}"
       end
     end
 
@@ -78,6 +69,20 @@ module Rnes
     # @return [Boolean]
     def attatched_to_large_program_rom?
       @program_rom.bytesize > 16 * 2**10
+    end
+
+    # @return [Integer]
+    def offset_on_reading_program_rom_higher_region
+      attatched_to_large_program_rom? ? 0x8000 : 0xC000
+    end
+
+    # @param [Integer] address
+    def try_to_read_program_rom(address)
+      if @program_rom
+        @program_rom.read(address)
+      else
+        raise ::Rnes::Errors::ProgramRomNotConnectedError
+      end
     end
   end
 end

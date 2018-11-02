@@ -15,10 +15,11 @@ module Rnes
     attr_reader :ppu_bus
 
     def initialize
-      @ram = ::Rnes::Ram.new
-      @ppu_bus = ::Rnes::PpuBus.new
+      @video_ram = ::Rnes::Ram.new
+      @working_ram = ::Rnes::Ram.new
+      @ppu_bus = ::Rnes::PpuBus.new(ram: @video_ram)
       @ppu = ::Rnes::Ppu.new(bus: @ppu_bus)
-      @cpu_bus = ::Rnes::CpuBus.new(ppu: @ppu, ram: @ram)
+      @cpu_bus = ::Rnes::CpuBus.new(ppu: @ppu, ram: @working_ram)
       @cpu = ::Rnes::Cpu.new(bus: @cpu_bus)
     end
 

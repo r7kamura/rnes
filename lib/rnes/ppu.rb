@@ -4,13 +4,15 @@ require 'rnes/ram'
 
 module Rnes
   class Ppu
+    ADDRESS_TO_START_ATTRIBUTE_TABLE = 0x23C0
+
+    ADDRESS_TO_START_NAME_TABLE = 0x2000
+
     CYCLES_PER_LINE = 341
 
     LINE_TO_FINISH_V_BLANK = 261
 
     LINE_TO_START_V_BLANK = 240
-
-    NAME_TABLE_START_ADDRESS = 0x2000
 
     PALETTE_SIZE = 256
 
@@ -49,11 +51,11 @@ module Rnes
       end
       @registers = ::Rnes::PpuRegisters.new
       @sprite_ram = ::Rnes::Ram.new
-      @tile_bitmap_high = 0x0
-      @tile_bitmap_low = 0x0
-      @video_ram = ::Rnes::Ram.new
+      @tile_bitmap_high_byte = 0x0
+      @tile_bitmap_low_byte = 0x0
     end
 
+    # @note Read by CPU.
     # @param [Integer] address
     # @return [Integer]
     def read(address)
@@ -64,8 +66,17 @@ module Rnes
     def tick
       if (0...LINE_TO_START_V_BLANK).cover?(line)
         if (1..VISIBLE_WINDOW_WIDTH).cover?(cycle)
-          if x_in_tile.zero?
+          case x_in_tile
+          when 0
             draw_eight_pixels
+          when 1
+            @pattern_index = @bus.read(ADDRESS_TO_START_NAME_TABLE + tile_index)
+          when 3
+            @attribute_table_byte = @bus.read(ADDRESS_TO_START_ATTRIBUTE_TABLE + tile_index)
+          when 5
+            @tile_bitmap_low_byte = @bus.read(@pattern_index * 16 + y_in_tile)
+          when 7
+            @tile_bitmap_high_byte = @bus.read(@pattern_index * 16 + y_in_tile + 8)
           end
         end
       end
@@ -106,7 +117,7 @@ module Rnes
     def draw_eight_pixels
       8.times do |i|
         tile_bitmap_index = 7 - i
-        palette_index = @tile_bitmap_low[tile_bitmap_index] | @tile_bitmap_high[tile_bitmap_index] << 1 | attribute_value << 2
+        palette_index = @tile_bitmap_low_byte[tile_bitmap_index] | @tile_bitmap_high_byte[tile_bitmap_index] << 1 | attribute_value << 2
         rgb_index = @palette[palette_index]
         @colors[VISIBLE_WINDOW_WIDTH * y + x + i] = [
           ::Rnes::Ppu::RGB_PALETTE[rgb_index * 3 + 0],
@@ -162,7 +173,7 @@ module Rnes
 
     # @return [Integer]
     def x_of_tile
-      Math.floor(x / TILE_WIDTH)
+      x / TILE_WIDTH
     end
 
     # @return [Integer]
@@ -177,7 +188,7 @@ module Rnes
 
     # @return [Integer]
     def y_of_tile
-      Math.floor(y / TILE_HEIGHT)
+      y / TILE_HEIGHT
     end
   end
 end

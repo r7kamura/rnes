@@ -3,10 +3,16 @@ module Rnes
     class BaseError < ::StandardError
     end
 
-    class InvalidAddressError < BaseError
+    class CharacterRomNotConnectedError < BaseError
+    end
+
+    class InvalidCpuBusAddressError < BaseError
     end
 
     class InvalidInesFormatError < BaseError
+    end
+
+    class InvalidPpuBusAddressError < BaseError
     end
 
     class ProgramRomNotConnectedError < BaseError

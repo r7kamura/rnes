@@ -4,7 +4,11 @@ RSpec.describe Rnes::Ppu do
   end
 
   let(:ppu_bus) do
-    Rnes::PpuBus.new
+    Rnes::PpuBus.new(ram: video_ram)
+  end
+
+  let(:video_ram) do
+    Rnes::Ram.new
   end
 
   describe '#tick' do
