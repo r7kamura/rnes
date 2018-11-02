@@ -93,9 +93,10 @@ RSpec.describe Rnes::Cpu do
         :BRK
       end
 
-      it 'sets break bit' do
+      it 'sets break bit and interrupt bit' do
         subject
         expect(cpu.registers).to have_break_bit
+        expect(cpu.registers).to have_interrupt_bit
         expect(cpu.registers.pc).to eq(program_counter_after_reset)
       end
     end

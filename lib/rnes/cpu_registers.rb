@@ -96,36 +96,54 @@ module Rnes
       @y = 0x00
     end
 
-    def set_break_bit
-      @p |= 1 << BREAK_BIT_INDEX
+    # @param [Integer] index
+    # @param [Boolean] boolean
+    def toggle_bit(index, boolean)
+      if boolean
+        @p |= 1 << index
+      else
+        @p &= ~(1 << index)
+      end
     end
 
-    def set_carry_bit
-      @p |= 1 << CARRY_BIT_INDEX
+    # @param [Boolean] boolean
+    def toggle_break_bit(boolean)
+      toggle_bit(BREAK_BIT_INDEX, boolean)
     end
 
-    def set_decimal_bit
-      @p |= 1 << DECIMAL_BIT_INDEX
+    # @param [Boolean] boolean
+    def toggle_carry_bit(boolean)
+      toggle_bit(CARRY_BIT_INDEX, boolean)
     end
 
-    def set_interrupt_bit
-      @p |= 1 << INTERRUPT_BIT_INDEX
+    # @param [Boolean] boolean
+    def toggle_decimal_bit(boolean)
+      toggle_bit(DECIMAL_BIT_INDEX, boolean)
     end
 
-    def set_negative_bit
-      @p |= 1 << NEGATIVE_BIT_INDEX
+    # @param [Boolean] boolean
+    def toggle_interrupt_bit(boolean)
+      toggle_bit(INTERRUPT_BIT_INDEX, boolean)
     end
 
-    def set_overflow_bit
-      @p |= 1 << OVERFLOW_BIT_INDEX
+    # @param [Boolean] boolean
+    def toggle_negative_bit(boolean)
+      toggle_bit(NEGATIVE_BIT_INDEX, boolean)
     end
 
-    def set_reserved_bit
-      @p |= 1 << RESERVED_BIT_INDEX
+    # @param [Boolean] boolean
+    def toggle_overflow_bit(boolean)
+      toggle_bit(OVERFLOW_BIT_INDEX, boolean)
     end
 
-    def set_zero_bit
-      @p |= 1 << ZERO_BIT_INDEX
+    # @param [Boolean] boolean
+    def toggle_reserved_bit(boolean)
+      toggle_bit(RESERVED_BIT_INDEX, boolean)
+    end
+
+    # @param [Boolean] boolean
+    def toggle_zero_bit(boolean)
+      toggle_bit(ZERO_BIT_INDEX, boolean)
     end
   end
 end

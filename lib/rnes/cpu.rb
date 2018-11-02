@@ -43,11 +43,11 @@ module Rnes
 
     # @param [Rnes::Operation] operation
     def execute_operation_brk(_operation)
-      registers.set_break_bit
+      registers.toggle_break_bit(true)
       stack_program_counter
       stack_status
       unless registers.has_interrupt_bit?
-        registers.set_interrupt_bit
+        registers.toggle_interrupt_bit(true)
         registers.pc = read_word(0xFFFE)
       end
       registers.pc -= 1
@@ -60,6 +60,8 @@ module Rnes
       value = fetch_value_by_addressing_mode(operation.addressing_mode)
       value = read(value) if operation.addressing_mode != :immediate
       registers.a = value
+      registers.toggle_negative_bit(value.negative?)
+      registers.toggle_zero_bit(value.zero?)
     end
 
     # @param [Rnes::Operation] operation
