@@ -18,7 +18,7 @@ module Rnes
       when 0x0000..0x1FFF
         try_to_read_character_rom(address)
       when 0x2000..0x27FF
-        @ram.read(address)
+        @ram.read(address - 0x2000)
       when 0x2800..0x2FFF
         @ram.read(address - 0x0800)
       when 0x3000..0x3EFF
