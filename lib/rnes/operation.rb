@@ -11,22 +11,22 @@ module Rnes
       end
     end
 
-    # @return [String]
+    # @return [Symbol]
     attr_reader :addressing_mode
 
     # @return [Integer]
     attr_reader :cycle
 
-    # @return [String]
+    # @return [Symbol]
     attr_reader :full_name
 
-    # @return [String]
+    # @return [Symbol]
     attr_reader :name
 
-    # @param [String] addressing_mode
+    # @param [Symbol] addressing_mode
     # @param [Integer] cycle
-    # @param [String] full_name
-    # @param [String] name
+    # @param [Symbol] full_name
+    # @param [Symbol] name
     def initialize(addressing_mode:, cycle:, full_name:, name:)
       @addressing_mode = addressing_mode
       @cycle = cycle

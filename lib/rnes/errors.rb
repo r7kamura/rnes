@@ -11,5 +11,8 @@ module Rnes
 
     class ProgramRomNotConnectedError < BaseError
     end
+
+    class UnknownOperationError < BaseError
+    end
   end
 end

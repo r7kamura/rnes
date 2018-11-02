@@ -1,5 +1,6 @@
 require 'rnes/cpu_bus'
 require 'rnes/cpu_registers'
+require 'rnes/errors'
 require 'rnes/operation'
 
 module Rnes
@@ -13,23 +14,45 @@ module Rnes
       @registers = ::Rnes::CpuRegisters.new
     end
 
-    # @return [Rnes::Operation]
-    def fetch_operation
-      operation_code = fetch_operation_code
-      operation = ::Rnes::Operation.build(operation_code)
-    end
-
-    # @return [Array<Rnes::OperationCode>]
-    def operation_codes
-      @operation_codes ||= []
-    end
-
     def reset
       @registers.reset
       @registers.pc = read_word(0xFFFC)
     end
 
+    def tick
+      operation = fetch_operation
+      execute_operation(operation)
+    end
+
     private
+
+    # @param [Rnes::Operation] operation
+    def execute_operation(operation)
+      case operation.name
+      when :BRK
+        execute_operation_brk(operation)
+      else
+        raise ::Rnes::Errors::UnknownOperationError.new
+      end
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_brk(operation)
+      registers.set_break_bit
+      stack_program_counter
+      stack_status
+      unless registers.has_interrupt_bit?
+        registers.set_interrupt_bit
+        registers.pc = read_word(0xFFFE)
+      end
+      registers.pc -= 1
+    end
+
+    # @return [Rnes::Operation]
+    def fetch_operation
+      operation_code = fetch_operation_code
+      ::Rnes::Operation.build(operation_code)
+    end
 
     # @return [Integer]
     def fetch_operation_code
@@ -50,6 +73,38 @@ module Rnes
     # @return [Integer]
     def read_word(address)
       read(address) | read(address + 1) << 8
+    end
+
+    # @param [Integer] value
+    def stack(value)
+      write(registers.sp | 0x100, value)
+      registers.sp -= 1
+    end
+
+    def stack_program_counter
+      stack_word(registers.pc)
+    end
+
+    def stack_status
+      stack(registers.p)
+    end
+
+    # @param [Integer] value
+    def stack_word(value)
+      stack(value >> 8)
+      stack(value & 0xFF)
+    end
+
+    # @return [Integer]
+    def unstack
+      registers.sp += 1
+      read(registers.sp & 0xFF | 0x100)
+    end
+
+    # @todo
+    # @param [Integer] address
+    # @param [Integer] value
+    def write(address, value)
     end
   end
 end

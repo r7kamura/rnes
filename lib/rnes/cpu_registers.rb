@@ -14,6 +14,15 @@ module Rnes
     # @return [Integer]
     attr_accessor :pc
 
+    # @note stack pointer
+    # @param [Integer]
+    # @return [Integer]
+    attr_accessor :sp
+
+    # @note status
+    # @return [Integer]
+    attr_reader :p
+
     def initialize
       @a = 0x00
       @p = 0b00000000
@@ -70,6 +79,38 @@ module Rnes
       @sp = 0x1FD
       @x = 0x00
       @y = 0x00
+    end
+
+    def set_break_bit
+      @p |= 1 << BREAK_BIT_INDEX
+    end
+
+    def set_carry_bit
+      @p |= 1 << CARRY_BIT_INDEX
+    end
+
+    def set_decimal_bit
+      @p |= 1 << DECIMAL_BIT_INDEX
+    end
+
+    def set_interrupt_bit
+      @p |= 1 << INTERRUPT_BIT_INDEX
+    end
+
+    def set_negative_bit
+      @p |= 1 << NEGATIVE_BIT_INDEX
+    end
+
+    def set_overflow_bit
+      @p |= 1 << OVERFLOW_BIT_INDEX
+    end
+
+    def set_reserved_bit
+      @p |= 1 << RESERVED_BIT_INDEX
+    end
+
+    def set_zero_bit
+      @p |= 1 << ZERO_BIT_INDEX
     end
   end
 end
