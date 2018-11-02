@@ -49,14 +49,14 @@ RSpec.describe Rnes::Ppu do
         ppu.line = 261
         ppu.registers.toggle_in_v_blank_bit(true)
         ppu.registers.toggle_sprite_hit_bit(true)
-        allow(ppu).to receive(:render)
+        allow(ppu).to receive(:render_image)
       end
 
       it 'updates cycle and line, render image, and unsets some bits' do
         subject
         expect(ppu.cycle).to eq(0)
         expect(ppu.line).to eq(0)
-        expect(ppu).to have_received(:render)
+        expect(ppu).to have_received(:render_image)
         expect(ppu.registers).not_to have_in_v_blank_bit
         expect(ppu.registers).not_to have_sprite_hit_bit
       end

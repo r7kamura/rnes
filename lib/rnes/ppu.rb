@@ -11,15 +11,15 @@ module Rnes
 
     CYCLES_PER_LINE = 341
 
-    LINE_TO_FINISH_V_BLANK = 261
-
-    LINE_TO_START_V_BLANK = 240
-
     PALETTE_SIZE = 256
 
     TILE_HEIGHT = 8
 
     TILE_WIDTH = 8
+
+    V_BLANK_HEIGHT = 21
+
+    VISIBLE_WINDOW_HEIGHT = 240
 
     VISIBLE_WINDOW_WIDTH = 256
 
@@ -38,14 +38,14 @@ module Rnes
     def initialize(bus:)
       @attribute_table_byte = 0x0
       @bus = bus
-      @colors = ::Array.new(VISIBLE_WINDOW_WIDTH * LINE_TO_START_V_BLANK).map do
+      @cycle = 0
+      @image = ::Array.new(VISIBLE_WINDOW_WIDTH * VISIBLE_WINDOW_HEIGHT).map do
         [
           0, # Red
           0, # Green
           0, # Blue
         ]
       end
-      @cycle = 0
       @line = 0
       @palette = ::Array.new(PALETTE_SIZE).map do
         0
@@ -69,34 +69,21 @@ module Rnes
 
     # @todo
     def tick
-      if (0...LINE_TO_START_V_BLANK).cover?(line)
-        if (1..VISIBLE_WINDOW_WIDTH).cover?(cycle)
-          case x_in_tile
-          when 0
-            draw_eight_pixels
-          when 1
-            @pattern_index = @bus.read(ADDRESS_TO_START_NAME_TABLE + tile_index)
-          when 3
-            @attribute_table_byte = @bus.read(ADDRESS_TO_START_ATTRIBUTE_TABLE + tile_index)
-          when 5
-            @tile_bitmap_low_byte = @bus.read(@pattern_index * 16 + y_in_tile)
-          when 7
-            @tile_bitmap_high_byte = @bus.read(@pattern_index * 16 + y_in_tile + 8)
-          end
-        end
+      if on_visible_cycle?
+        draw
       end
-
-      if on_cycle_to_reset?
+      if on_right_end_cycle?
         self.cycle = 0
-        if on_line_to_finish_v_blank?
+        if on_bottom_end_line?
           self.line = 0
-          render
-          registers.toggle_in_v_blank_bit(false)
-          registers.toggle_sprite_hit_bit(false)
+          clear_nmi
+          clear_sprite_hit
+          clear_v_blank
+          render_image
         else
           self.line += 1
           if on_line_to_start_v_blank?
-            registers.toggle_in_v_blank_bit(true)
+            set_v_blank
           end
         end
       else
@@ -145,16 +132,30 @@ module Rnes
       (@attribute_table_byte >> attribute_shift) & 0b11
     end
 
-    def draw_eight_pixels
-      8.times do |i|
-        tile_bitmap_index = 7 - i
-        palette_index = @tile_bitmap_low_byte[tile_bitmap_index] | @tile_bitmap_high_byte[tile_bitmap_index] << 1 | attribute_value << 2
-        rgb_index = @palette[palette_index]
-        @colors[VISIBLE_WINDOW_WIDTH * y + x + i] = [
-          ::Rnes::Ppu::RGB_PALETTE[rgb_index * 3 + 0],
-          ::Rnes::Ppu::RGB_PALETTE[rgb_index * 3 + 1],
-          ::Rnes::Ppu::RGB_PALETTE[rgb_index * 3 + 2],
-        ]
+    # @todo
+    def clear_nmi
+    end
+
+    def clear_sprite_hit
+      registers.toggle_sprite_hit_bit(false)
+    end
+
+    def clear_v_blank
+      registers.toggle_in_v_blank_bit(false)
+    end
+
+    def draw
+      case x_in_tile
+      when 0
+        update_eight_pixels
+      when 1
+        @pattern_index = @bus.read(ADDRESS_TO_START_NAME_TABLE + tile_index)
+      when 3
+        @attribute_table_byte = @bus.read(ADDRESS_TO_START_ATTRIBUTE_TABLE + tile_index)
+      when 5
+        @tile_bitmap_low_byte = @bus.read(@pattern_index * 16 + y_in_tile)
+      when 7
+        @tile_bitmap_high_byte = @bus.read(@pattern_index * 16 + y_in_tile + 8)
       end
     end
 
@@ -169,27 +170,49 @@ module Rnes
     end
 
     # @return [Boolean]
-    def on_cycle_to_reset?
-      cycle == CYCLES_PER_LINE - 1
-    end
-
-    # @return [Boolean]
-    def on_line_to_finish_v_blank?
-      line == LINE_TO_FINISH_V_BLANK
+    def on_bottom_end_line?
+      line == VISIBLE_WINDOW_HEIGHT + V_BLANK_HEIGHT
     end
 
     # @return [Boolean]
     def on_line_to_start_v_blank?
-      line == LINE_TO_START_V_BLANK
+      line == VISIBLE_WINDOW_HEIGHT
+    end
+
+    # @return [Boolean]
+    def on_right_end_cycle?
+      cycle == CYCLES_PER_LINE - 1
+    end
+
+    # @return [Boolean]
+    def on_visible_cycle?
+      (0...VISIBLE_WINDOW_WIDTH).cover?(x) && (0...VISIBLE_WINDOW_HEIGHT).cover?(y)
     end
 
     # @todo
-    def render
+    def render_image
+    end
+
+    def set_v_blank
+      registers.toggle_in_v_blank_bit(true)
     end
 
     # @return [Integer]
     def tile_index
       y_of_tile * (VISIBLE_WINDOW_WIDTH / TILE_WIDTH) + x_of_tile
+    end
+
+    def update_eight_pixels
+      8.times do |i|
+        tile_bitmap_index = 7 - i
+        palette_index = @tile_bitmap_low_byte[tile_bitmap_index] | @tile_bitmap_high_byte[tile_bitmap_index] << 1 | attribute_value << 2
+        rgb_index = @palette[palette_index]
+        @image[VISIBLE_WINDOW_WIDTH * y + x + i] = [
+          ::Rnes::Ppu::RGB_PALETTE[rgb_index * 3 + 0],
+          ::Rnes::Ppu::RGB_PALETTE[rgb_index * 3 + 1],
+          ::Rnes::Ppu::RGB_PALETTE[rgb_index * 3 + 2],
+        ]
+      end
     end
 
     # @return [Integer]
