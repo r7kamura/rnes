@@ -23,5 +23,8 @@ module Rnes
 
     class UnknownOperationError < BaseError
     end
+
+    class UnknownPpuAddressError < BaseError
+    end
   end
 end

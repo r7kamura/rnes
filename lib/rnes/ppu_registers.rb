@@ -3,6 +3,15 @@ module Rnes
     STATUS_IN_V_BLANK_BIT_INDEX = 7
     STATUS_SPRITE_HIT_BIT_INDEX = 5
 
+    # @return [Integer]
+    attr_reader :status
+
+    # @param [Integer]
+    attr_writer :control1
+
+    # @param [Integer]
+    attr_writer :control2
+
     def initialize
       @control1 = 0x0
       @control2 = 0x0

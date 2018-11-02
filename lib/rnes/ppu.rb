@@ -1,3 +1,4 @@
+require 'rnes/errors'
 require 'rnes/ppu_registers'
 require 'rnes/ppu/rgb_palette'
 require 'rnes/ram'
@@ -55,11 +56,15 @@ module Rnes
       @tile_bitmap_low_byte = 0x0
     end
 
-    # @note Read by CPU.
     # @param [Integer] address
     # @return [Integer]
     def read(address)
-      @bus.read(address)
+      case address
+      when 0x2002
+        registers.status
+      else
+        raise ::Rnes::Errors::UnknownPpuAddressError, "Unknown address: #{address}"
+      end
     end
 
     # @todo
@@ -96,6 +101,32 @@ module Rnes
         end
       else
         self.cycle += 1
+      end
+    end
+
+    # @param [Integer] address
+    # @param [Integer] value
+    # @return [Integer]
+    def write(address, value)
+      case address
+      when 0x2000
+        registers.control1 = value
+      when 0x2001
+        registers.control2 = value
+      when 0x2003
+        # TODO sprite address register
+      when 0x2004
+        # TODO sprite address register
+      when 0x2005
+        # TODO scroll register
+      when 0x2006
+        # TODO VRAM address register
+      when 0x2007
+        # TODO VRAM access register
+      when 0x4014
+        # TODO sprite DMA register
+      else
+        raise ::Rnes::Errors::UnknownPpuAddressError, "Unknown address: #{address}"
       end
     end
 
