@@ -15,9 +15,5 @@ module Rnes
     def read(address)
       @bytes[address]
     end
-
-    def write(address, value)
-      @bytes[address] = value
-    end
   end
 end

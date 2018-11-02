@@ -61,9 +61,9 @@ RSpec.describe Rnes::Cpu do
     end
 
     before do
-      program_rom.write(0x0000, operation_code)
-      program_rom.write(0x3FFC, program_counter_after_reset & 0xFF)
-      program_rom.write(0x3FFD, program_counter_after_reset >> 8)
+      program_rom_bytes[0x0000] = operation_code
+      program_rom_bytes[0x3FFC] = program_counter_after_reset & 0xFF
+      program_rom_bytes[0x3FFD] = program_counter_after_reset >> 8
       cpu_bus.program_rom = program_rom
       cpu.reset
     end
@@ -112,20 +112,44 @@ RSpec.describe Rnes::Cpu do
     #
     context 'with LDA_IMM operation' do
       before do
-        program_rom.write(0x0001, immediate_value)
-      end
-
-      let(:immediate_value) do
-        0x01
+        program_rom_bytes[0x0001] = value
       end
 
       let(:operation_full_name) do
         :LDA_IMM
       end
 
+      let(:value) do
+        0x01
+      end
+
       it 'fetches value and sets it to accumulator' do
         expect { subject }.to change(cpu.registers, :pc).by(2)
-        expect(cpu.registers.a).to eq(immediate_value)
+        expect(cpu.registers.a).to eq(value)
+      end
+    end
+
+    context 'with LDA_ZERO operation' do
+      before do
+        program_rom_bytes[0x0001] = value_address
+        ram.write(value_address, value)
+      end
+
+      let(:operation_full_name) do
+        :LDA_ZERO
+      end
+
+      let(:value) do
+        0x01
+      end
+
+      let(:value_address) do
+        0x00
+      end
+
+      it 'fetches address, read value, and sets it to accumulator' do
+        expect { subject }.to change(cpu.registers, :pc).by(2)
+        expect(cpu.registers.a).to eq(value)
       end
     end
   end

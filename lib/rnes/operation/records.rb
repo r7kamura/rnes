@@ -10,7 +10,7 @@ module Rnes
       {
         full_name: :ORA_INDX,
         name: :ORA,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 6,
       },
       {
@@ -22,7 +22,7 @@ module Rnes
       {
         full_name: :SLO_INDX,
         name: :SLO,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 8,
       },
       {
@@ -34,19 +34,19 @@ module Rnes
       {
         full_name: :ORA_ZERO,
         name: :ORA,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :ASL_ZERO,
         name: :ASL,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
         full_name: :SLO_ZERO,
         name: :SLO,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
@@ -101,7 +101,7 @@ module Rnes
       {
         full_name: :ORA_INDY,
         name: :ORA,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 5,
       },
       {
@@ -113,7 +113,7 @@ module Rnes
       {
         full_name: :SLO_INDY,
         name: :SLO,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 8,
       },
       {
@@ -125,19 +125,19 @@ module Rnes
       {
         full_name: :ORA_ZEROX,
         name: :ORA,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 4,
       },
       {
         full_name: :ASL_ZEROX,
         name: :ASL,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
         full_name: :SLO_ZEROX,
         name: :SLO,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
@@ -149,7 +149,7 @@ module Rnes
       {
         full_name: :ORA_ABSY,
         name: :ORA,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 4,
       },
       {
@@ -161,7 +161,7 @@ module Rnes
       {
         full_name: :SLO_ABSY,
         name: :SLO,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 7,
       },
       {
@@ -173,19 +173,19 @@ module Rnes
       {
         full_name: :ORA_ABSX,
         name: :ORA,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 4,
       },
       {
         full_name: :ASL_ABSX,
         name: :ASL,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 6,
       },
       {
         full_name: :SLO_ABSX,
         name: :SLO,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 7,
       },
       {
@@ -197,7 +197,7 @@ module Rnes
       {
         full_name: :AND_INDX,
         name: :AND,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 6,
       },
       {
@@ -209,31 +209,31 @@ module Rnes
       {
         full_name: :RLA_INDX,
         name: :RLA,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 8,
       },
       {
         full_name: :BIT_ZERO,
         name: :BIT,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :AND_ZERO,
         name: :AND,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :ROL_ZERO,
         name: :ROL,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
         full_name: :RLA_ZERO,
         name: :RLA,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
@@ -288,7 +288,7 @@ module Rnes
       {
         full_name: :AND_INDY,
         name: :AND,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 5,
       },
       {
@@ -300,7 +300,7 @@ module Rnes
       {
         full_name: :RLA_INDY,
         name: :RLA,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 8,
       },
       {
@@ -312,19 +312,19 @@ module Rnes
       {
         full_name: :AND_ZEROX,
         name: :AND,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 4,
       },
       {
         full_name: :ROL_ZEROX,
         name: :ROL,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
         full_name: :RLA_ZEROX,
         name: :RLA,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
@@ -336,7 +336,7 @@ module Rnes
       {
         full_name: :AND_ABSY,
         name: :AND,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 4,
       },
       {
@@ -348,7 +348,7 @@ module Rnes
       {
         full_name: :RLA_ABSY,
         name: :RLA,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 7,
       },
       {
@@ -360,19 +360,19 @@ module Rnes
       {
         full_name: :AND_ABSX,
         name: :AND,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 4,
       },
       {
         full_name: :ROL_ABSX,
         name: :ROL,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 6,
       },
       {
         full_name: :RLA_ABSX,
         name: :RLA,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 7,
       },
       {
@@ -384,7 +384,7 @@ module Rnes
       {
         full_name: :EOR_INDX,
         name: :EOR,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 6,
       },
       {
@@ -396,7 +396,7 @@ module Rnes
       {
         full_name: :SRE_INDX,
         name: :SRE,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 8,
       },
       {
@@ -408,19 +408,19 @@ module Rnes
       {
         full_name: :EOR_ZERO,
         name: :EOR,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :LSR_ZERO,
         name: :LSR,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
         full_name: :SRE_ZERO,
         name: :SRE,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
@@ -475,7 +475,7 @@ module Rnes
       {
         full_name: :EOR_INDY,
         name: :EOR,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 5,
       },
       {
@@ -487,7 +487,7 @@ module Rnes
       {
         full_name: :SRE_INDY,
         name: :SRE,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 8,
       },
       {
@@ -499,19 +499,19 @@ module Rnes
       {
         full_name: :EOR_ZEROX,
         name: :EOR,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 4,
       },
       {
         full_name: :LSR_ZEROX,
         name: :LSR,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
         full_name: :SRE_ZEROX,
         name: :SRE,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
@@ -523,7 +523,7 @@ module Rnes
       {
         full_name: :EOR_ABSY,
         name: :EOR,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 4,
       },
       {
@@ -535,7 +535,7 @@ module Rnes
       {
         full_name: :SRE_ABSY,
         name: :SRE,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 7,
       },
       {
@@ -547,19 +547,19 @@ module Rnes
       {
         full_name: :EOR_ABSX,
         name: :EOR,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 4,
       },
       {
         full_name: :LSR_ABSX,
         name: :LSR,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 6,
       },
       {
         full_name: :SRE_ABSX,
         name: :SRE,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 7,
       },
       {
@@ -571,7 +571,7 @@ module Rnes
       {
         full_name: :ADC_INDX,
         name: :ADC,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 6,
       },
       {
@@ -583,7 +583,7 @@ module Rnes
       {
         full_name: :RRA_INDX,
         name: :RRA,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 8,
       },
       {
@@ -595,19 +595,19 @@ module Rnes
       {
         full_name: :ADC_ZERO,
         name: :ADC,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :ROR_ZERO,
         name: :ROR,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
         full_name: :RRA_ZERO,
         name: :RRA,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
@@ -632,7 +632,7 @@ module Rnes
       {
         full_name: :JMP_INDABS,
         name: :JMP,
-        addressing_mode: :indirectAbsolute,
+        addressing_mode: :indirect_absolute,
         cycle: 5,
       },
       {
@@ -662,7 +662,7 @@ module Rnes
       {
         full_name: :ADC_INDY,
         name: :ADC,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 5,
       },
       {
@@ -674,7 +674,7 @@ module Rnes
       {
         full_name: :RRA_INDY,
         name: :RRA,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 8,
       },
       {
@@ -686,19 +686,19 @@ module Rnes
       {
         full_name: :ADC_ZEROX,
         name: :ADC,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 4,
       },
       {
         full_name: :ROR_ZEROX,
         name: :ROR,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
         full_name: :RRA_ZEROX,
         name: :RRA,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
@@ -710,7 +710,7 @@ module Rnes
       {
         full_name: :ADC_ABSY,
         name: :ADC,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 4,
       },
       {
@@ -722,7 +722,7 @@ module Rnes
       {
         full_name: :RRA_ABSY,
         name: :RRA,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 7,
       },
       {
@@ -734,19 +734,19 @@ module Rnes
       {
         full_name: :ADC_ABSX,
         name: :ADC,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 4,
       },
       {
         full_name: :ROR_ABSX,
         name: :ROR,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 6,
       },
       {
         full_name: :RRA_ABSX,
         name: :RRA,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 7,
       },
       {
@@ -758,7 +758,7 @@ module Rnes
       {
         full_name: :STA_INDX,
         name: :STA,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 6,
       },
       {
@@ -770,31 +770,31 @@ module Rnes
       {
         full_name: :SAX_INDX,
         name: :SAX,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 6,
       },
       {
         full_name: :STY_ZERO,
         name: :STY,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :STA_ZERO,
         name: :STA,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :STX_ZERO,
         name: :STX,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :SAX_ZERO,
         name: :SAX,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
@@ -849,7 +849,7 @@ module Rnes
       {
         full_name: :STA_INDY,
         name: :STA,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 6,
       },
       {
@@ -862,25 +862,25 @@ module Rnes
       {
         full_name: :STY_ZEROX,
         name: :STY,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 4,
       },
       {
         full_name: :STA_ZEROX,
         name: :STA,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 4,
       },
       {
         full_name: :STX_ZEROY,
         name: :STX,
-        addressing_mode: :zeroPageY,
+        addressing_mode: :zero_page_y,
         cycle: 4,
       },
       {
         full_name: :SAX_ZEROY,
         name: :SAX,
-        addressing_mode: :zeroPageY,
+        addressing_mode: :zero_page_y,
         cycle: 4,
       },
       {
@@ -892,7 +892,7 @@ module Rnes
       {
         full_name: :STA_ABSY,
         name: :STA,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 4,
       },
       {
@@ -906,7 +906,7 @@ module Rnes
       {
         full_name: :STA_ABSX,
         name: :STA,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 4,
       },
       {},
@@ -920,7 +920,7 @@ module Rnes
       {
         full_name: :LDA_INDX,
         name: :LDA,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 6,
       },
       {
@@ -932,31 +932,31 @@ module Rnes
       {
         full_name: :LAX_INDX,
         name: :LAX,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 6,
       },
       {
         full_name: :LDY_ZERO,
         name: :LDY,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :LDA_ZERO,
         name: :LDA,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :LDX_ZERO,
         name: :LDX,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :LAX_ZERO,
         name: :LAX,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
@@ -1011,7 +1011,7 @@ module Rnes
       {
         full_name: :LDA_INDY,
         name: :LDA,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 5,
       },
       {
@@ -1023,31 +1023,31 @@ module Rnes
       {
         full_name: :LAX_INDY,
         name: :LAX,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 5,
       },
       {
         full_name: :LDY_ZEROX,
         name: :LDY,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 4,
       },
       {
         full_name: :LDA_ZEROX,
         name: :LDA,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 4,
       },
       {
         full_name: :LDX_ZEROY,
         name: :LDX,
-        addressing_mode: :zeroPageY,
+        addressing_mode: :zero_page_y,
         cycle: 4,
       },
       {
         full_name: :LAX_ZEROY,
         name: :LAX,
-        addressing_mode: :zeroPageY,
+        addressing_mode: :zero_page_y,
         cycle: 4,
       },
       {
@@ -1059,7 +1059,7 @@ module Rnes
       {
         full_name: :LDA_ABSY,
         name: :LDA,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 4,
       },
       {
@@ -1072,25 +1072,25 @@ module Rnes
       {
         full_name: :LDY_ABSX,
         name: :LDY,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 4,
       },
       {
         full_name: :LDA_ABSX,
         name: :LDA,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 4,
       },
       {
         full_name: :LDX_ABSY,
         name: :LDX,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 4,
       },
       {
         full_name: :LAX_ABSY,
         name: :LAX,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 4,
       },
       {
@@ -1102,7 +1102,7 @@ module Rnes
       {
         full_name: :CMP_INDX,
         name: :CMP,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 6,
       },
       {
@@ -1114,31 +1114,31 @@ module Rnes
       {
         full_name: :DCP_INDX,
         name: :DCP,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 8,
       },
       {
         full_name: :CPY_ZERO,
         name: :CPY,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :CMP_ZERO,
         name: :CMP,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :DEC_ZERO,
         name: :DEC,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
         full_name: :DCP_ZERO,
         name: :DCP,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
@@ -1193,7 +1193,7 @@ module Rnes
       {
         full_name: :CMP_INDY,
         name: :CMP,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 5,
       },
       {
@@ -1205,7 +1205,7 @@ module Rnes
       {
         full_name: :DCP_INDY,
         name: :DCP,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 8,
       },
       {
@@ -1217,19 +1217,19 @@ module Rnes
       {
         full_name: :CMP_ZEROX,
         name: :CMP,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 4,
       },
       {
         full_name: :DEC_ZEROX,
         name: :DEC,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
         full_name: :DCP_ZEROX,
         name: :DCP,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
@@ -1241,7 +1241,7 @@ module Rnes
       {
         full_name: :CMP_ABSY,
         name: :CMP,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 4,
       },
       {
@@ -1253,7 +1253,7 @@ module Rnes
       {
         full_name: :DCP_ABSY,
         name: :DCP,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 2,
       },
       {
@@ -1265,19 +1265,19 @@ module Rnes
       {
         full_name: :CMP_ABSX,
         name: :CMP,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 4,
       },
       {
         full_name: :DEC_ABSX,
         name: :DEC,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 7,
       },
       {
         full_name: :DCP_ABSX,
         name: :DCP,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 7,
       },
       {
@@ -1289,7 +1289,7 @@ module Rnes
       {
         full_name: :SBC_INDX,
         name: :SBC,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 6,
       },
       {
@@ -1301,31 +1301,31 @@ module Rnes
       {
         full_name: :ISB_INDX,
         name: :ISB,
-        addressing_mode: :preIndexedIndirect,
+        addressing_mode: :pre_indexed_indirect,
         cycle: 8,
       },
       {
         full_name: :CPX_ZERO,
         name: :CPX,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :SBC_ZERO,
         name: :SBC,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 3,
       },
       {
         full_name: :INC_ZERO,
         name: :INC,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
         full_name: :ISB_ZERO,
         name: :ISB,
-        addressing_mode: :zeroPage,
+        addressing_mode: :zero_page,
         cycle: 5,
       },
       {
@@ -1385,7 +1385,7 @@ module Rnes
       {
         full_name: :SBC_INDY,
         name: :SBC,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 5,
       },
       {
@@ -1397,7 +1397,7 @@ module Rnes
       {
         full_name: :ISB_INDY,
         name: :ISB,
-        addressing_mode: :postIndexedIndirect,
+        addressing_mode: :post_indexed_indirect,
         cycle: 8,
       },
       {
@@ -1409,19 +1409,19 @@ module Rnes
       {
         full_name: :SBC_ZEROX,
         name: :SBC,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 4,
       },
       {
         full_name: :INC_ZEROX,
         name: :INC,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
         full_name: :ISB_ZEROX,
         name: :ISB,
-        addressing_mode: :zeroPageX,
+        addressing_mode: :zero_page_x,
         cycle: 6,
       },
       {
@@ -1433,7 +1433,7 @@ module Rnes
       {
         full_name: :SBC_ABSY,
         name: :SBC,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 4,
       },
       {
@@ -1445,7 +1445,7 @@ module Rnes
       {
         full_name: :ISB_ABSY,
         name: :ISB,
-        addressing_mode: :absoluteY,
+        addressing_mode: :absolute_y,
         cycle: 2,
       },
       {
@@ -1457,19 +1457,19 @@ module Rnes
       {
         full_name: :SBC_ABSX,
         name: :SBC,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 4,
       },
       {
         full_name: :INC_ABSX,
         name: :INC,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 7,
       },
       {
         full_name: :ISB_ABSX,
         name: :ISB,
-        addressing_mode: :absoluteX,
+        addressing_mode: :absolute_x,
         cycle: 7,
       },
     ].freeze

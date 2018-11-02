@@ -27,10 +27,10 @@ module Rnes
       rom_loader = ::Rnes::RomLoader.new(rom_bytes)
       @cpu_bus.program_rom = ::Rnes::ProgramRom.new(rom_loader.program_rom_bytes)
       @ppu_bus.character_rom = ::Rnes::CharacterRom.new(rom_loader.character_rom_bytes)
+      @cpu.reset
     end
 
     def run
-      @cpu.reset
       loop(&:tick)
     end
 

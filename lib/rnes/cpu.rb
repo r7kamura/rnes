@@ -55,9 +55,6 @@ module Rnes
     # @param [Rnes::Operation] operation
     def execute_operation_lda(operation)
       value = fetch_value_by_addressing_mode(operation.addressing_mode)
-      if operation.addressing_mode != :immediate
-        value = read(value)
-      end
       registers.a = value
     end
 
@@ -81,30 +78,30 @@ module Rnes
       case addressing_mode
       when :absolute
         fetch_value_by_addressing_mode_absolute
-      when :absoluteX
-        fetch_value_by_addressing_mode_absoluteX
-      when :absoluteY
-        fetch_value_by_addressing_mode_absoluteY
+      when :absolute_x
+        fetch_value_by_addressing_mode_absolute_x
+      when :absolute_y
+        fetch_value_by_addressing_mode_absolute_y
       when :accumulator
         fetch_value_by_addressing_mode_accumulator
       when :immediate
         fetch_value_by_addressing_mode_immediate
       when :implied
         fetch_value_by_addressing_mode_implied
-      when :indirectAbsolute
-        fetch_value_by_addressing_mode_indirectAbsolute
-      when :postIndexedIndirect
-        fetch_value_by_addressing_mode_postIndexedIndirect
-      when :preIndexedIndirect
-        fetch_value_by_addressing_mode_preIndexedIndirect
+      when :indirect_absolute
+        fetch_value_by_addressing_mode_indirect_absolute
+      when :post_indexed_indirect
+        fetch_value_by_addressing_mode_post_indexed_indirect
+      when :pre_indexed_indirect
+        fetch_value_by_addressing_mode_pre_indexed_indirect
       when :relative
         fetch_value_by_addressing_mode_relative
-      when :zeroPage
-        fetch_value_by_addressing_mode_zeroPage
-      when :zeroPageX
-        fetch_value_by_addressing_mode_zeroPageX
-      when :zeroPageY
-        fetch_value_by_addressing_mode_zeroPageY
+      when :zero_page
+        fetch_value_by_addressing_mode_zero_page
+      when :zero_page_x
+        fetch_value_by_addressing_mode_zero_page_x
+      when :zero_page_y
+        fetch_value_by_addressing_mode_zero_page_y
       else
         raise ::Rnes::Errors::UnknownAddressingModeError, "Unknown addressing mode: #{addressing_mode}"
       end
@@ -113,6 +110,12 @@ module Rnes
     # @return [Integer]
     def fetch_value_by_addressing_mode_immediate
       fetch
+    end
+
+    # @return [Integer]
+    def fetch_value_by_addressing_mode_zero_page
+      address = fetch
+      read(address)
     end
 
     # @param [Integer] address
