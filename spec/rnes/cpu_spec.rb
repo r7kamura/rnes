@@ -123,7 +123,7 @@ RSpec.describe Rnes::Cpu do
         0x01
       end
 
-      it 'fetches value and sets it to accumulator' do
+      it 'sets fetched value to accumulator' do
         expect { subject }.to change(cpu.registers, :pc).by(2)
         expect(cpu.registers.a).to eq(value)
       end
@@ -162,7 +162,7 @@ RSpec.describe Rnes::Cpu do
         0x00
       end
 
-      it 'fetches address, read value, and sets it to accumulator' do
+      it 'sets value from fetched address to accumulator' do
         expect { subject }.to change(cpu.registers, :pc).by(2)
         expect(cpu.registers.a).to eq(value)
       end
@@ -213,7 +213,7 @@ RSpec.describe Rnes::Cpu do
         1
       end
 
-      it 'fetches address, adds x, read value, and sets it to accumulator' do
+      it 'sets value from fetched address + x to accumulator' do
         expect { subject }.to change(cpu.registers, :pc).by(2)
         expect(cpu.registers.a).to eq(value)
       end
@@ -237,7 +237,7 @@ RSpec.describe Rnes::Cpu do
         :STA_ZERO
       end
 
-      it 'writes accumulator value into fetched address' do
+      it 'sets value from accumulator to fetched address' do
         expect { subject }.to change(cpu.registers, :pc).by(2)
         expect(ram.read(address)).to eq(accumulator_value)
       end
