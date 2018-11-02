@@ -16,6 +16,17 @@ RSpec.describe Rnes::Ppu do
       ppu.tick
     end
 
+    context 'on cycle 8 on line 0' do
+      before do
+        ppu.cycle = 5
+        ppu.line = 0
+      end
+
+      it do
+        subject
+      end
+    end
+
     context 'on cycle 340 on line 0' do
       before do
         ppu.cycle = 340

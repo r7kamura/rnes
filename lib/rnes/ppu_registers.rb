@@ -29,6 +29,11 @@ module Rnes
     end
 
     # @return [Boolean]
+    def has_large_video_ram_address_offset_bit?
+      @control1[4] == 1
+    end
+
+    # @return [Boolean]
     def has_sprite_enabled_bit?
       @control2[4] == 1
     end
