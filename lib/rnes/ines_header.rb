@@ -9,9 +9,9 @@ module Rnes
       0x1A, # end-of-file in MS-DOS
     ]
 
-    # @param [Array<Integer>] data
-    def initialize(data)
-      @data = data
+    # @param [Array<Integer>] bytes
+    def initialize(bytes)
+      @bytes = bytes
     end
 
     # @return [Integer]
@@ -21,12 +21,12 @@ module Rnes
 
     # @return [Integer]
     def character_ram_bytesize
-      @data[8]
+      @bytes[8]
     end
 
     # @return [Integer]
     def character_rom_bytesize
-      @data[5] * 8 * 2 ** 10
+      @bytes[5] * 8 * 2 ** 10
     end
 
     # @return [Boolean]
@@ -57,7 +57,7 @@ module Rnes
 
     # @return [Integer]
     def program_rom_bytesize
-      @data[4] * 16 * 2 ** 10
+      @bytes[4] * 16 * 2 ** 10
     end
 
     # @return [Integer]
@@ -71,19 +71,19 @@ module Rnes
 
     # @return [Boolean]
     def valid?
-      @data[0..3] == PREFIX_BYTES
+      @bytes[0..3] == PREFIX_BYTES
     end
 
     private
 
     # @return [Integer]
     def flags1
-      @data[6]
+      @bytes[6]
     end
 
     # @return [Integer]
     def flags2
-      @data[7]
+      @bytes[7]
     end
   end
 end

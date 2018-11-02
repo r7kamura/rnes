@@ -1,10 +1,10 @@
 RSpec.describe Rnes::RomLoader do
-  let(:data) do
+  let(:bytes) do
      ines_header_bytes + trainer_bytes + program_rom_bytes + character_rom_bytes
   end
 
   let(:rom_loader) do
-    described_class.new(data)
+    described_class.new(bytes)
   end
 
   shared_context 'with 0 byte trainer, 0 byte program ROM, and 0 byte character ROM' do
@@ -43,7 +43,7 @@ RSpec.describe Rnes::RomLoader do
   end
 
   shared_context 'with invalid iNES header' do
-    let(:data) do
+    let(:bytes) do
       []
     end
   end
