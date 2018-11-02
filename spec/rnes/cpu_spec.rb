@@ -58,8 +58,21 @@ RSpec.describe Rnes::Cpu do
     end
 
     before do
+      program_rom.write(0x0000, operation_code)
+      program_rom.write(0x3FFC, program_counter_after_reset & 0xFF)
+      program_rom.write(0x3FFD, program_counter_after_reset >> 8)
       cpu_bus.program_rom = program_rom
-      allow(cpu).to receive(:fetch_operation_code).and_return(operation_code)
+      cpu.reset
+    end
+
+    let(:program_counter_after_reset) do
+      0x8000
+    end
+
+    let(:operation_code) do
+      Rnes::Operation::RECORDS.find_index do |record|
+        record[:full_name] == operation_full_name
+      end
     end
 
     context 'with unknown operation' do
@@ -73,17 +86,25 @@ RSpec.describe Rnes::Cpu do
     end
 
     context 'with BRK operation' do
-      let(:operation_code) do
-        Rnes::Operation::RECORDS.find_index do |record|
-          record[:full_name] == :BRK
-        end
+      let(:operation_full_name) do
+        :BRK
       end
 
       it 'sets break bit' do
         subject
         expect(cpu.registers).to have_break_bit
-        expect(cpu.registers.pc).to eq(-1)
-        expect(cpu.registers.sp).to eq(-3)
+        expect(cpu.registers.pc).to eq(program_counter_after_reset)
+      end
+    end
+
+    context 'with LDA_IMM operation' do
+      let(:operation_full_name) do
+        :LDA_IMM
+      end
+
+      it 'fetches value and sets it to accumulator' do
+        expect { subject }.to change(cpu.registers, :pc).by(2)
+        expect(cpu.registers.a).to eq(0)
       end
     end
   end

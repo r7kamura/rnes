@@ -31,8 +31,10 @@ module Rnes
       case operation.name
       when :BRK
         execute_operation_brk(operation)
+      when :LDA
+        execute_operation_lda(operation)
       else
-        raise ::Rnes::Errors::UnknownOperationError
+        raise ::Rnes::Errors::UnknownOperationError, "Unknown operation: #{operation.name}"
       end
     end
 
@@ -48,18 +50,69 @@ module Rnes
       registers.pc -= 1
     end
 
-    # @return [Rnes::Operation]
-    def fetch_operation
-      operation_code = fetch_operation_code
-      ::Rnes::Operation.build(operation_code)
+    # @todo negative check
+    # @todo zero check
+    # @param [Rnes::Operation] operation
+    def execute_operation_lda(operation)
+      value = fetch_value_by_addressing_mode(operation.addressing_mode)
+      if operation.addressing_mode != :immediate
+        value = read(value)
+      end
+      registers.a = value
     end
 
     # @return [Integer]
-    def fetch_operation_code
+    def fetch
       address = @registers.pc
-      operation_code = read(address)
+      value = read(address)
       @registers.pc += 1
-      operation_code
+      value
+    end
+
+    # @return [Rnes::Operation]
+    def fetch_operation
+      operation_code = fetch
+      ::Rnes::Operation.build(operation_code)
+    end
+
+    # @param [Symbol] addressing_mode
+    # @return [Integer]
+    def fetch_value_by_addressing_mode(addressing_mode)
+      case addressing_mode
+      when :absolute
+        fetch_value_by_addressing_mode_absolute
+      when :absoluteX
+        fetch_value_by_addressing_mode_absoluteX
+      when :absoluteY
+        fetch_value_by_addressing_mode_absoluteY
+      when :accumulator
+        fetch_value_by_addressing_mode_accumulator
+      when :immediate
+        fetch_value_by_addressing_mode_immediate
+      when :implied
+        fetch_value_by_addressing_mode_implied
+      when :indirectAbsolute
+        fetch_value_by_addressing_mode_indirectAbsolute
+      when :postIndexedIndirect
+        fetch_value_by_addressing_mode_postIndexedIndirect
+      when :preIndexedIndirect
+        fetch_value_by_addressing_mode_preIndexedIndirect
+      when :relative
+        fetch_value_by_addressing_mode_relative
+      when :zeroPage
+        fetch_value_by_addressing_mode_zeroPage
+      when :zeroPageX
+        fetch_value_by_addressing_mode_zeroPageX
+      when :zeroPageY
+        fetch_value_by_addressing_mode_zeroPageY
+      else
+        raise ::Rnes::Errors::UnknownAddressingModeError, "Unknown addressing mode: #{addressing_mode}"
+      end
+    end
+
+    # @return [Integer]
+    def fetch_value_by_addressing_mode_immediate
+      fetch
     end
 
     # @param [Integer] address

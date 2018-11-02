@@ -11,9 +11,13 @@ module Rnes
     end
 
     # @param [Integer] address
-    # @return [Integer]
+    # @param [Integer] value
     def read(address)
       @bytes[address]
+    end
+
+    def write(address, value)
+      @bytes[address] = value
     end
   end
 end

@@ -9,6 +9,11 @@ module Rnes
     OVERFLOW_BIT_INDEX = 6
     NEGATIVE_BIT_INDEX = 7
 
+    # @note accumulator
+    # @param [Integer]
+    # @return [Integer]
+    attr_accessor :a
+
     # @note program counter
     # @param [Integer]
     # @return [Integer]
