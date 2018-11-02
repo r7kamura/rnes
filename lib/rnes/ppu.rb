@@ -1,10 +1,18 @@
 module Rnes
   class Ppu
-    # @todo
+    # @param [Rnes::PpuBus] bus
+    def initialize(bus:)
+      @bus = bus
+    end
+
     # @param [Integer] address
     # @return [Integer]
     def read(address)
-      0
+      @bus.read(address)
+    end
+
+    # @todo
+    def tick
     end
   end
 end

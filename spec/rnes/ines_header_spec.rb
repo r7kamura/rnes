@@ -1,6 +1,6 @@
 RSpec.describe Rnes::InesHeader do
   let(:ines_header) do
-    described_class.new(bytes)
+    described_class.new(rom_bytes)
   end
 
   describe '#valid?' do
@@ -9,7 +9,7 @@ RSpec.describe Rnes::InesHeader do
     end
 
     context 'with invalid bytes' do
-      let(:bytes) do
+      let(:rom_bytes) do
         []
       end
 
@@ -19,7 +19,7 @@ RSpec.describe Rnes::InesHeader do
     end
 
     context 'with leading NES + 0x1A bytes' do
-      let(:bytes) do
+      let(:rom_bytes) do
         'NES'.chars.map(&:ord) + [0x1A]
       end
 

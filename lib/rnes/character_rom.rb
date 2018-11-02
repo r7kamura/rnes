@@ -1,5 +1,5 @@
 module Rnes
-  class ProgramRom
+  class CharacterRom
     # @param [Integer] bytes
     def initialize(bytes)
       @bytes = bytes

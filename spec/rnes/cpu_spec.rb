@@ -1,6 +1,6 @@
 RSpec.describe Rnes::Cpu do
   let(:cpu) do
-    described_class.new(cpu_bus)
+    described_class.new(bus: cpu_bus)
   end
 
   let(:cpu_bus) do
@@ -8,11 +8,21 @@ RSpec.describe Rnes::Cpu do
   end
 
   let(:ppu) do
-    Rnes::Ppu.new
+    Rnes::Ppu.new(bus: ppu_bus)
+  end
+
+  let(:ppu_bus) do
+    Rnes::PpuBus.new
   end
 
   let(:program_rom) do
-    Rnes::ProgramRom.new
+    Rnes::ProgramRom.new(program_rom_bytes)
+  end
+
+  let(:program_rom_bytes) do
+    Array.new(16 * 2 ** 10).map do
+      0
+    end
   end
 
   let(:ram) do

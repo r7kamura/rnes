@@ -9,7 +9,7 @@ module Rnes
     attr_reader :registers
 
     # @param [Rnes::CpuBus] bus
-    def initialize(bus)
+    def initialize(bus:)
       @bus = bus
       @registers = ::Rnes::CpuRegisters.new
     end
@@ -101,10 +101,10 @@ module Rnes
       read(registers.sp & 0xFF | 0x100)
     end
 
-    # @todo
     # @param [Integer] address
     # @param [Integer] value
     def write(address, value)
+      @bus.write(address, value)
     end
   end
 end

@@ -3,7 +3,8 @@ require 'rnes/errors'
 module Rnes
   class CpuBus
     # @param [Rnes::ProgramRom]
-    attr_writer :program_rom
+    # @return [Rnes::ProgramRom]
+    attr_accessor :program_rom
 
     # @param [Rnes::Ppu] ppu
     # @param [Rnes::Ram] ram
@@ -46,6 +47,12 @@ module Rnes
       else
         raise ::Rnes::Errors::InvalidAddressError.new
       end
+    end
+
+    # @todo
+    # @param [Integer] address
+    # @param [Integer] value
+    def write(address, value)
     end
 
     private
