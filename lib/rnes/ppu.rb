@@ -120,17 +120,17 @@ module Rnes
       when 0x2001
         registers.control2 = value
       when 0x2003
-        # TODO sprite address register
+        # TODO: sprite address register
       when 0x2004
-        # TODO sprite address register
+        # TODO: sprite address register
       when 0x2005
-        # TODO scroll register
+        # TODO: scroll register
       when 0x2006
-        # TODO VRAM address register
+        # TODO: VRAM address register
       when 0x2007
-        # TODO VRAM access register
+        # TODO: VRAM access register
       when 0x4014
-        # TODO sprite DMA register
+        # TODO: sprite DMA register
       else
         raise ::Rnes::Errors::UnknownPpuAddressError, "Unknown address: #{address}"
       end

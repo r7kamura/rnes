@@ -24,9 +24,9 @@ module Rnes
       when 0x3000..0x3EFF
         @ram.read(address - 0x1000)
       when 0x3F00..0x3E0F
-        # TODO backgroud palette table
+        # TODO: backgroud palette table
       when 0x3F10..0x3F1F
-        # TODO sprite palette table
+        # TODO: sprite palette table
       when 0x3F20..0x3FFF
         read(address - 20) # mirror to 0x3F00..0x3F1F
       when 0x4000..0xFFFF
