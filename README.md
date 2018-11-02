@@ -1,5 +1,7 @@
 # Rnes
 
+![Travis CI badge](https://travis-ci.org/r7kamura/rnes.svg?branch=master)
+
 A NES emulator written in Ruby.
 
 ## Installation
