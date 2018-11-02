@@ -1,0 +1,28 @@
+jobs:
+  rspec:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          command: bundle install
+          name: bundle install
+      - run:
+          command: bundle exec rspec
+          name: rspec
+  rubocop:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          command: bundle install
+          name: bundle install
+      - run:
+          command: bundle exec rubocop
+          name: rubocop
+version: 2
+workflows:
+  version: 2
+  test:
+    jobs:
+      - rspec
+      - rubocop
