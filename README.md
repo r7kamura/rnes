@@ -1,6 +1,6 @@
 # Rnes
 
-[![Travis CI badge](https://travis-ci.org/r7kamura/rnes.svg?branch=master)](https://travis-ci.org/r7kamura/rnes)
+[![CircleCI](https://circleci.com/gh/r7kamura/rnes.svg?style=svg)](https://circleci.com/gh/r7kamura/rnes)
 
 A NES emulator written in Ruby.
 
