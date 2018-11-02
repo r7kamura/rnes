@@ -167,5 +167,56 @@ RSpec.describe Rnes::Cpu do
         expect(cpu.registers.a).to eq(value)
       end
     end
+
+    # Program ROM state
+    #
+    # | address | value |
+    # | ------- | ----- |
+    # | 0x0000  | 0xB5  |
+    # | 0x0001  | 0x00  |
+    # | ...     | ...   |
+    # | 0x3FFC  | 0x00  |
+    # | 0x3FFD  | 0x80  |
+    #
+    # RAM state
+    #
+    # | address | value |
+    # | ------- | ----- |
+    # | 0x0000  | 0x00  |
+    # | 0x0001  | 0x01  |
+    #
+    # CPU registers state
+    #
+    # | name    | value |
+    # | ------- | ----- |
+    # | x       | 0x01  |
+    context 'with LDA_ZEROX operation' do
+      before do
+        program_rom_bytes[0x0001] = value_base_address
+        ram.write(value_base_address + x, value)
+        cpu.registers.x = x
+      end
+
+      let(:operation_full_name) do
+        :LDA_ZEROX
+      end
+
+      let(:value) do
+        0x01
+      end
+
+      let(:value_base_address) do
+        0x00
+      end
+
+      let(:x) do
+        1
+      end
+
+      it 'fetches address, adds x, read value, and sets it to accumulator' do
+        expect { subject }.to change(cpu.registers, :pc).by(2)
+        expect(cpu.registers.a).to eq(value)
+      end
+    end
   end
 end

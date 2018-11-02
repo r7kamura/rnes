@@ -28,6 +28,16 @@ module Rnes
     # @return [Integer]
     attr_reader :p
 
+    # @note index X
+    # @param [Integer]
+    # @return [Integer]
+    attr_accessor :x
+
+    # @note index Y
+    # @param [Integer]
+    # @return [Integer]
+    attr_accessor :y
+
     def initialize
       @a = 0x00
       @p = 0b00000000

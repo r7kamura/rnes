@@ -19,6 +19,7 @@ module Rnes
       @registers.pc = read_word(0xFFFC)
     end
 
+    # @todo Cycle calculation by using Rnes::Operation#cycle.
     def tick
       operation = fetch_operation
       execute_operation(operation)
@@ -115,6 +116,20 @@ module Rnes
     # @return [Integer]
     def fetch_value_by_addressing_mode_zero_page
       address = fetch
+      read(address)
+    end
+
+    # @return [Integer]
+    def fetch_value_by_addressing_mode_zero_page_x
+      address = fetch
+      address = (address + registers.x) & 0xFF
+      read(address)
+    end
+
+    # @return [Integer]
+    def fetch_value_by_addressing_mode_zero_page_y
+      address = fetch
+      address = (address + registers.y) & 0xFF
       read(address)
     end
 
