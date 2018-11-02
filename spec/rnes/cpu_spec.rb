@@ -100,23 +100,32 @@ RSpec.describe Rnes::Cpu do
       end
     end
 
-    # Program ROM
+    # Program ROM state
     #
     # | address | value |
     # | ------- | ----- |
     # | 0x0000  | 0xA9  | <- cpu.cpu_bus.read(0x8000) will return 0xA9 (LDA_IMM)
+    # | 0x0001  | 0x01  | <- immediate value
     # | ...     | ...   |
     # | 0x3FFC  | 0x00  |
     # | 0x3FFD  | 0x80  | <- program counter will be 0x8000 after reset
     #
     context 'with LDA_IMM operation' do
+      before do
+        program_rom.write(0x0001, immediate_value)
+      end
+
+      let(:immediate_value) do
+        0x01
+      end
+
       let(:operation_full_name) do
         :LDA_IMM
       end
 
       it 'fetches value and sets it to accumulator' do
         expect { subject }.to change(cpu.registers, :pc).by(2)
-        expect(cpu.registers.a).to eq(0)
+        expect(cpu.registers.a).to eq(immediate_value)
       end
     end
   end
