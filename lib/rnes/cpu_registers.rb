@@ -96,16 +96,6 @@ module Rnes
       @y = 0x00
     end
 
-    # @param [Integer] index
-    # @param [Boolean] boolean
-    def toggle_bit(index, boolean)
-      if boolean
-        @p |= 1 << index
-      else
-        @p &= ~(1 << index)
-      end
-    end
-
     # @param [Boolean] boolean
     def toggle_break_bit(boolean)
       toggle_bit(BREAK_BIT_INDEX, boolean)
@@ -144,6 +134,18 @@ module Rnes
     # @param [Boolean] boolean
     def toggle_zero_bit(boolean)
       toggle_bit(ZERO_BIT_INDEX, boolean)
+    end
+
+    private
+
+    # @param [Integer] index
+    # @param [Boolean] boolean
+    def toggle_bit(index, boolean)
+      if boolean
+        @p |= 1 << index
+      else
+        @p &= ~(1 << index)
+      end
     end
   end
 end
