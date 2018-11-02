@@ -97,6 +97,15 @@ RSpec.describe Rnes::Cpu do
       end
     end
 
+    # Program ROM
+    #
+    # | address | value |
+    # | ------- | ----- |
+    # | 0x0000  | 0xA9  | <- cpu.cpu_bus.read(0x8000) will return 0xA9 (LDA_IMM)
+    # | ...     | ...   |
+    # | 0x3FFC  | 0x00  |
+    # | 0x3FFD  | 0x80  | <- program counter will be 0x8000 after reset
+    #
     context 'with LDA_IMM operation' do
       let(:operation_full_name) do
         :LDA_IMM
