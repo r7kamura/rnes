@@ -47,6 +47,11 @@ module Rnes
       @y = 0x00
     end
 
+    # @return [Integer]
+    def carry_bit
+      @p[CARRY_BIT_INDEX]
+    end
+
     # @return [Boolean]
     def has_break_bit?
       @p[BREAK_BIT_INDEX] == 1

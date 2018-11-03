@@ -82,16 +82,6 @@ RSpec.describe Rnes::Cpu do
       end
     end
 
-    context 'with unknown operation' do
-      let(:operation_code) do
-        0xFF
-      end
-
-      it 'raises Rnes::Errors::UnknownOperationError' do
-        expect { subject }.to raise_error(Rnes::Errors::UnknownOperationError)
-      end
-    end
-
     context 'with BRK operation' do
       let(:operation_full_name) do
         :BRK

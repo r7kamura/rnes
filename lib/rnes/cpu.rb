@@ -27,40 +27,227 @@ module Rnes
 
     private
 
+    # @param [Integer] value
+    def adjust_carry_bit(value)
+      flag = value > 0xFF
+      registers.toggle_carry_bit(flag)
+    end
+
+    # @param [Integer] value
+    def adjust_negative_bit(value)
+      flag = value.negative?
+      registers.toggle_negative_bit(flag)
+    end
+
+    # @param [Integer] value
+    def adjust_overflow_bit(value)
+      flag = value >= 0xFF || value < -0xFF
+      registers.toggle_overflow_bit(flag)
+    end
+
+    # @param [Integer] value
+    def adjust_zero_bit(value)
+      flag = value.zero?
+      registers.toggle_zero_bit(flag)
+    end
+
+    # @param [Integer] address
+    def branch(address)
+      registers.pc = address
+    end
+
     # @param [Rnes::Operation] operation
     def execute_operation(operation)
       case operation.name
+      when :ADC
+        execute_operation_adc(operation)
+      when :AND
+        execute_operation_and(operation)
+      when :ASL
+        execute_operation_asl(operation)
+      when :BCC
+        execute_operation_bcc(operation)
+      when :BCS
+        execute_operation_bcs(operation)
+      when :BEQ
+        execute_operation_beq(operation)
+      when :BIT
+        execute_operation_bit(operation)
+      when :BMI
+        execute_operation_bmi(operation)
       when :BNE
         execute_operation_bne(operation)
       when :BPL
         execute_operation_bpl(operation)
       when :BRK
         execute_operation_brk(operation)
+      when :BVC
+        execute_operation_bvc(operation)
+      when :BVS
+        execute_operation_bvs(operation)
+      when :CLC
+        execute_operation_clc(operation)
       when :CLD
         execute_operation_cld(operation)
+      when :CLI
+        execute_operation_cli(operation)
+      when :CLV
+        execute_operation_clv(operation)
+      when :CMP
+        execute_operation_cmp(operation)
+      when :CPX
+        execute_operation_cpx(operation)
+      when :CPY
+        execute_operation_cpy(operation)
+      when :DCP
+        execute_operation_dcp(operation)
+      when :DEC
+        execute_operation_dec(operation)
+      when :DEX
+        execute_operation_dex(operation)
       when :DEY
         execute_operation_dey(operation)
+      when :EOR
+        execute_operation_eor(operation)
+      when :INC
+        execute_operation_inc(operation)
       when :INX
         execute_operation_inx(operation)
+      when :INY
+        execute_operation_iny(operation)
+      when :ISB
+        execute_operation_isb(operation)
       when :JMP
         execute_operation_jmp(operation)
       when :JSR
         execute_operation_jsr(operation)
+      when :LAX
+        execute_operation_lax(operation)
       when :LDA
         execute_operation_lda(operation)
       when :LDX
         execute_operation_ldx(operation)
       when :LDY
         execute_operation_ldy(operation)
+      when :LSR
+        execute_operation_lsr(operation)
+      when :NOP
+        execute_operation_nop(operation)
+      when :NOPD
+        execute_operation_nopd(operation)
+      when :NOPI
+        execute_operation_nopi(operation)
+      when :ORA
+        execute_operation_ora(operation)
+      when :PHA
+        execute_operation_pha(operation)
+      when :PHP
+        execute_operation_php(operation)
+      when :PLA
+        execute_operation_pla(operation)
+      when :PLP
+        execute_operation_plp(operation)
+      when :RLA
+        execute_operation_rla(operation)
+      when :ROL
+        execute_operation_rol(operation)
+      when :ROR
+        execute_operation_ror(operation)
+      when :RRA
+        execute_operation_rra(operation)
+      when :RTI
+        execute_operation_rti(operation)
+      when :RTS
+        execute_operation_rts(operation)
+      when :SAX
+        execute_operation_sax(operation)
+      when :SBC
+        execute_operation_sbc(operation)
+      when :SEC
+        execute_operation_sec(operation)
+      when :SED
+        execute_operation_sed(operation)
       when :SEI
         execute_operation_sei(operation)
+      when :SLO
+        execute_operation_slo(operation)
+      when :SRE
+        execute_operation_sre(operation)
       when :STA
         execute_operation_sta(operation)
+      when :STX
+        execute_operation_stx(operation)
+      when :STY
+        execute_operation_sty(operation)
+      when :TAX
+        execute_operation_tax(operation)
+      when :TAY
+        execute_operation_tay(operation)
+      when :TSX
+        execute_operation_tsx(operation)
+      when :TXA
+        execute_operation_txa(operation)
       when :TXS
         execute_operation_txs(operation)
+      when :TYA
+        execute_operation_tya(operation)
       else
         raise ::Rnes::Errors::UnknownOperationError, "Unknown operation: #{operation.name}"
       end
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_adc(operation)
+      result = fetch_value_by_addressing_mode_with_optional_read(operation.addressing_mode) + registers.x + registers.carry_bit
+      adjust_carry_bit(result)
+      adjust_negative_bit(result)
+      adjust_overflow_bit(result)
+      adjust_zero_bit(result)
+      registers.a = result & 0xFF
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_and(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_asl(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_bcc(operation)
+      unless registers.has_carry_bit?
+        address = fetch_value_by_addressing_mode(operation.addressing_mode)
+        branch(address)
+      end
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_bcs(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_beq(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_bit(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_bmi(_operation)
+      raise ::NotImplementedError
     end
 
     # @param [Rnes::Operation] operation
@@ -90,25 +277,112 @@ module Rnes
       registers.pc -= 1
     end
 
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_bvc(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_bvs(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_clc(_operation)
+      registers.toggle_carry_bit(true)
+    end
+
     # @param [Rnes::Operation] operation
     def execute_operation_cld(_operation)
       registers.toggle_decimal_bit(false)
     end
 
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_cli(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_clv(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_cmp(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_cpx(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_cpy(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_dcp(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_dec(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_dex(_operation)
+      result = registers.x - 1
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
+      registers.x = result & 0xFF
+    end
+
     # @param [Rnes::Operation] operation
     def execute_operation_dey(_operation)
-      value = (registers.y - 1) & 0xFF
-      registers.y = value
-      registers.toggle_negative_bit(value.negative?)
-      registers.toggle_zero_bit(value.zero?)
+      result = registers.y - 1
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
+      registers.y = result & 0xFF
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_eor(_operation)
+      raise ::NotImplementedError
     end
 
     # @param [Rnes::Operation] operation
     def execute_operation_inx(_operation)
-      value = (registers.x + 1) & 0xFF
-      registers.x = value
-      registers.toggle_negative_bit(value.negative?)
-      registers.toggle_zero_bit(value.zero?)
+      result = registers.x + 1
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
+      registers.x = result & 0xFF
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_iny(_operation)
+      result = registers.y + 1
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
+      registers.y = result & 0xFF
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_isb(_operation)
+      raise NotImplementedError
     end
 
     # @param [Rnes::Operation] operation
@@ -123,29 +397,146 @@ module Rnes
       registers.pc = fetch_value_by_addressing_mode(operation.addressing_mode)
     end
 
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_lax(_operation)
+      raise NotImplementedError
+    end
+
     # @param [Rnes::Operation] operation
     def execute_operation_lda(operation)
-      value = fetch_value_by_addressing_mode(operation.addressing_mode)
-      value = read(value) if operation.addressing_mode != :immediate
-      registers.a = value
-      registers.toggle_negative_bit(value.negative?)
-      registers.toggle_zero_bit(value.zero?)
+      result = fetch_value_by_addressing_mode_with_optional_read(operation.addressing_mode)
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
+      registers.a = result
     end
 
     # @param [Rnes::Operation] operation
     def execute_operation_ldx(operation)
-      value = fetch_value_by_addressing_mode(operation.addressing_mode)
-      registers.x = value
-      registers.toggle_negative_bit(value.negative?)
-      registers.toggle_zero_bit(value.zero?)
+      result = fetch_value_by_addressing_mode_with_optional_read(operation.addressing_mode)
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
+      registers.x = result
     end
 
     # @param [Rnes::Operation] operation
     def execute_operation_ldy(operation)
-      value = fetch_value_by_addressing_mode(operation.addressing_mode)
-      registers.y = value
-      registers.toggle_negative_bit(value.negative?)
-      registers.toggle_zero_bit(value.zero?)
+      result = fetch_value_by_addressing_mode_with_optional_read(operation.addressing_mode)
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
+      registers.y = result
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_lsr(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_nop(_operation)
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_nopd(_operation)
+      registers.pc += 1
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_nopi(_operation)
+      registers.pc += 2
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_ora(operation)
+      value = registers.a | fetch_value_by_addressing_mode_with_optional_read(operation.addressing_mode)
+      adjust_negative_bit(value)
+      adjust_zero_bit(value)
+      registers.a = value % 0xFF
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_pha(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_php(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_pla(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_plp(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_rla(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_rol(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_ror(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_rra(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_rti(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_rts(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_sax(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_sbc(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_sec(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_sed(_operation)
+      raise ::NotImplementedError
     end
 
     # @param [Rnes::Operation] operation
@@ -153,17 +544,71 @@ module Rnes
       registers.toggle_interrupt_bit(true)
     end
 
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_slo(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_sre(_operation)
+      raise ::NotImplementedError
+    end
+
     # @param [Rnes::Operation] operation
     def execute_operation_sta(operation)
-      write(
-        fetch_value_by_addressing_mode(operation.addressing_mode),
-        registers.a
-      )
+      address = fetch_value_by_addressing_mode(operation.addressing_mode)
+      write(address, registers.a)
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_stx(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_sty(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_tax(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_tay(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_tsx(_operation)
+      raise ::NotImplementedError
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_txa(_operation)
+      value = registers.x
+      adjust_negative_bit(value)
+      adjust_zero_bit(value)
+      registers.a = value
     end
 
     # @param [Rnes::Operation] operation
     def execute_operation_txs(_operation)
       registers.sp = registers.x + 0x100
+    end
+
+    # @todo
+    # @param [Rnes::Operation] operation
+    def execute_operation_tya(_operation)
+      raise ::NotImplementedError
     end
 
     # @return [Integer]
@@ -213,6 +658,14 @@ module Rnes
       else
         raise ::Rnes::Errors::UnknownAddressingModeError, "Unknown addressing mode: #{addressing_mode}"
       end
+    end
+
+    # @param [Symbol] addressing_mode
+    # @return [Integer]
+    def fetch_value_by_addressing_mode_with_optional_read(addressing_mode)
+      value = fetch_value_by_addressing_mode(addressing_mode)
+      value = read(value) if addressing_mode != :immediate
+      value
     end
 
     # @return [Integer]
