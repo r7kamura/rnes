@@ -239,8 +239,28 @@ module Rnes
       @bus.read(sprite_line_low_byte_address)
     end
 
-    # @todo
     def render_image
+      puts "\e[61A\e[128D";
+      60.times do |y_of_character|
+        128.times do |x_of_character|
+          base = y_of_character * 4 * 256 + x_of_character * 2
+          print(
+            (
+              (
+                 (@image[base + 256 * 0 + 0] == [0, 0, 0] ? 0 : 1) |
+                ((@image[base + 256 * 1 + 0] == [0, 0, 0] ? 0 : 1) << 1) |
+                ((@image[base + 256 * 2 + 0] == [0, 0, 0] ? 0 : 1) << 2) |
+                ((@image[base + 256 * 0 + 1] == [0, 0, 0] ? 0 : 1) << 3) |
+                ((@image[base + 256 * 1 + 1] == [0, 0, 0] ? 0 : 1) << 4) |
+                ((@image[base + 256 * 2 + 1] == [0, 0, 0] ? 0 : 1) << 5) |
+                ((@image[base + 256 * 3 + 0] == [0, 0, 0] ? 0 : 1) << 6) |
+                ((@image[base + 256 * 3 + 1] == [0, 0, 0] ? 0 : 1) << 7)
+              ) + 0x2800
+            ).chr('UTF-8')
+          )
+        end
+        puts
+      end
     end
 
     def set_v_blank
