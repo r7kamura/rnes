@@ -120,7 +120,7 @@ RSpec.describe Rnes::Cpu do
 
       it 'sets fetched value to accumulator' do
         expect { subject }.to change(cpu.registers, :program_counter).by(2)
-        expect(cpu.registers.a).to eq(value)
+        expect(cpu.registers.accumlator).to eq(value)
       end
     end
 
@@ -159,7 +159,7 @@ RSpec.describe Rnes::Cpu do
 
       it 'sets value from fetched address to accumulator' do
         expect { subject }.to change(cpu.registers, :program_counter).by(2)
-        expect(cpu.registers.a).to eq(value)
+        expect(cpu.registers.accumlator).to eq(value)
       end
     end
 
@@ -210,14 +210,14 @@ RSpec.describe Rnes::Cpu do
 
       it 'sets value from fetched address + x to accumulator' do
         expect { subject }.to change(cpu.registers, :program_counter).by(2)
-        expect(cpu.registers.a).to eq(value)
+        expect(cpu.registers.accumlator).to eq(value)
       end
     end
 
     context 'with STA_ZERO' do
       before do
         program_rom_bytes[0x0001] = address
-        cpu.registers.a = accumulator_value
+        cpu.registers.accumlator = accumulator_value
       end
 
       let(:accumulator_value) do

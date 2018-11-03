@@ -199,7 +199,7 @@ module Rnes
       adjust_negative_bit(result)
       adjust_overflow_bit(result)
       adjust_zero_bit(result)
-      registers.a = result & 0xFF
+      registers.accumlator = result & 0xFF
     end
 
     # @todo
@@ -240,7 +240,7 @@ module Rnes
       result = read(operand)
       registers.toggle_overflow_bit(result[6] != 0)
       adjust_negative_bit(result)
-      adjust_zero_bit(registers.a & result)
+      adjust_zero_bit(registers.accumlator & result)
     end
 
     # @todo
@@ -311,7 +311,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_cmp(operand)
-      result = registers.a - operand
+      result = registers.accumlator - operand
       registers.toggle_carry_bit(result >= 0)
       adjust_negative_bit(result)
       adjust_zero_bit(result)
@@ -365,10 +365,10 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_eor(operand)
-      result = operand ^ registers.a
+      result = operand ^ registers.accumlator
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.a = result & 0xFF
+      registers.accumlator = result & 0xFF
     end
 
     # @param [Integer] operand
@@ -422,7 +422,7 @@ module Rnes
     def execute_operation_lda(operand)
       adjust_negative_bit(operand)
       adjust_zero_bit(operand)
-      registers.a = operand
+      registers.accumlator = operand
     end
 
     # @param [Integer] operand
@@ -461,15 +461,15 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_ora(operand)
-      result = registers.a | operand
+      result = registers.accumlator | operand
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.a = result % 0xFF
+      registers.accumlator = result % 0xFF
     end
 
     # @param [Integer] operand
     def execute_operation_pha(_operand)
-      push(registers.a)
+      push(registers.accumlator)
     end
 
     # @todo
@@ -483,7 +483,7 @@ module Rnes
       result = pop
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.a = result
+      registers.accumlator = result
     end
 
     # @todo
@@ -537,12 +537,12 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_sbc(operand)
-      result = registers.a - operand - 1 + registers.carry_bit
-      registers.toggle_overflow_bit((registers.a ^ result) & 0x80 != 0 && ((registers.a ^ operand) & 0x80) != 0)
+      result = registers.accumlator - operand - 1 + registers.carry_bit
+      registers.toggle_overflow_bit((registers.accumlator ^ result) & 0x80 != 0 && ((registers.accumlator ^ operand) & 0x80) != 0)
       registers.toggle_carry_bit(result >= 0)
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.a = result & 0xFF
+      registers.accumlator = result & 0xFF
     end
 
     # @param [Integer] operand
@@ -566,9 +566,9 @@ module Rnes
       value = read(operand)
       adjust_carry_bit(value)
       result = (value << 1) & 0xFF
-      registers.a |= result
-      adjust_negative_bit(registers.a)
-      adjust_zero_bit(registers.a)
+      registers.accumlator |= result
+      adjust_negative_bit(registers.accumlator)
+      adjust_zero_bit(registers.accumlator)
       write(address, result)
     end
 
@@ -580,7 +580,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_sta(operand)
-      write(operand, registers.a)
+      write(operand, registers.accumlator)
     end
 
     # @param [Integer] operand
@@ -595,7 +595,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_tax(_operand)
-      result = registers.a
+      result = registers.accumlator
       adjust_negative_bit(result)
       adjust_zero_bit(result)
       registers.x = result
@@ -603,7 +603,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_tay(_operand)
-      result = registers.a
+      result = registers.accumlator
       adjust_negative_bit(result)
       adjust_zero_bit(result)
       registers.y = result
@@ -620,7 +620,7 @@ module Rnes
       result = registers.x
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.a = result
+      registers.accumlator = result
     end
 
     # @param [Integer] operand
@@ -633,7 +633,7 @@ module Rnes
       result = registers.y
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.a = result
+      registers.accumlator = result
     end
 
     # @return [Integer]

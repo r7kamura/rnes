@@ -12,7 +12,7 @@ module Rnes
     # @note accumulator
     # @param [Integer]
     # @return [Integer]
-    attr_accessor :a
+    attr_accessor :accumlator
 
     # @note program counter
     # @param [Integer]
@@ -39,7 +39,7 @@ module Rnes
     attr_accessor :y
 
     def initialize
-      @a = 0x00
+      @accumlator = 0x00
       @program_counter = 0x0000
       @stack_pointer = 0x0000
       @status = 0b00000000
@@ -93,7 +93,7 @@ module Rnes
     end
 
     def reset
-      @a = 0x00
+      @accumlator = 0x00
       @program_counter = 0x0000
       @stack_pointer = 0x1FD
       @status = 0b00110100
