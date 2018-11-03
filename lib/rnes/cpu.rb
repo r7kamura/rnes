@@ -726,8 +726,8 @@ module Rnes
 
     # @return [Integer]
     def fetch_value_by_addressing_mode_relative
-      offset = fetch
-      offset -= 256 if offset >= 128
+      int8 = fetch
+      offset = int8 > 0x80 ? int8 - 256 : int8
       registers.pc + offset
     end
 
