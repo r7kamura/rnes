@@ -9,32 +9,26 @@ module Rnes
     OVERFLOW_BIT_INDEX = 6
     NEGATIVE_BIT_INDEX = 7
 
-    # @note accumulator
     # @param [Integer]
     # @return [Integer]
     attr_accessor :accumlator
 
-    # @note index X
     # @param [Integer]
     # @return [Integer]
     attr_accessor :index_x
 
-    # @note index Y
     # @param [Integer]
     # @return [Integer]
     attr_accessor :index_y
 
-    # @note program counter
     # @param [Integer]
     # @return [Integer]
     attr_accessor :program_counter
 
-    # @note stack pointer
     # @param [Integer]
     # @return [Integer]
     attr_accessor :stack_pointer
 
-    # @note status
     # @return [Integer]
     attr_reader :status
 
