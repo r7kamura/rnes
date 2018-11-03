@@ -718,14 +718,6 @@ module Rnes
       end
     end
 
-    # @param [Symbol] addressing_mode
-    # @return [Integer]
-    def fetch_value_by_addressing_mode_with_optional_read(addressing_mode)
-      value = fetch_value_by_addressing_mode(addressing_mode)
-      value = read(value) if addressing_mode != :immediate
-      value
-    end
-
     # @return [Integer]
     def fetch_value_by_addressing_mode_absolute
       fetch_word
