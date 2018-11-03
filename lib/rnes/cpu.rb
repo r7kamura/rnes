@@ -30,7 +30,11 @@ module Rnes
       when :AND
         execute_operation_and(operand)
       when :ASL
-        execute_operation_asl(operand, addressing_mode: operation.addressing_mode)
+        if operation.addressing_mode == :accumulator
+          execute_operation_asl_for_accoumulator(operand)
+        else
+          execute_operation_asl(operand)
+        end
       when :BCC
         execute_operation_bcc(operand)
       when :BCS
@@ -96,7 +100,11 @@ module Rnes
       when :LDY
         execute_operation_ldy(operand)
       when :LSR
-        execute_operation_lsr(operand, addressing_mode: operation.addressing_mode)
+        if operation.addressing_mode == :accumulator
+          execute_operation_lsr_for_accumulator(operand)
+        else
+          execute_operation_lsr(operand)
+        end
       when :NOP
         execute_operation_nop(operand)
       when :NOPD
@@ -190,24 +198,24 @@ module Rnes
       registers.accumulator = result
     end
 
-    # @param [Symbol] addressing_mode
     # @param [Integer] operand
-    def execute_operation_asl(operand, addressing_mode:)
-      if addressing_mode == :accumulator
-        value = registers.accumulator
-        result = (value << 1) && 0xFF
-        registers.carry = value[7] == 1
-        registers.negative = result[7] == 1
-        registers.zero = result.zero?
-        registers.accumulator = result
-      else
-        value = read(operand)
-        result = (value << 1) && 0xFF
-        registers.carry = value[7] == 1
-        registers.negative = result[7] == 1
-        registers.zero = result.zero?
-        write(operand, result)
-      end
+    def execute_operation_asl(operand)
+      value = read(operand)
+      result = (value << 1) && 0xFF
+      registers.carry = value[7] == 1
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      write(operand, result)
+    end
+
+    # @param [Integer] operand
+    def execute_operation_asl_for_accoumulator(operand)
+      value = registers.accumulator
+      result = (value << 1) && 0xFF
+      registers.carry = value[7] == 1
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
     end
 
     # @param [Integer] operand
@@ -449,23 +457,24 @@ module Rnes
       registers.index_y = operand
     end
 
-    # @param [Symbol] addressing_mode
     # @param [Integer] operand
-    def execute_operation_lsr(operand, addressing_mode:)
-      if addressing_mode == :accumulator
-        value = registers.accumulator
-        result = value >> 1
-        registers.carry = value[0] == 1
-        registers.zero = result.zero?
-        registers.accumulator = result
-      else
-        value = read(operand)
-        result = value >> 1
-        registers.carry = value[0] == 1
-        registers.zero = result.zero?
-        write(operand, result)
-      end
+    def execute_operation_lsr(operand)
+      value = read(operand)
+      result = value >> 1
+      registers.carry = value[0] == 1
       registers.negative = false
+      registers.zero = result.zero?
+      write(operand, result)
+    end
+
+    # @param [Integer] operand
+    def execute_operation_lsr_for_accumulator(operand)
+      value = registers.accumulator
+      result = value >> 1
+      registers.carry = value[0] == 1
+      registers.negative = false
+      registers.zero = result.zero?
+      registers.accumulator = result
     end
 
     # @param [Integer] operand
