@@ -30,14 +30,51 @@ module Rnes
     # @param [Rnes::Operation] operation
     def execute_operation(operation)
       case operation.name
+      when :BNE
+        execute_operation_bne(operation)
+      when :BPL
+        execute_operation_bpl(operation)
       when :BRK
         execute_operation_brk(operation)
+      when :CLD
+        execute_operation_cld(operation)
+      when :DEY
+        execute_operation_dey(operation)
+      when :INX
+        execute_operation_inx(operation)
+      when :JMP
+        execute_operation_jmp(operation)
+      when :JSR
+        execute_operation_jsr(operation)
       when :LDA
         execute_operation_lda(operation)
+      when :LDX
+        execute_operation_ldx(operation)
+      when :LDY
+        execute_operation_ldy(operation)
+      when :SEI
+        execute_operation_sei(operation)
       when :STA
         execute_operation_sta(operation)
+      when :TXS
+        execute_operation_txs(operation)
       else
         raise ::Rnes::Errors::UnknownOperationError, "Unknown operation: #{operation.name}"
+      end
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_bne(operation)
+      value = fetch_value_by_addressing_mode(operation.addressing_mode)
+      unless registers.has_zero_bit?
+        registers.pc = value
+      end
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_bpl(operation)
+      unless registers.has_negative_bit?
+        registers.pc = fetch_value_by_addressing_mode(operation.addressing_mode)
       end
     end
 
@@ -53,8 +90,39 @@ module Rnes
       registers.pc -= 1
     end
 
-    # @todo negative check
-    # @todo zero check
+    # @param [Rnes::Operation] operation
+    def execute_operation_cld(_operation)
+      registers.toggle_decimal_bit(false)
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_dey(_operation)
+      value = (registers.y - 1) & 0xFF
+      registers.y = value
+      registers.toggle_negative_bit(value.negative?)
+      registers.toggle_zero_bit(value.zero?)
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_inx(_operation)
+      value = (registers.x + 1) & 0xFF
+      registers.x = value
+      registers.toggle_negative_bit(value.negative?)
+      registers.toggle_zero_bit(value.zero?)
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_jmp(operation)
+      registers.pc = fetch_value_by_addressing_mode(operation.addressing_mode)
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_jsr(operation)
+      registers.pc -= 1
+      stack_program_counter
+      registers.pc = fetch_value_by_addressing_mode(operation.addressing_mode)
+    end
+
     # @param [Rnes::Operation] operation
     def execute_operation_lda(operation)
       value = fetch_value_by_addressing_mode(operation.addressing_mode)
@@ -65,9 +133,37 @@ module Rnes
     end
 
     # @param [Rnes::Operation] operation
-    def execute_operation_sta(operation)
+    def execute_operation_ldx(operation)
       value = fetch_value_by_addressing_mode(operation.addressing_mode)
-      write(value, registers.a)
+      registers.x = value
+      registers.toggle_negative_bit(value.negative?)
+      registers.toggle_zero_bit(value.zero?)
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_ldy(operation)
+      value = fetch_value_by_addressing_mode(operation.addressing_mode)
+      registers.y = value
+      registers.toggle_negative_bit(value.negative?)
+      registers.toggle_zero_bit(value.zero?)
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_sei(_operation)
+      registers.toggle_interrupt_bit(true)
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_sta(operation)
+      write(
+        fetch_value_by_addressing_mode(operation.addressing_mode),
+        registers.a
+      )
+    end
+
+    # @param [Rnes::Operation] operation
+    def execute_operation_txs(_operation)
+      registers.sp = registers.x + 0x100
     end
 
     # @return [Integer]
@@ -166,7 +262,7 @@ module Rnes
     def fetch_value_by_addressing_mode_relative
       offset = fetch
       offset -= 256 if offset >= 128
-      this.registers.pc + offset
+      registers.pc + offset
     end
 
     # @return [Integer]
