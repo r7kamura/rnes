@@ -184,12 +184,12 @@ RSpec.describe Rnes::Cpu do
     #
     # | name    | value |
     # | ------- | ----- |
-    # | x       | 0x01  |
+    # | index_x       | 0x01  |
     context 'with LDA_ZEROX operation' do
       before do
         program_rom_bytes[0x0001] = value_base_address
-        working_ram.write(value_base_address + x, value)
-        cpu.registers.x = x
+        working_ram.write(value_base_address + index_x, value)
+        cpu.registers.index_x = index_x
       end
 
       let(:operation_full_name) do
@@ -204,11 +204,11 @@ RSpec.describe Rnes::Cpu do
         0x00
       end
 
-      let(:x) do
+      let(:index_x) do
         1
       end
 
-      it 'sets value from fetched address + x to accumulator' do
+      it 'sets value from fetched address + index_x to accumulator' do
         expect { subject }.to change(cpu.registers, :program_counter).by(2)
         expect(cpu.registers.accumlator).to eq(value)
       end

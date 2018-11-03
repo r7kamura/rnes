@@ -194,7 +194,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_adc(operand)
-      result = operand + registers.x + registers.carry_bit
+      result = operand + registers.index_x + registers.carry_bit
       adjust_carry_bit(result)
       adjust_negative_bit(result)
       adjust_overflow_bit(result)
@@ -319,7 +319,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_cpx(operand)
-      result = registers.x - operand
+      result = registers.index_x - operand
       registers.toggle_carry_bit(result >= 0)
       adjust_negative_bit(result)
       adjust_zero_bit(result)
@@ -349,10 +349,10 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_dex(_operand)
-      result = registers.x - 1
+      result = registers.index_x - 1
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.x = result & 0xFF
+      registers.index_x = result & 0xFF
     end
 
     # @param [Integer] operand
@@ -381,10 +381,10 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_inx(_operand)
-      result = registers.x + 1
+      result = registers.index_x + 1
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.x = result & 0xFF
+      registers.index_x = result & 0xFF
     end
 
     # @param [Integer] operand
@@ -429,7 +429,7 @@ module Rnes
     def execute_operation_ldx(operand)
       adjust_negative_bit(operand)
       adjust_zero_bit(operand)
-      registers.x = operand
+      registers.index_x = operand
     end
 
     # @param [Integer] operand
@@ -585,7 +585,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_stx(operand)
-      write(operand, registers.x)
+      write(operand, registers.index_x)
     end
 
     # @param [Integer] operand
@@ -598,7 +598,7 @@ module Rnes
       result = registers.accumlator
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.x = result
+      registers.index_x = result
     end
 
     # @param [Integer] operand
@@ -617,7 +617,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_txa(_operand)
-      result = registers.x
+      result = registers.index_x
       adjust_negative_bit(result)
       adjust_zero_bit(result)
       registers.accumlator = result
@@ -625,7 +625,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_txs(_operand)
-      registers.stack_pointer = registers.x + 0x100
+      registers.stack_pointer = registers.index_x + 0x100
     end
 
     # @param [Integer] operand
@@ -710,7 +710,7 @@ module Rnes
 
     # @return [Integer]
     def fetch_value_by_addressing_mode_absolute_x
-      (fetch_word + registers.x) & 0xFFFF
+      (fetch_word + registers.index_x) & 0xFFFF
     end
 
     # @return [Integer]
@@ -738,7 +738,7 @@ module Rnes
 
     # @return [Integer]
     def fetch_value_by_addressing_mode_pre_indexed_indirect
-      read_word((fetch + registers.x) & 0xFF)
+      read_word((fetch + registers.index_x) & 0xFF)
     end
 
     # @return [Integer]
@@ -760,7 +760,7 @@ module Rnes
 
     # @return [Integer]
     def fetch_value_by_addressing_mode_zero_page_x
-      (fetch + registers.x) & 0xFF
+      (fetch + registers.index_x) & 0xFF
     end
 
     # @return [Integer]
