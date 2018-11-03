@@ -22,42 +22,6 @@ module Rnes
     # @todo Cycle calculation by using Rnes::Operation#cycle.
     def tick
       operation = fetch_operation
-      execute_operation(operation)
-    end
-
-    private
-
-    # @param [Integer] value
-    def adjust_carry_bit(value)
-      flag = value > 0xFF
-      registers.toggle_carry_bit(flag)
-    end
-
-    # @param [Integer] value
-    def adjust_negative_bit(value)
-      flag = value >= 0x80
-      registers.toggle_negative_bit(flag)
-    end
-
-    # @param [Integer] value
-    def adjust_overflow_bit(value)
-      flag = value >= 0xFF || value < -0xFF
-      registers.toggle_overflow_bit(flag)
-    end
-
-    # @param [Integer] value
-    def adjust_zero_bit(value)
-      flag = value.zero?
-      registers.toggle_zero_bit(flag)
-    end
-
-    # @param [Integer] address
-    def branch(address)
-      registers.pc = address
-    end
-
-    # @param [Rnes::Operation] operation
-    def execute_operation(operation)
       operand = fetch_operand(operation)
       case operation.name
       when :ADC
@@ -195,6 +159,37 @@ module Rnes
       else
         raise ::Rnes::Errors::UnknownOperationError, "Unknown operation: #{operation.name}"
       end
+    end
+
+    private
+
+    # @param [Integer] value
+    def adjust_carry_bit(value)
+      flag = value > 0xFF
+      registers.toggle_carry_bit(flag)
+    end
+
+    # @param [Integer] value
+    def adjust_negative_bit(value)
+      flag = value >= 0x80
+      registers.toggle_negative_bit(flag)
+    end
+
+    # @param [Integer] value
+    def adjust_overflow_bit(value)
+      flag = value >= 0xFF || value < -0xFF
+      registers.toggle_overflow_bit(flag)
+    end
+
+    # @param [Integer] value
+    def adjust_zero_bit(value)
+      flag = value.zero?
+      registers.toggle_zero_bit(flag)
+    end
+
+    # @param [Integer] address
+    def branch(address)
+      registers.pc = address
     end
 
     # @param [Integer] operand
