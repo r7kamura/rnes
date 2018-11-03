@@ -232,10 +232,12 @@ module Rnes
       raise ::NotImplementedError
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
     def execute_operation_beq(_operation)
-      raise ::NotImplementedError
+      if registers.has_zero_bit?
+        address = fetch_value_by_addressing_mode(operation.addressing_mode)
+        branch(address)
+      end
     end
 
     # @todo
@@ -268,8 +270,8 @@ module Rnes
     # @param [Rnes::Operation] operation
     def execute_operation_brk(_operation)
       registers.toggle_break_bit(true)
-      stack_program_counter
-      stack_status
+      push_program_counter
+      push_status
       unless registers.has_interrupt_bit?
         registers.toggle_interrupt_bit(true)
         registers.pc = read_word(0xFFFE)
@@ -335,10 +337,13 @@ module Rnes
       raise ::NotImplementedError
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
-    def execute_operation_dec(_operation)
-      raise ::NotImplementedError
+    def execute_operation_dec(operation)
+      address = fetch_value_by_addressing_mode(operation.addressing_mode)
+      result = read(address) - 1
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
+      write(address, result)
     end
 
     # @param [Rnes::Operation] operation
@@ -394,7 +399,7 @@ module Rnes
     def execute_operation_jsr(operation)
       address = fetch_value_by_addressing_mode(operation.addressing_mode)
       registers.pc -= 1
-      stack_program_counter
+      push_program_counter
       registers.pc = address
     end
 
@@ -504,16 +509,17 @@ module Rnes
       raise ::NotImplementedError
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
     def execute_operation_rti(_operation)
-      raise ::NotImplementedError
+      pop_status
+      pop_program_counter
+      registers.toggle_reserved_bit(true)
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
     def execute_operation_rts(_operation)
-      raise ::NotImplementedError
+      pop_program_counter
+      registers.pc += 1
     end
 
     # @todo
@@ -545,10 +551,16 @@ module Rnes
       registers.toggle_interrupt_bit(true)
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
-    def execute_operation_slo(_operation)
-      raise ::NotImplementedError
+    def execute_operation_slo(operation)
+      address = fetch_value_by_addressing_mode(operation.addressing_mode)
+      value = read(address)
+      adjust_carry_bit(value)
+      result = (value << 1) & 0xFF
+      registers.a |= result
+      adjust_negative_bit(registers.a)
+      adjust_zero_bit(registers.a)
+      write(address, result)
     end
 
     # @todo
@@ -739,6 +751,45 @@ module Rnes
       fetch | (fetch << 8)
     end
 
+    # @return [Integer]
+    def pop
+      registers.sp += 1
+      read(registers.sp & 0xFF | 0x100)
+    end
+
+    def pop_program_counter
+      registers.pc = pop_word
+    end
+
+    def pop_status
+      registers.p = pop
+    end
+
+    # @return [Integer]
+    def pop_word
+      pop | pop << 8
+    end
+
+    # @param [Integer] value
+    def push(value)
+      write(registers.sp | 0x100, value)
+      registers.sp -= 1
+    end
+
+    def push_program_counter
+      push_word(registers.pc)
+    end
+
+    def push_status
+      push(registers.p)
+    end
+
+    # @param [Integer] value
+    def push_word(value)
+      push(value >> 8)
+      push(value & 0xFF)
+    end
+
     # @param [Integer] address
     # @return [Integer]
     def read(address)
@@ -749,32 +800,6 @@ module Rnes
     # @return [Integer]
     def read_word(address)
       read(address) | read((address + 1) & 0xFFFF) << 8
-    end
-
-    # @param [Integer] value
-    def stack(value)
-      write(registers.sp | 0x100, value)
-      registers.sp -= 1
-    end
-
-    def stack_program_counter
-      stack_word(registers.pc)
-    end
-
-    def stack_status
-      stack(registers.p)
-    end
-
-    # @param [Integer] value
-    def stack_word(value)
-      stack(value >> 8)
-      stack(value & 0xFF)
-    end
-
-    # @return [Integer]
-    def unstack
-      registers.sp += 1
-      read(registers.sp & 0xFF | 0x100)
     end
 
     # @param [Integer] address
