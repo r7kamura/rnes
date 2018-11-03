@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+require 'rnes'
+
+path = ARGV[0]
+io = File.binread(path)
+bytes = io.bytes
+emulator = Rnes::Emulator.new
+emulator.load_rom(bytes)
+emulator.run

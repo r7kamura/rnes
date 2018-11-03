@@ -25,6 +25,14 @@ Or install it yourself as:
 gem install rnes
 ```
 
+## Usage
+
+Pass ROM file path to `rnes` executable.
+
+```sh
+rnes <path-to-rom-file>
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/r7kamura/rnes.
