@@ -16,7 +16,7 @@ module Rnes
 
     def reset
       @registers.reset
-      @registers.pc = read_word(0xFFFC)
+      @registers.program_counter = read_word(0xFFFC)
     end
 
     # @todo Cycle calculation by using Rnes::Operation#cycle.
@@ -189,7 +189,7 @@ module Rnes
 
     # @param [Integer] address
     def branch(address)
-      registers.pc = address
+      registers.program_counter = address
     end
 
     # @param [Integer] operand
@@ -252,27 +252,27 @@ module Rnes
     # @param [Integer] operand
     def execute_operation_bne(operand)
       unless registers.has_zero_bit?
-        registers.pc = operand
+        registers.program_counter = operand
       end
     end
 
     # @param [Integer] operand
     def execute_operation_bpl(operand)
       unless registers.has_negative_bit?
-        registers.pc = operand
+        registers.program_counter = operand
       end
     end
 
     # @param [Integer] operand
     def execute_operation_brk(_operand)
       registers.toggle_break_bit(true)
-      push_word(registers.pc)
+      push_word(registers.program_counter)
       push(registers.status)
       unless registers.has_interrupt_bit?
         registers.toggle_interrupt_bit(true)
-        registers.pc = read_word(0xFFFE)
+        registers.program_counter = read_word(0xFFFE)
       end
-      registers.pc -= 1
+      registers.program_counter -= 1
     end
 
     # @todo
@@ -403,13 +403,13 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_jmp(operand)
-      registers.pc = operand
+      registers.program_counter = operand
     end
 
     # @param [Integer] operand
     def execute_operation_jsr(operand)
-      push_word(registers.pc - 1)
-      registers.pc = operand
+      push_word(registers.program_counter - 1)
+      registers.program_counter = operand
     end
 
     # @todo
@@ -451,12 +451,12 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_nopd(_operand)
-      registers.pc += 1
+      registers.program_counter += 1
     end
 
     # @param [Integer] operand
     def execute_operation_nopi(_operand)
-      registers.pc += 2
+      registers.program_counter += 2
     end
 
     # @param [Integer] operand
@@ -519,14 +519,14 @@ module Rnes
     # @param [Integer] operand
     def execute_operation_rti(_operand)
       registers.status = pop
-      registers.pc = pop_word
+      registers.program_counter = pop_word
       registers.toggle_reserved_bit(true)
     end
 
     # @param [Integer] operand
     def execute_operation_rts(_operand)
-      registers.pc = pop_word
-      registers.pc += 1
+      registers.program_counter = pop_word
+      registers.program_counter += 1
     end
 
     # @todo
@@ -638,9 +638,9 @@ module Rnes
 
     # @return [Integer]
     def fetch
-      address = @registers.pc
+      address = @registers.program_counter
       value = read(address)
-      @registers.pc += 1
+      @registers.program_counter += 1
       value
     end
 
@@ -750,7 +750,7 @@ module Rnes
     def fetch_value_by_addressing_mode_relative
       int8 = fetch
       offset = int8 > 0x80 ? int8 - 256 : int8
-      registers.pc + offset
+      registers.program_counter + offset
     end
 
     # @return [Integer]

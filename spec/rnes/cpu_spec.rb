@@ -53,7 +53,7 @@ RSpec.describe Rnes::Cpu do
       expect(cpu.registers).to have_reserved_bit
       expect(cpu.registers).not_to have_overflow_bit
       expect(cpu.registers).not_to have_negative_bit
-      expect(cpu.registers.pc).to eq(0x0101)
+      expect(cpu.registers.program_counter).to eq(0x0101)
       expect(program_rom).to have_received(:read).with(0x3FFC)
       expect(program_rom).to have_received(:read).with(0x3FFD)
     end
@@ -91,7 +91,7 @@ RSpec.describe Rnes::Cpu do
         subject
         expect(cpu.registers).to have_break_bit
         expect(cpu.registers).to have_interrupt_bit
-        expect(cpu.registers.pc).to eq(program_counter_after_reset)
+        expect(cpu.registers.program_counter).to eq(program_counter_after_reset)
       end
     end
 
@@ -119,7 +119,7 @@ RSpec.describe Rnes::Cpu do
       end
 
       it 'sets fetched value to accumulator' do
-        expect { subject }.to change(cpu.registers, :pc).by(2)
+        expect { subject }.to change(cpu.registers, :program_counter).by(2)
         expect(cpu.registers.a).to eq(value)
       end
     end
@@ -158,7 +158,7 @@ RSpec.describe Rnes::Cpu do
       end
 
       it 'sets value from fetched address to accumulator' do
-        expect { subject }.to change(cpu.registers, :pc).by(2)
+        expect { subject }.to change(cpu.registers, :program_counter).by(2)
         expect(cpu.registers.a).to eq(value)
       end
     end
@@ -209,7 +209,7 @@ RSpec.describe Rnes::Cpu do
       end
 
       it 'sets value from fetched address + x to accumulator' do
-        expect { subject }.to change(cpu.registers, :pc).by(2)
+        expect { subject }.to change(cpu.registers, :program_counter).by(2)
         expect(cpu.registers.a).to eq(value)
       end
     end
@@ -233,7 +233,7 @@ RSpec.describe Rnes::Cpu do
       end
 
       it 'sets value from accumulator to fetched address' do
-        expect { subject }.to change(cpu.registers, :pc).by(2)
+        expect { subject }.to change(cpu.registers, :program_counter).by(2)
         expect(working_ram.read(address)).to eq(accumulator_value)
       end
     end
