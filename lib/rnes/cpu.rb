@@ -764,7 +764,7 @@ module Rnes
     # @return [Integer]
     def fetch_value_by_addressing_mode_relative
       int8 = fetch
-      offset = int8 > 0x80 ? int8 - 256 : int8
+      offset = int8[7] == 1 ? int8 - 256 : int8
       registers.program_counter + offset
     end
 
