@@ -240,7 +240,7 @@ module Rnes
     end
 
     def render_image
-      puts "\e[61A\e[128D";
+      puts "\e[61A\e[128D"
       60.times do |y_of_character|
         128.times do |x_of_character|
           base = y_of_character * 4 * 256 + x_of_character * 2
@@ -255,7 +255,7 @@ module Rnes
                 ((@image[base + 256 * 2 + 1] == [0, 0, 0] ? 0 : 1) << 5) |
                 ((@image[base + 256 * 3 + 0] == [0, 0, 0] ? 0 : 1) << 6) |
                 ((@image[base + 256 * 3 + 1] == [0, 0, 0] ? 0 : 1) << 7)
-              ) + 0x2800
+               ) + 0x2800
             ).chr('UTF-8')
           )
         end
