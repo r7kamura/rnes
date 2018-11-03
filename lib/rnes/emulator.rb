@@ -32,7 +32,9 @@ module Rnes
     end
 
     def run
-      loop(&:tick)
+      loop do
+        tick
+      end
     end
 
     def tick
