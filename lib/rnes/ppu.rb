@@ -100,7 +100,6 @@ module Rnes
       end
     end
 
-    # @todo
     def tick
       if on_visible_cycle?
         draw
