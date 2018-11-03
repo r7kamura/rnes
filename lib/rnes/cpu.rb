@@ -35,7 +35,7 @@ module Rnes
 
     # @param [Integer] value
     def adjust_negative_bit(value)
-      flag = value.negative?
+      flag = value >= 0x80
       registers.toggle_negative_bit(flag)
     end
 
