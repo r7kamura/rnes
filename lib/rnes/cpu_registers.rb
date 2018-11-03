@@ -22,7 +22,7 @@ module Rnes
     # @note stack pointer
     # @param [Integer]
     # @return [Integer]
-    attr_accessor :sp
+    attr_accessor :stack_pointer
 
     # @note status
     # @return [Integer]
@@ -41,7 +41,7 @@ module Rnes
     def initialize
       @a = 0x00
       @program_counter = 0x0000
-      @sp = 0x0000
+      @stack_pointer = 0x0000
       @status = 0b00000000
       @x = 0x00
       @y = 0x00
@@ -95,7 +95,7 @@ module Rnes
     def reset
       @a = 0x00
       @program_counter = 0x0000
-      @sp = 0x1FD
+      @stack_pointer = 0x1FD
       @status = 0b00110100
       @x = 0x00
       @y = 0x00

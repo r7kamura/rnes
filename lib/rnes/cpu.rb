@@ -625,7 +625,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_txs(_operand)
-      registers.sp = registers.x + 0x100
+      registers.stack_pointer = registers.x + 0x100
     end
 
     # @param [Integer] operand
@@ -775,8 +775,8 @@ module Rnes
 
     # @return [Integer]
     def pop
-      registers.sp += 1
-      read(registers.sp & 0xFF | 0x100)
+      registers.stack_pointer += 1
+      read(registers.stack_pointer & 0xFF | 0x100)
     end
 
     # @return [Integer]
@@ -786,8 +786,8 @@ module Rnes
 
     # @param [Integer] value
     def push(value)
-      write(registers.sp | 0x100, value)
-      registers.sp -= 1
+      write(registers.stack_pointer | 0x100, value)
+      registers.stack_pointer -= 1
     end
 
     # @param [Integer] value
