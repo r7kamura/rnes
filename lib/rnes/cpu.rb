@@ -10,6 +10,7 @@ module Rnes
 
     # @param [Rnes::CpuBus] bus
     def initialize(bus:)
+      @branched = false
       @bus = bus
       @registers = ::Rnes::CpuRegisters.new
     end
@@ -159,6 +160,7 @@ module Rnes
       else
         raise ::Rnes::Errors::UnknownOperationError, "Unknown operation: #{operation.name}"
       end
+      @branched = false
     end
 
     private
@@ -189,6 +191,7 @@ module Rnes
 
     # @param [Integer] address
     def branch(address)
+      @branched = true
       registers.program_counter = address
     end
 
