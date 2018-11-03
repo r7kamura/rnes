@@ -264,7 +264,7 @@ module Rnes
     end
 
     def set_v_blank
-      registers.toggle_in_v_blank_bit(true)
+      registers.set_in_v_blank_bit
     end
 
     # @return [Integer]

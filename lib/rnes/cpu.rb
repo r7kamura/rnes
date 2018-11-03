@@ -226,10 +226,12 @@ module Rnes
       end
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
-    def execute_operation_bcs(_operation)
-      raise ::NotImplementedError
+    def execute_operation_bcs(operation)
+      address = fetch_value_by_addressing_mode(operation.addressing_mode)
+      if registers.has_carry_bit?
+        branch(address)
+      end
     end
 
     # @param [Rnes::Operation] operation
@@ -314,22 +316,31 @@ module Rnes
       raise ::NotImplementedError
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
-    def execute_operation_cmp(_operation)
-      raise ::NotImplementedError
+    def execute_operation_cmp(operation)
+      value = fetch_value_by_addressing_mode_with_optional_read(operation.addressing_mode)
+      result = registers.a - value
+      registers.toggle_carry_bit(result >= 0)
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
-    def execute_operation_cpx(_operation)
-      raise ::NotImplementedError
+    def execute_operation_cpx(operation)
+      value = fetch_value_by_addressing_mode_with_optional_read(operation.addressing_mode)
+      result = registers.x - value
+      registers.toggle_carry_bit(result >= 0)
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
-    def execute_operation_cpy(_operation)
-      raise ::NotImplementedError
+    def execute_operation_cpy(operation)
+      value = fetch_value_by_addressing_mode_with_optional_read(operation.addressing_mode)
+      result = registers.y - value
+      registers.toggle_carry_bit(result >= 0)
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
     end
 
     # @todo
@@ -575,16 +586,16 @@ module Rnes
       write(address, registers.a)
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
-    def execute_operation_stx(_operation)
-      raise ::NotImplementedError
+    def execute_operation_stx(operation)
+      address = fetch_value_by_addressing_mode(operation.addressing_mode)
+      write(address, registers.x)
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
-    def execute_operation_sty(_operation)
-      raise ::NotImplementedError
+    def execute_operation_sty(operation)
+      address = fetch_value_by_addressing_mode(operation.addressing_mode)
+      write(address, registers.y)
     end
 
     # @todo
@@ -607,10 +618,10 @@ module Rnes
 
     # @param [Rnes::Operation] operation
     def execute_operation_txa(_operation)
-      value = registers.x
-      adjust_negative_bit(value)
-      adjust_zero_bit(value)
-      registers.a = value
+      result = registers.x
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
+      registers.a = result
     end
 
     # @param [Rnes::Operation] operation
@@ -618,10 +629,12 @@ module Rnes
       registers.sp = registers.x + 0x100
     end
 
-    # @todo
     # @param [Rnes::Operation] operation
     def execute_operation_tya(_operation)
-      raise ::NotImplementedError
+      result = registers.y
+      adjust_negative_bit(result)
+      adjust_zero_bit(result)
+      registers.a = result
     end
 
     # @return [Integer]

@@ -48,6 +48,10 @@ module Rnes
       @control1[6] == 1
     end
 
+    def set_in_v_blank_bit
+      @status |= (1 << STATUS_IN_V_BLANK_BIT_INDEX)
+    end
+
     # @param [Boolean] boolean
     def toggle_in_v_blank_bit(boolean)
       toggle_status_bit(STATUS_IN_V_BLANK_BIT_INDEX, boolean)
