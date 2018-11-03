@@ -1,4 +1,14 @@
 RSpec.describe Rnes::Ppu do
+  let(:character_rom) do
+    Rnes::CharacterRom.new(character_rom_bytes)
+  end
+
+  let(:character_rom_bytes) do
+    Array.new(8 * 2**10).map do
+      0
+    end
+  end
+
   let(:ppu) do
     described_class.new(bus: ppu_bus)
   end
@@ -16,14 +26,53 @@ RSpec.describe Rnes::Ppu do
       ppu.tick
     end
 
-    context 'on cycle 8 on line 0' do
+    before do
+      ppu_bus.character_rom = character_rom
+    end
+
+    context 'on cycle 1 on line 0' do
       before do
-        ppu.cycle = 5
+        # Load dummy 2 bytes palette.
+        allow(Rnes::Ppu).to receive(:generate_empty_palette).and_return(palette)
+
+        # Use sprite 1 on tile 0 (cycle 1 on line 0 renders the top line of tile 0).
+        video_ram.write(0, sprite_index)
+
+        # Use palette[1] color (blue color in fact) on the top line of sprite 1.
+        character_rom_bytes[16 * sprite_index] = sprite_line_low_byte
+        character_rom_bytes[16 * sprite_index + 1] = sprite_line_high_byte
+
+        ppu.cycle = 1
         ppu.line = 0
       end
 
-      it do
+      let(:blue_color) do
+        [0x0f, 0x0f, 0x65]
+      end
+
+      let(:blue_color_id) do
+        2
+      end
+
+      let(:sprite_index) do
+        1
+      end
+
+      let(:palette) do
+        [0, blue_color_id]
+      end
+
+      let(:sprite_line_high_byte) do
+        0b00000000
+      end
+
+      let(:sprite_line_low_byte) do
+        0b11111111
+      end
+
+      it 'draws 8 pixels by using palette' do
         subject
+        expect(ppu.image[0]).to eq(blue_color)
       end
     end
 

@@ -1,6 +1,6 @@
 require 'rnes/errors'
 require 'rnes/ppu_registers'
-require 'rnes/ppu/rgb_palette'
+require 'rnes/ppu/colors'
 require 'rnes/ram'
 
 module Rnes
@@ -15,7 +15,7 @@ module Rnes
 
     CYCLES_PER_LINE = 341
 
-    PALETTE_SIZE = 256
+    PALETTE_BYTESIZE = 32
 
     SPRITE_HEIGHT = 8
 
@@ -43,7 +43,7 @@ module Rnes
 
       # @return [Array<Integer>]
       def generate_empty_palette
-        ::Array.new(PALETTE_SIZE).map do
+        ::Array.new(PALETTE_BYTESIZE).map do
           0
         end
       end
@@ -56,24 +56,29 @@ module Rnes
       end
     end
 
+    # @note For debug use.
     # @param [Integer]
     # @return [Integer]
     attr_accessor :cycle
 
+    # @note For debug use.
     # @param [Integer]
     # @return [Integer]
     attr_accessor :line
+
+    # @param [Array<Array<Integer>>]
+    attr_reader :image
 
     # @return [Rnes::PpuRegisters]
     attr_reader :registers
 
     # @param [Rnes::PpuBus] bus
     def initialize(bus:)
-      @palette_indices_byte = 0x0
       @bus = bus
       @cycle = 0
       @image = self.class.generate_empty_image
       @line = 0
+      @mini_palette_ids_byte = 0x0
       @palette = self.class.generate_empty_palette
       @registers = ::Rnes::PpuRegisters.new
       @sprite_line_high_byte = 0x0
@@ -168,18 +173,14 @@ module Rnes
       registers.toggle_in_v_blank_bit(false)
     end
 
+    # @note Drawing next 8 pixels per 8 cycles.
     def draw
-      case x_in_tile
-      when 0
-        update_eight_pixels
-      when 1
+      if x_in_tile.zero?
         @sprite_index = read_sprite_index_from_name_table
-      when 3
-        @palette_indices_byte = read_palette_indices_byte
-      when 5
+        @mini_palette_ids_byte = read_mini_palette_ids_byte
         @sprite_line_low_byte = read_sprite_line_low_byte
-      when 7
         @sprite_line_high_byte = read_sprite_line_high_byte
+        update_eight_pixels
       end
     end
 
@@ -191,6 +192,11 @@ module Rnes
     # @return [Boolean]
     def drawing_right_block?
       (x % BLOCK_WIDTH).odd?
+    end
+
+    # @return [Integer] Which 4-color-palette to use (0-3)
+    def mini_palette_id
+      (@mini_palette_ids_byte >> (block_position * 2)) & 0b11
     end
 
     # @return [Boolean]
@@ -213,14 +219,8 @@ module Rnes
       (0...VISIBLE_WINDOW_WIDTH).cover?(x) && (0...VISIBLE_WINDOW_HEIGHT).cover?(y)
     end
 
-    # @return [Integer]
-    def palette_index
-      (@palette_indices_byte >> (block_position * 2)) & 0b11
-    end
-
-    # @note 2 bit index for which one to use from 4 palettes, for each 4 block = 8 bit = 1 byte.
-    # @return [Integer]
-    def read_palette_indices_byte
+    # @return [Integer] 4-color-palette IDs of 4 blocks, as 8 bit data.
+    def read_mini_palette_ids_byte
       @bus.read(ADDRESS_TO_START_ATTRIBUTE_TABLE + tile_index)
     end
 
@@ -264,16 +264,14 @@ module Rnes
     end
 
     def update_eight_pixels
-      current_palette_index = palette_index
+      mini_palette_id_memo = mini_palette_id
       8.times do |x_in_sprite|
         index_in_sprite_line_byte = 7 - x_in_sprite
-        palette_index = @sprite_line_low_byte[index_in_sprite_line_byte] | @sprite_line_high_byte[index_in_sprite_line_byte] << 1 | current_palette_index << 2
-        rgb_index = @palette[palette_index]
-        @image[VISIBLE_WINDOW_WIDTH * y + x + x_in_sprite] = [
-          ::Rnes::Ppu::RGB_PALETTE[rgb_index * 3 + 0],
-          ::Rnes::Ppu::RGB_PALETTE[rgb_index * 3 + 1],
-          ::Rnes::Ppu::RGB_PALETTE[rgb_index * 3 + 2],
+        color_id = @palette[
+          @sprite_line_low_byte[index_in_sprite_line_byte] | @sprite_line_high_byte[index_in_sprite_line_byte] << 1 | mini_palette_id_memo << 2
         ]
+        image_index = VISIBLE_WINDOW_WIDTH * y + x + x_in_sprite
+        @image[image_index] = ::Rnes::Ppu::COLORS[color_id]
       end
     end
 
