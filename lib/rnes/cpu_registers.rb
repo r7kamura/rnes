@@ -19,6 +19,11 @@ module Rnes
     # @return [Integer]
     attr_accessor :index_x
 
+    # @note index Y
+    # @param [Integer]
+    # @return [Integer]
+    attr_accessor :index_y
+
     # @note program counter
     # @param [Integer]
     # @return [Integer]
@@ -33,18 +38,13 @@ module Rnes
     # @return [Integer]
     attr_reader :status
 
-    # @note index Y
-    # @param [Integer]
-    # @return [Integer]
-    attr_accessor :y
-
     def initialize
       @accumlator = 0x00
       @index_x = 0x00
+      @index_y = 0x00
       @program_counter = 0x0000
       @stack_pointer = 0x0000
       @status = 0b00000000
-      @y = 0x00
     end
 
     # @return [Integer]
@@ -95,10 +95,10 @@ module Rnes
     def reset
       @accumlator = 0x00
       @index_x = 0x00
+      @index_y = 0x00
       @program_counter = 0x0000
       @stack_pointer = 0x1FD
       @status = 0b00110100
-      @y = 0x00
     end
 
     # @param [Boolean] boolean

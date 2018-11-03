@@ -327,7 +327,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_cpy(operand)
-      result = registers.y - operand
+      result = registers.index_y - operand
       registers.toggle_carry_bit(result >= 0)
       adjust_negative_bit(result)
       adjust_zero_bit(result)
@@ -357,10 +357,10 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_dey(_operand)
-      result = registers.y - 1
+      result = registers.index_y - 1
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.y = result & 0xFF
+      registers.index_y = result & 0xFF
     end
 
     # @param [Integer] operand
@@ -389,10 +389,10 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_iny(_operand)
-      result = registers.y + 1
+      result = registers.index_y + 1
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.y = result & 0xFF
+      registers.index_y = result & 0xFF
     end
 
     # @todo
@@ -436,7 +436,7 @@ module Rnes
     def execute_operation_ldy(operand)
       adjust_negative_bit(operand)
       adjust_zero_bit(operand)
-      registers.y = operand
+      registers.index_y = operand
     end
 
     # @todo
@@ -590,7 +590,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_sty(operand)
-      write(operand, registers.y)
+      write(operand, registers.index_y)
     end
 
     # @param [Integer] operand
@@ -606,7 +606,7 @@ module Rnes
       result = registers.accumlator
       adjust_negative_bit(result)
       adjust_zero_bit(result)
-      registers.y = result
+      registers.index_y = result
     end
 
     # @todo
@@ -630,7 +630,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_tya(_operand)
-      result = registers.y
+      result = registers.index_y
       adjust_negative_bit(result)
       adjust_zero_bit(result)
       registers.accumlator = result
@@ -715,7 +715,7 @@ module Rnes
 
     # @return [Integer]
     def fetch_value_by_addressing_mode_absolute_y
-      (fetch_word + registers.y) & 0xFFFF
+      (fetch_word + registers.index_y) & 0xFFFF
     end
 
     # @return [nil]
@@ -743,7 +743,7 @@ module Rnes
 
     # @return [Integer]
     def fetch_value_by_addressing_mode_post_indexed_indirect
-      (read_word(fetch) + registers.y) & 0xFF
+      (read_word(fetch) + registers.index_y) & 0xFF
     end
 
     # @return [Integer]
@@ -765,7 +765,7 @@ module Rnes
 
     # @return [Integer]
     def fetch_value_by_addressing_mode_zero_page_y
-      (fetch + registers.y) & 0xFF
+      (fetch + registers.index_y) & 0xFF
     end
 
     # @return [Integer]
