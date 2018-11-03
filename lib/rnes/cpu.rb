@@ -220,8 +220,8 @@ module Rnes
 
     # @param [Rnes::Operation] operation
     def execute_operation_bcc(operation)
+      address = fetch_value_by_addressing_mode(operation.addressing_mode)
       unless registers.has_carry_bit?
-        address = fetch_value_by_addressing_mode(operation.addressing_mode)
         branch(address)
       end
     end
@@ -234,8 +234,8 @@ module Rnes
 
     # @param [Rnes::Operation] operation
     def execute_operation_beq(_operation)
+      address = fetch_value_by_addressing_mode(operation.addressing_mode)
       if registers.has_zero_bit?
-        address = fetch_value_by_addressing_mode(operation.addressing_mode)
         branch(address)
       end
     end
@@ -254,16 +254,17 @@ module Rnes
 
     # @param [Rnes::Operation] operation
     def execute_operation_bne(operation)
-      value = fetch_value_by_addressing_mode(operation.addressing_mode)
+      address = fetch_value_by_addressing_mode(operation.addressing_mode)
       unless registers.has_zero_bit?
-        registers.pc = value
+        registers.pc = address
       end
     end
 
     # @param [Rnes::Operation] operation
     def execute_operation_bpl(operation)
+      address = fetch_value_by_addressing_mode(operation.addressing_mode)
       unless registers.has_negative_bit?
-        registers.pc = fetch_value_by_addressing_mode(operation.addressing_mode)
+        registers.pc = address
       end
     end
 
