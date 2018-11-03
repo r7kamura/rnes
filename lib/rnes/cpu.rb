@@ -267,7 +267,7 @@ module Rnes
     def execute_operation_brk(_operand)
       registers.toggle_break_bit(true)
       push_word(registers.pc)
-      push(registers.p)
+      push(registers.status)
       unless registers.has_interrupt_bit?
         registers.toggle_interrupt_bit(true)
         registers.pc = read_word(0xFFFE)
@@ -518,7 +518,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_rti(_operand)
-      registers.p = pop
+      registers.status = pop
       registers.pc = pop_word
       registers.toggle_reserved_bit(true)
     end

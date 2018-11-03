@@ -26,7 +26,7 @@ module Rnes
 
     # @note status
     # @return [Integer]
-    attr_reader :p
+    attr_reader :status
 
     # @note index X
     # @param [Integer]
@@ -40,63 +40,63 @@ module Rnes
 
     def initialize
       @a = 0x00
-      @p = 0b00000000
       @pc = 0x0000
       @sp = 0x0000
+      @status = 0b00000000
       @x = 0x00
       @y = 0x00
     end
 
     # @return [Integer]
     def carry_bit
-      @p[CARRY_BIT_INDEX]
+      @status[CARRY_BIT_INDEX]
     end
 
     # @return [Boolean]
     def has_break_bit?
-      @p[BREAK_BIT_INDEX] == 1
+      @status[BREAK_BIT_INDEX] == 1
     end
 
     # @return [Boolean]
     def has_carry_bit?
-      @p[CARRY_BIT_INDEX] == 1
+      @status[CARRY_BIT_INDEX] == 1
     end
 
     # @return [Boolean]
     def has_decimal_bit?
-      @p[DECIMAL_BIT_INDEX] == 1
+      @status[DECIMAL_BIT_INDEX] == 1
     end
 
     # @return [Boolean]
     def has_interrupt_bit?
-      @p[INTERRUPT_BIT_INDEX] == 1
+      @status[INTERRUPT_BIT_INDEX] == 1
     end
 
     # @return [Boolean]
     def has_negative_bit?
-      @p[NEGATIVE_BIT_INDEX] == 1
+      @status[NEGATIVE_BIT_INDEX] == 1
     end
 
     # @return [Boolean]
     def has_overflow_bit?
-      @p[OVERFLOW_BIT_INDEX] == 1
+      @status[OVERFLOW_BIT_INDEX] == 1
     end
 
     # @return [Boolean]
     def has_reserved_bit?
-      @p[RESERVED_BIT_INDEX] == 1
+      @status[RESERVED_BIT_INDEX] == 1
     end
 
     # @return [Boolean]
     def has_zero_bit?
-      @p[ZERO_BIT_INDEX] == 1
+      @status[ZERO_BIT_INDEX] == 1
     end
 
     def reset
       @a = 0x00
-      @p = 0b00110100
       @pc = 0x0000
       @sp = 0x1FD
+      @status = 0b00110100
       @x = 0x00
       @y = 0x00
     end
@@ -147,9 +147,9 @@ module Rnes
     # @param [Boolean] boolean
     def toggle_bit(index, boolean)
       if boolean
-        @p |= 1 << index
+        @status |= 1 << index
       else
-        @p &= ~(1 << index)
+        @status &= ~(1 << index)
       end
     end
   end
