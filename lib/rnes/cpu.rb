@@ -270,8 +270,8 @@ module Rnes
     # @param [Rnes::Operation] operation
     def execute_operation_brk(_operation)
       registers.toggle_break_bit(true)
-      push_program_counter
-      push_status
+      push_word(registers.pc)
+      push(registers.p)
       unless registers.has_interrupt_bit?
         registers.toggle_interrupt_bit(true)
         registers.pc = read_word(0xFFFE)
@@ -399,7 +399,6 @@ module Rnes
     def execute_operation_jsr(operation)
       address = fetch_value_by_addressing_mode(operation.addressing_mode)
       registers.pc -= 1
-      push_program_counter
       registers.pc = address
     end
 
@@ -511,14 +510,14 @@ module Rnes
 
     # @param [Rnes::Operation] operation
     def execute_operation_rti(_operation)
-      pop_status
-      pop_program_counter
+      registers.p = pop
+      registers.pc = pop_word
       registers.toggle_reserved_bit(true)
     end
 
     # @param [Rnes::Operation] operation
     def execute_operation_rts(_operation)
-      pop_program_counter
+      registers.pc = pop_word
       registers.pc += 1
     end
 
@@ -757,14 +756,6 @@ module Rnes
       read(registers.sp & 0xFF | 0x100)
     end
 
-    def pop_program_counter
-      registers.pc = pop_word
-    end
-
-    def pop_status
-      registers.p = pop
-    end
-
     # @return [Integer]
     def pop_word
       pop | pop << 8
@@ -774,14 +765,6 @@ module Rnes
     def push(value)
       write(registers.sp | 0x100, value)
       registers.sp -= 1
-    end
-
-    def push_program_counter
-      push_word(registers.pc)
-    end
-
-    def push_status
-      push(registers.p)
     end
 
     # @param [Integer] value
