@@ -36,6 +36,21 @@ module Rnes
       end
     end
 
+    # @param [Integer] address
+    # @param [Integer] value
+    def write(address, value)
+      case address
+      when 0x2000..0x27FF
+        @ram.write(address - 0x2000, value)
+      when 0x2800..0x2FFF
+        @ram.write(address - 0x0800, value)
+      when 0x3000..0x3EFF
+        @ram.write(address - 0x1000, value)
+      else
+        raise ::Rnes::Errors::InvalidPpuBusAddressError, "Invalid address: #{address}"
+      end
+    end
+
     private
 
     # @param [Integer] address

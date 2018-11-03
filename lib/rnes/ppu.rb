@@ -312,7 +312,7 @@ module Rnes
       when 0x3F00..0x3FFF
         @palette[@video_ram_address - 0x3F00] = value
       else
-        @video_ram.write(@video_ram_address, value)
+        @bus.write(@video_ram_address, value)
       end
       @video_ram_address += video_ram_address_offset
     end
