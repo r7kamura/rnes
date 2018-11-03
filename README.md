@@ -5,21 +5,13 @@
 
 A NES emulator written in Ruby.
 
+## Requirements
+
+- Ruby 2.2 or higher
+
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'rnes'
-```
-
-And then execute:
-
-```sh
-bundle
-```
-
-Or install it yourself as:
+Install rnes as a gem.
 
 ```sh
 gem install rnes
