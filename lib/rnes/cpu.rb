@@ -392,9 +392,10 @@ module Rnes
 
     # @param [Rnes::Operation] operation
     def execute_operation_jsr(operation)
+      address = fetch_value_by_addressing_mode(operation.addressing_mode)
       registers.pc -= 1
       stack_program_counter
-      registers.pc = fetch_value_by_addressing_mode(operation.addressing_mode)
+      registers.pc = address
     end
 
     # @todo
