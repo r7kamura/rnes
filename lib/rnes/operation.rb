@@ -49,8 +49,8 @@ module Rnes
     end
 
     # @return [Boolean]
-    def unimmediate?
-      NAMES_ALLOWING_IMMEDIATE_ADDRESSING_MODE.include?(name) && addressing_mode != :immediate
+    def allowing_immediate?
+      NAMES_ALLOWING_IMMEDIATE_ADDRESSING_MODE.include?(name)
     end
   end
 end

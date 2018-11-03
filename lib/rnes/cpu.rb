@@ -679,7 +679,7 @@ module Rnes
     # @param [Rnes::Operation]
     def fetch_operand(operation)
       value = fetch_value_by_addressing_mode(operation.addressing_mode)
-      if operation.unimmediate?
+      if operation.allowing_immediate? && operation.addressing_mode != :immediate
         read(value)
       else
         value
