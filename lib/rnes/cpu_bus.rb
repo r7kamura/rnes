@@ -26,7 +26,7 @@ module Rnes
       when 0x2008..0x3FFF
         @ppu.read(address - 0x2008)
       when 0x4000..0x401F
-        # TODO
+        0 # TODO
       when 0x4020..0x5FFF
         # TODO
       when 0x6000..0x7FFF

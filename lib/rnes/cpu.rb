@@ -30,7 +30,7 @@ module Rnes
       when :AND
         execute_operation_and(operand)
       when :ASL
-        execute_operation_asl(operand)
+        execute_operation_asl(operand, addressing_mode: operation.addressing_mode)
       when :BCC
         execute_operation_bcc(operand)
       when :BCS
@@ -96,7 +96,7 @@ module Rnes
       when :LDY
         execute_operation_ldy(operand)
       when :LSR
-        execute_operation_lsr(operand)
+        execute_operation_lsr(operand, addressing_mode: operation.addressing_mode)
       when :NOP
         execute_operation_nop(operand)
       when :NOPD
@@ -165,75 +165,68 @@ module Rnes
 
     private
 
-    # @param [Integer] value
-    def adjust_carry_bit(value)
-      flag = value > 0xFF
-      registers.toggle_carry_bit(flag)
-    end
-
-    # @param [Integer] value
-    def adjust_negative_bit(value)
-      flag = value >= 0x80
-      registers.toggle_negative_bit(flag)
-    end
-
-    # @param [Integer] value
-    def adjust_overflow_bit(value)
-      flag = value >= 0xFF || value < -0xFF
-      registers.toggle_overflow_bit(flag)
-    end
-
-    # @param [Integer] value
-    def adjust_zero_bit(value)
-      flag = value.zero?
-      registers.toggle_zero_bit(flag)
-    end
-
     # @param [Integer] address
     def branch(address)
       @branched = true
       registers.program_counter = address
     end
 
+    # @note ADC means "ADD with Carry".
     # @param [Integer] operand
     def execute_operation_adc(operand)
-      result = operand + registers.index_x + registers.carry_bit
-      adjust_carry_bit(result)
-      adjust_negative_bit(result)
-      adjust_overflow_bit(result)
-      adjust_zero_bit(result)
-      registers.accumlator = result & 0xFF
+      result = operand + registers.accumulator + registers.carry_bit
+      registers.carry = result > 0xFF
+      registers.negative = result[7] == 1
+      registers.overflow = (registers.accumulator ^ operand)[7].zero? && !(registers.accumulator ^ result)[7].zero?
+      registers.zero = result.zero?
+      registers.accumulator = result & 0xFF
     end
 
-    # @todo
     # @param [Integer] operand
-    def execute_operation_and(_operand)
-      raise ::NotImplementedError
+    def execute_operation_and(operand)
+      result = operand & registers.accumulator
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
     end
 
-    # @todo
+    # @param [Symbol] addressing_mode
     # @param [Integer] operand
-    def execute_operation_asl(_operand)
-      raise ::NotImplementedError
+    def execute_operation_asl(operand, addressing_mode:)
+      if addressing_mode == :accumulator
+        value = registers.accumulator
+        result = (value << 1) && 0xFF
+        registers.carry = value[7] == 1
+        registers.negative = result[7] == 1
+        registers.zero = result.zero?
+        registers.accumulator = result
+      else
+        value = read(operand)
+        result = (value << 1) && 0xFF
+        registers.carry = value[7] == 1
+        registers.negative = result[7] == 1
+        registers.zero = result.zero?
+        write(operand, result)
+      end
     end
 
     # @param [Integer] operand
     def execute_operation_bcc(operand)
-      unless registers.has_carry_bit?
+      unless registers.carry?
         branch(operand)
       end
     end
 
     # @param [Integer] operand
     def execute_operation_bcs(operand)
-      if registers.has_carry_bit?
+      if registers.carry?
         branch(operand)
       end
     end
 
     # @param [Integer] operand
     def execute_operation_beq(operand)
-      if registers.has_zero_bit?
+      if registers.zero?
         branch(operand)
       end
     end
@@ -241,167 +234,178 @@ module Rnes
     # @param [Integer] operand
     def execute_operation_bit(operand)
       result = read(operand)
-      registers.toggle_overflow_bit(result[6] != 0)
-      adjust_negative_bit(result)
-      adjust_zero_bit(registers.accumlator & result)
+      registers.overflow = result[6] == 1
+      registers.negative = result[7] == 1
+      registers.zero = (registers.accumulator & result).zero?
     end
 
-    # @todo
     # @param [Integer] operand
     def execute_operation_bmi(_operand)
-      raise ::NotImplementedError
+      unless registers.negative?
+        branch(operand)
+      end
     end
 
     # @param [Integer] operand
     def execute_operation_bne(operand)
-      unless registers.has_zero_bit?
-        registers.program_counter = operand
+      unless registers.zero?
+        branch(operand)
       end
     end
 
     # @param [Integer] operand
     def execute_operation_bpl(operand)
-      unless registers.has_negative_bit?
-        registers.program_counter = operand
+      unless registers.negative?
+        branch(operand)
       end
     end
 
     # @param [Integer] operand
     def execute_operation_brk(_operand)
-      registers.toggle_break_bit(true)
+      registers.break = true
+      registers.program_counter += 1
       push_word(registers.program_counter)
       push(registers.status)
-      unless registers.has_interrupt_bit?
-        registers.toggle_interrupt_bit(true)
+      unless registers.interrupt?
+        registers.interrupt = true
         registers.program_counter = read_word(0xFFFE)
       end
       registers.program_counter -= 1
     end
 
-    # @todo
     # @param [Integer] operand
-    def execute_operation_bvc(_operand)
-      raise ::NotImplementedError
+    def execute_operation_bvc(operand)
+      unless registers.overflow?
+        branch(operand)
+      end
     end
 
-    # @todo
     # @param [Integer] operand
-    def execute_operation_bvs(_operand)
-      raise ::NotImplementedError
+    def execute_operation_bvs(operand)
+      if registers.overflow?
+        branch(operand)
+      end
     end
 
     # @param [Integer] operand
     def execute_operation_clc(_operand)
-      registers.toggle_carry_bit(true)
+      registers.carry = false
     end
 
     # @param [Integer] operand
     def execute_operation_cld(_operand)
-      registers.toggle_decimal_bit(false)
+      registers.decimal = false
     end
 
-    # @todo
     # @param [Integer] operand
     def execute_operation_cli(_operand)
-      raise ::NotImplementedError
+      registers.interrupt = false
     end
 
-    # @todo
     # @param [Integer] operand
     def execute_operation_clv(_operand)
-      raise ::NotImplementedError
+      registers.overflow = false
     end
 
     # @param [Integer] operand
     def execute_operation_cmp(operand)
-      result = registers.accumlator - operand
-      registers.toggle_carry_bit(result >= 0)
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
+      result = registers.accumulator - operand
+      registers.carry = result >= 0
+      registers.negative = result[7] == 1
+      registers.zero = (result & 0xFF).zero?
     end
 
     # @param [Integer] operand
     def execute_operation_cpx(operand)
       result = registers.index_x - operand
-      registers.toggle_carry_bit(result >= 0)
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
+      registers.carry = result >= 0
+      registers.negative = result[7] == 1
+      registers.zero = (result & 0xFF).zero?
     end
 
     # @param [Integer] operand
     def execute_operation_cpy(operand)
       result = registers.index_y - operand
-      registers.toggle_carry_bit(result >= 0)
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
+      registers.carry = result >= 0
+      registers.negative = result[7] == 1
+      registers.zero = (result & 0xFF).zero?
     end
 
-    # @todo
     # @param [Integer] operand
-    def execute_operation_dcp(_operand)
-      raise ::NotImplementedError
+    def execute_operation_dcp(operand)
+      result = (read(operand) - 1) & 0xFF
+      sub_result = (registers.accumulator - result) & 0x1FF
+      registers.negative = sub_result[7] == 1
+      registers.zero = sub_result.zero?
+      write(operand, result)
     end
 
     # @param [Integer] operand
     def execute_operation_dec(operand)
-      result = read(operand) - 1
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
+      result = (read(operand) - 1) & 0xFF
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
       write(operand, result)
     end
 
     # @param [Integer] operand
     def execute_operation_dex(_operand)
-      result = registers.index_x - 1
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
-      registers.index_x = result & 0xFF
+      result = (registers.index_x - 1) & 0xFF
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.index_x = result
     end
 
     # @param [Integer] operand
     def execute_operation_dey(_operand)
-      result = registers.index_y - 1
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
-      registers.index_y = result & 0xFF
+      result = (registers.index_y - 1) & 0xFF
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.index_y = result
     end
 
     # @param [Integer] operand
     def execute_operation_eor(operand)
-      result = operand ^ registers.accumlator
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
-      registers.accumlator = result & 0xFF
+      result = (operand ^ registers.accumulator) & 0xFF
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
     end
 
     # @param [Integer] operand
     def execute_operation_inc(operand)
-      result = read(operand) + 1
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
-      write(operand, result & 0xFF)
+      result = (read(operand) + 1) & 0xFF
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      write(operand, result)
     end
 
     # @param [Integer] operand
     def execute_operation_inx(_operand)
-      result = registers.index_x + 1
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
-      registers.index_x = result & 0xFF
+      result = (registers.index_x + 1) & 0xFF
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.index_x = result
     end
 
     # @param [Integer] operand
     def execute_operation_iny(_operand)
-      result = registers.index_y + 1
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
-      registers.index_y = result & 0xFF
+      result = (registers.index_y + 1) & 0xFF
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.index_y = result
     end
 
-    # @todo
     # @param [Integer] operand
     def execute_operation_isb(_operand)
-      raise NotImplementedError
+      value = (read(operand) + 1) & 0xFF
+      result = (~value & 0xFF) + registers.accumulator + registers.carry
+      registers.overflow = (registers.accumulator ^ value)[7].zero? && !(registers.accumulator ^ result)[7].zero?
+      registers.carry = result > 0xFF
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result & 0xFF
+      write(address, value)
     end
 
     # @param [Integer] operand
@@ -415,37 +419,53 @@ module Rnes
       registers.program_counter = operand
     end
 
-    # @todo
     # @param [Integer] operand
-    def execute_operation_lax(_operand)
-      raise NotImplementedError
+    def execute_operation_lax(operand)
+      result = read(operand)
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
+      registers.index_x = result
     end
 
     # @param [Integer] operand
     def execute_operation_lda(operand)
-      adjust_negative_bit(operand)
-      adjust_zero_bit(operand)
-      registers.accumlator = operand
+      registers.negative = operand[7] == 1
+      registers.zero = operand.zero?
+      registers.accumulator = operand
     end
 
     # @param [Integer] operand
     def execute_operation_ldx(operand)
-      adjust_negative_bit(operand)
-      adjust_zero_bit(operand)
+      registers.negative = operand[7] == 1
+      registers.zero = operand.zero?
       registers.index_x = operand
     end
 
     # @param [Integer] operand
     def execute_operation_ldy(operand)
-      adjust_negative_bit(operand)
-      adjust_zero_bit(operand)
+      registers.negative = operand[7] == 1
+      registers.zero = operand.zero?
       registers.index_y = operand
     end
 
-    # @todo
+    # @param [Symbol] addressing_mode
     # @param [Integer] operand
-    def execute_operation_lsr(_operand)
-      raise ::NotImplementedError
+    def execute_operation_lsr(operand, addressing_mode:)
+      if addressing_mode == :accumulator
+        value = registers.accumulator
+        result = value >> 1
+        registers.carry = value[0] == 1
+        registers.zero = result.zero?
+        registers.accumulator = result
+      else
+        value = read(operand)
+        result = value >> 1
+        registers.carry = value[0] == 1
+        registers.zero = result.zero?
+        write(operand, result)
+      end
+      registers.negative = false
     end
 
     # @param [Integer] operand
@@ -464,35 +484,35 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_ora(operand)
-      result = registers.accumlator | operand
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
-      registers.accumlator = result % 0xFF
+      result = registers.accumulator | operand
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result & 0xFF
     end
 
     # @param [Integer] operand
     def execute_operation_pha(_operand)
-      push(registers.accumlator)
+      push(registers.accumulator)
     end
 
-    # @todo
     # @param [Integer] operand
     def execute_operation_php(_operand)
-      raise ::NotImplementedError
+      registers.break = true
+      push(registers.status)
     end
 
     # @param [Integer] operand
     def execute_operation_pla(_operand)
       result = pop
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
-      registers.accumlator = result
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
     end
 
-    # @todo
     # @param [Integer] operand
     def execute_operation_plp(_operand)
-      raise ::NotImplementedError
+      registers.status = pop
+      registers.reserved = true
     end
 
     # @todo
@@ -523,7 +543,7 @@ module Rnes
     def execute_operation_rti(_operand)
       registers.status = pop
       registers.program_counter = pop_word
-      registers.toggle_reserved_bit(true)
+      registers.reserved = true
     end
 
     # @param [Integer] operand
@@ -540,17 +560,17 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_sbc(operand)
-      result = registers.accumlator - operand - 1 + registers.carry_bit
-      registers.toggle_overflow_bit((registers.accumlator ^ result) & 0x80 != 0 && ((registers.accumlator ^ operand) & 0x80) != 0)
-      registers.toggle_carry_bit(result >= 0)
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
-      registers.accumlator = result & 0xFF
+      result = registers.accumulator - operand - 1 + registers.carry_bit
+      registers.overflow = ((registers.accumulator ^ result) & 0x80 != 0 && ((registers.accumulator ^ operand) & 0x80) != 0)
+      registers.carry = result >= 0
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result & 0xFF
     end
 
     # @param [Integer] operand
     def execute_operation_sec(_operand)
-      registers.toggle_carry_bit(true)
+      registers.carry = true
     end
 
     # @todo
@@ -561,17 +581,17 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_sei(_operand)
-      registers.toggle_interrupt_bit(true)
+      registers.interrupt = true
     end
 
     # @param [Integer] operand
     def execute_operation_slo(operand)
       value = read(operand)
-      adjust_carry_bit(value)
+      registers.carry = value[7] == 1
       result = (value << 1) & 0xFF
-      registers.accumlator |= result
-      adjust_negative_bit(registers.accumlator)
-      adjust_zero_bit(registers.accumlator)
+      registers.accumulator |= result
+      registers.negative = registers.accumulator[7] == 1
+      registers.zero = registers.accumulator.zero?
       write(address, result)
     end
 
@@ -583,7 +603,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_sta(operand)
-      write(operand, registers.accumlator)
+      write(operand, registers.accumulator)
     end
 
     # @param [Integer] operand
@@ -598,17 +618,17 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_tax(_operand)
-      result = registers.accumlator
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
+      result = registers.accumulator
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
       registers.index_x = result
     end
 
     # @param [Integer] operand
     def execute_operation_tay(_operand)
-      result = registers.accumlator
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
+      result = registers.accumulator
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
       registers.index_y = result
     end
 
@@ -621,9 +641,9 @@ module Rnes
     # @param [Integer] operand
     def execute_operation_txa(_operand)
       result = registers.index_x
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
-      registers.accumlator = result
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
     end
 
     # @param [Integer] operand
@@ -634,9 +654,9 @@ module Rnes
     # @param [Integer] operand
     def execute_operation_tya(_operand)
       result = registers.index_y
-      adjust_negative_bit(result)
-      adjust_zero_bit(result)
-      registers.accumlator = result
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
     end
 
     # @return [Integer]

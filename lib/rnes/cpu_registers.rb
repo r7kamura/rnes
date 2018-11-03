@@ -11,7 +11,7 @@ module Rnes
 
     # @param [Integer]
     # @return [Integer]
-    attr_accessor :accumlator
+    attr_accessor :accumulator
 
     # @param [Integer]
     # @return [Integer]
@@ -29,16 +29,37 @@ module Rnes
     # @return [Integer]
     attr_accessor :stack_pointer
 
+    # @param [Integer]
     # @return [Integer]
-    attr_reader :status
+    attr_accessor :status
 
     def initialize
-      @accumlator = 0x00
+      @accumulator = 0x00
       @index_x = 0x00
       @index_y = 0x00
       @program_counter = 0x0000
       @stack_pointer = 0x0000
       @status = 0b00000000
+    end
+
+    # @return [Boolean]
+    def break?
+      @status[BREAK_BIT_INDEX] == 1
+    end
+
+    # @param [Boolean] boolean
+    def break=(boolean)
+      toggle_bit(BREAK_BIT_INDEX, boolean)
+    end
+
+    # @return [Boolean]
+    def carry?
+      @status[CARRY_BIT_INDEX] == 1
+    end
+
+    # @param [Boolean] boolean
+    def carry=(boolean)
+      toggle_bit(CARRY_BIT_INDEX, boolean)
     end
 
     # @return [Integer]
@@ -47,47 +68,52 @@ module Rnes
     end
 
     # @return [Boolean]
-    def has_break_bit?
-      @status[BREAK_BIT_INDEX] == 1
-    end
-
-    # @return [Boolean]
-    def has_carry_bit?
-      @status[CARRY_BIT_INDEX] == 1
-    end
-
-    # @return [Boolean]
-    def has_decimal_bit?
+    def decimal?
       @status[DECIMAL_BIT_INDEX] == 1
     end
 
+    # @param [Boolean] boolean
+    def decimal=(boolean)
+      toggle_bit(DECIMAL_BIT_INDEX, boolean)
+    end
+
     # @return [Boolean]
-    def has_interrupt_bit?
+    def interrupt?
       @status[INTERRUPT_BIT_INDEX] == 1
     end
 
-    # @return [Boolean]
-    def has_negative_bit?
-      @status[NEGATIVE_BIT_INDEX] == 1
+    # @param [Boolean] boolean
+    def interrupt=(boolean)
+      toggle_bit(INTERRUPT_BIT_INDEX, boolean)
     end
 
     # @return [Boolean]
-    def has_overflow_bit?
+    def negative?
+      @status[NEGATIVE_BIT_INDEX] == 1
+    end
+
+    # @param [Boolean] boolean
+    def negative=(boolean)
+      toggle_bit(NEGATIVE_BIT_INDEX, boolean)
+    end
+
+    # @return [Boolean]
+    def overflow?
       @status[OVERFLOW_BIT_INDEX] == 1
     end
 
     # @return [Boolean]
-    def has_reserved_bit?
+    def reserved?
       @status[RESERVED_BIT_INDEX] == 1
     end
 
-    # @return [Boolean]
-    def has_zero_bit?
-      @status[ZERO_BIT_INDEX] == 1
+    # @param [Boolean] boolean
+    def reserved=(boolean)
+      toggle_bit(RESERVED_BIT_INDEX, boolean)
     end
 
     def reset
-      @accumlator = 0x00
+      @accumulator = 0x00
       @index_x = 0x00
       @index_y = 0x00
       @program_counter = 0x0000
@@ -96,42 +122,17 @@ module Rnes
     end
 
     # @param [Boolean] boolean
-    def toggle_break_bit(boolean)
-      toggle_bit(BREAK_BIT_INDEX, boolean)
-    end
-
-    # @param [Boolean] boolean
-    def toggle_carry_bit(boolean)
-      toggle_bit(CARRY_BIT_INDEX, boolean)
-    end
-
-    # @param [Boolean] boolean
-    def toggle_decimal_bit(boolean)
-      toggle_bit(DECIMAL_BIT_INDEX, boolean)
-    end
-
-    # @param [Boolean] boolean
-    def toggle_interrupt_bit(boolean)
-      toggle_bit(INTERRUPT_BIT_INDEX, boolean)
-    end
-
-    # @param [Boolean] boolean
-    def toggle_negative_bit(boolean)
-      toggle_bit(NEGATIVE_BIT_INDEX, boolean)
-    end
-
-    # @param [Boolean] boolean
-    def toggle_overflow_bit(boolean)
+    def overflow=(boolean)
       toggle_bit(OVERFLOW_BIT_INDEX, boolean)
     end
 
-    # @param [Boolean] boolean
-    def toggle_reserved_bit(boolean)
-      toggle_bit(RESERVED_BIT_INDEX, boolean)
+    # @return [Boolean]
+    def zero?
+      @status[ZERO_BIT_INDEX] == 1
     end
 
     # @param [Boolean] boolean
-    def toggle_zero_bit(boolean)
+    def zero=(boolean)
       toggle_bit(ZERO_BIT_INDEX, boolean)
     end
 
