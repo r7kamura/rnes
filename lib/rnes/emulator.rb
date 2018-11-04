@@ -1,4 +1,3 @@
-require 'rnes/character_rom'
 require 'rnes/cpu_bus'
 require 'rnes/cpu'
 require 'rnes/ppu'
@@ -8,7 +7,30 @@ require 'rnes/rom_loader'
 
 module Rnes
   class Emulator
+    CHARACTER_RAM_BYTESIZE = 2**12
+
     LOG_FILE_NAME = 'rnes.log'.freeze
+
+    VIDEO_RAM_BYTESIZE = 2**13
+
+    WORKING_RAM_BYTESIZE = 2**11
+
+    class << self
+      # @return [Rnes::Ram]
+      def generate_character_ram
+        ::Rnes::Ram.new(bytesize: CHARACTER_RAM_BYTESIZE)
+      end
+
+      # @return [Rnes::Ram]
+      def generate_video_ram
+        ::Rnes::Ram.new(bytesize: VIDEO_RAM_BYTESIZE)
+      end
+
+      # @return [Rnes::Ram]
+      def generate_working_ram
+        ::Rnes::Ram.new(bytesize: WORKING_RAM_BYTESIZE)
+      end
+    end
 
     # @return [Rnes::CpuBus]
     attr_reader :cpu_bus
@@ -17,19 +39,30 @@ module Rnes
     attr_reader :ppu_bus
 
     def initialize
-      @video_ram = ::Rnes::Ram.new
-      @working_ram = ::Rnes::Ram.new
-      @ppu_bus = ::Rnes::PpuBus.new(ram: @video_ram)
-      @ppu = ::Rnes::Ppu.new(bus: @ppu_bus)
-      @cpu_bus = ::Rnes::CpuBus.new(ppu: @ppu, ram: @working_ram)
-      @cpu = ::Rnes::Cpu.new(bus: @cpu_bus)
+      @ppu_bus = ::Rnes::PpuBus.new(
+        character_ram: self.class.generate_character_ram,
+        video_ram: self.class.generate_video_ram,
+      )
+      @ppu = ::Rnes::Ppu.new(
+        bus: @ppu_bus,
+      )
+      @cpu_bus = ::Rnes::CpuBus.new(
+        ppu: @ppu,
+        ram: self.class.generate_working_ram,
+      )
+      @cpu = ::Rnes::Cpu.new(
+        bus: @cpu_bus,
+      )
     end
 
     # @param [Array<Integer>] rom_bytes
     def load_rom(rom_bytes)
       rom_loader = ::Rnes::RomLoader.new(rom_bytes)
+      character_rom_bytes = rom_loader.character_rom_bytes
+      character_rom_bytes.length.times do |i|
+        @ppu_bus.character_ram.write(i, character_rom_bytes[i])
+      end
       @cpu_bus.program_rom = ::Rnes::ProgramRom.new(rom_loader.program_rom_bytes)
-      @ppu_bus.character_rom = ::Rnes::CharacterRom.new(rom_loader.character_rom_bytes)
       @cpu.reset
     end
 

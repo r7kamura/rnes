@@ -19,6 +19,8 @@ module Rnes
 
     SPRITE_HEIGHT = 8
 
+    SPRITES_COUNT = 256
+
     TILE_HEIGHT = 8
 
     TILE_WIDTH = 8
@@ -83,7 +85,7 @@ module Rnes
       @registers = ::Rnes::PpuRegisters.new
       @sprite_line_high_byte = 0x0
       @sprite_line_low_byte = 0x0
-      @sprite_ram = ::Rnes::Ram.new
+      @sprite_ram = ::Rnes::Ram.new(bytesize: SPRITES_COUNT)
       @sprite_ram_address = 0x00
       @video_ram_address = 0x0000
       @writing_video_ram_address = false

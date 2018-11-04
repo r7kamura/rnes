@@ -1,8 +1,8 @@
 module Rnes
   class Ram
-    # @todo
-    def initialize
-      @bytes = Array.new(2 * 2**10).map do
+    # @param [Integer] bytesize
+    def initialize(bytesize:)
+      @bytes = Array.new(bytesize).map do
         0
       end
     end
@@ -13,6 +13,9 @@ module Rnes
       @bytes[address]
     end
 
+    # @param [Integer] address
+    # @param [Integer] value
+    # @return [Integer]
     def write(address, value)
       @bytes[address] = value
     end

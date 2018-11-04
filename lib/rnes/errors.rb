@@ -16,9 +16,6 @@ module Rnes
       end
     end
 
-    class CharacterRomNotConnectedError < BaseError
-    end
-
     class InvalidAddressingModeError < BaseError
     end
 

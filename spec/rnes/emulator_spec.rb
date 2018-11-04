@@ -40,18 +40,6 @@ RSpec.describe Rnes::Emulator do
     ines_header_bytes + program_rom_bytes + character_rom_bytes
   end
 
-  describe '#load_rom' do
-    subject do
-      emulator.load_rom(rom_bytes)
-    end
-
-    it 'sets loaded data to CPU bus and PPU bus' do
-      subject
-      expect(emulator.cpu_bus.program_rom).to be_a(Rnes::ProgramRom)
-      expect(emulator.ppu_bus.character_rom).to be_a(Rnes::CharacterRom)
-    end
-  end
-
   describe '#tick' do
     subject do
       emulator.tick
