@@ -15,6 +15,14 @@ module Rnes
       @registers = ::Rnes::CpuRegisters.new
     end
 
+    # @note For logging.
+    # @return [Rnes::Operation]
+    def read_operation
+      address = registers.program_counter
+      operation_code = read(address)
+      ::Rnes::Operation.build(operation_code)
+    end
+
     def reset
       @registers.reset
       @registers.program_counter = read_word(0xFFFC)

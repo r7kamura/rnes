@@ -57,5 +57,15 @@ module Rnes
     def allowing_immediate?
       NAMES_ALLOWING_IMMEDIATE_ADDRESSING_MODE.include?(name)
     end
+
+    # @return [Hash]
+    def to_hash
+      {
+        addressing_mode: addressing_mode,
+        cycle: cycle,
+        full_name: full_name,
+        name: name,
+      }
+    end
   end
 end
