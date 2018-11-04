@@ -217,7 +217,7 @@ module Rnes
     end
 
     # @param [Integer] operand
-    def execute_operation_asl_for_accoumulator(operand)
+    def execute_operation_asl_for_accoumulator(_operand)
       value = registers.accumulator
       result = (value << 1) && 0xFF
       registers.carry = value[7] == 1
@@ -476,7 +476,7 @@ module Rnes
     end
 
     # @param [Integer] operand
-    def execute_operation_lsr_for_accumulator(operand)
+    def execute_operation_lsr_for_accumulator(_operand)
       value = registers.accumulator
       result = value >> 1
       registers.carry = value[0] == 1

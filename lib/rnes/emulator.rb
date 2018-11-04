@@ -8,7 +8,7 @@ require 'rnes/rom_loader'
 
 module Rnes
   class Emulator
-    LOG_FILE_NAME = 'rnes.log'
+    LOG_FILE_NAME = 'rnes.log'.freeze
 
     # @return [Rnes::CpuBus]
     attr_reader :cpu_bus
@@ -78,56 +78,56 @@ module Rnes
 
     # @return [String]
     def log_segment_cpu_accumulator
-      'A:0x%02X' % @cpu.registers.accumulator
+      format('A:0x%02X', @cpu.registers.accumulator)
     end
 
     # @return [String]
     def log_segment_cpu_index_x
-      'X:0x%02X' % @cpu.registers.index_x
+      format('X:0x%02X', @cpu.registers.index_x)
     end
 
     # @return [String]
     def log_segment_cpu_index_y
-      'Y:0x%02X' % @cpu.registers.index_y
+      format('Y:0x%02X', @cpu.registers.index_y)
     end
 
     # @return [String]
     def log_segment_cpu_program_counter
-      'PC:0x%04X' % @cpu.registers.program_counter
+      format('PC:0x%04X', @cpu.registers.program_counter)
     end
 
     # @return [String]
     def log_segment_cpu_stack_pointer
-      'SP:0x%02X' % (@cpu.registers.stack_pointer - 0x100)
+      format('SP:0x%02X', @cpu.registers.stack_pointer - 0x100)
     end
 
     # @return [String]
     def log_segment_cpu_status
-      'P:0b%08b' % @cpu.registers.status
+      format('P:0b%08b', @cpu.registers.status)
     end
 
     # @return [String]
     def log_segment_cycle
-      'CYC:%03d' % @ppu.cycle
+      format('CYC:%03d', @ppu.cycle)
     end
 
     # @return [String]
     def log_segment_operation_code
       operation = @cpu.read_operation
       operation_code = ::Rnes::Operation::RECORDS.find_index(operation.to_hash)
-      'OP:0x%02X' % operation_code
+      format('OP:0x%02X', operation_code)
     end
 
     # @return [String]
     def log_segment_operation_name
       operation = @cpu.read_operation
-      '%-4s' % operation.name
+      format('%-4s', operation.name)
     end
 
     # @note SL means "Scan Line".
     # @return [String]
     def log_segment_ppu_line
-      'SL:%03d' % @ppu.line
+      format('SL:%03d', @ppu.line)
     end
 
     def puts_log_line
