@@ -2,8 +2,8 @@ require 'rnes/errors'
 
 module Rnes
   class CpuBus
-    # @param [Rnes::ProgramRom]
-    # @return [Rnes::ProgramRom]
+    # @param [Rnes::Rom]
+    # @return [Rnes::Rom]
     attr_accessor :program_rom
 
     # @param [Rnes::Ppu] ppu

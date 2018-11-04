@@ -1,7 +1,7 @@
 module Rnes
-  class ProgramRom
+  class Rom
     # @param [Integer] bytes
-    def initialize(bytes)
+    def initialize(bytes:)
       @bytes = bytes
     end
 

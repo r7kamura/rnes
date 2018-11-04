@@ -1,8 +1,8 @@
 require 'rnes/cpu_bus'
 require 'rnes/cpu'
 require 'rnes/ppu'
-require 'rnes/program_rom'
 require 'rnes/ram'
+require 'rnes/rom'
 require 'rnes/rom_loader'
 
 module Rnes
@@ -62,7 +62,7 @@ module Rnes
       character_rom_bytes.length.times do |i|
         @ppu_bus.character_ram.write(i, character_rom_bytes[i])
       end
-      @cpu_bus.program_rom = ::Rnes::ProgramRom.new(rom_loader.program_rom_bytes)
+      @cpu_bus.program_rom = ::Rnes::Rom.new(bytes: rom_loader.program_rom_bytes)
       @cpu.reset
     end
 

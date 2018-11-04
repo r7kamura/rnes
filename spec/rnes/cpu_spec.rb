@@ -23,7 +23,7 @@ RSpec.describe Rnes::Cpu do
   end
 
   let(:program_rom) do
-    Rnes::ProgramRom.new(program_rom_bytes)
+    Rnes::Rom.new(bytes: program_rom_bytes)
   end
 
   let(:program_rom_bytes) do
