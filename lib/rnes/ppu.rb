@@ -1,7 +1,6 @@
 require 'rnes/errors'
 require 'rnes/ppu_registers'
 require 'rnes/ppu/colors'
-require 'rnes/ram'
 
 module Rnes
   class Ppu
@@ -81,7 +80,6 @@ module Rnes
       @registers = ::Rnes::PpuRegisters.new
       @sprite_line_high_byte = 0x0
       @sprite_line_low_byte = 0x0
-      @sprite_ram = ::Rnes::Ram.new(bytesize: SPRITES_COUNT)
       @sprite_ram_address = 0x00
       @video_ram_address = 0x0000
       @writing_video_ram_address = false
