@@ -132,9 +132,17 @@ module Rnes
       when :RLA
         execute_operation_rla(operand)
       when :ROL
-        execute_operation_rol(operand)
+        if operation.addressing_mode == :accumulator
+          execute_operation_rol_for_accumulator(operand)
+        else
+          execute_operation_rol(operand)
+        end
       when :ROR
-        execute_operation_ror(operand)
+        if operation.addressing_mode == :accumulator
+          execute_operation_ror_for_accumulator(operand)
+        else
+          execute_operation_ror(operand)
+        end
       when :RRA
         execute_operation_rra(operand)
       when :RTI
@@ -187,7 +195,7 @@ module Rnes
       registers.program_counter = address
     end
 
-    # @note ADC means "ADD with Carry".
+    # @note ADd with Carry.
     # @param [Integer] operand
     def execute_operation_adc(operand)
       result = operand + registers.accumulator + registers.carry_bit
@@ -532,28 +540,69 @@ module Rnes
       registers.reserved = true
     end
 
-    # @todo
     # @param [Integer] operand
-    def execute_operation_rla(_operand)
-      raise ::NotImplementedError
+    def execute_operation_rla(operand)
+      value = (read(operand) << 1) + registers.carry_bit
+      result = (result & registers.accumulator) & 0xFF
+      registers.carry = value[8] == 1
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
+      write(operand, value)
     end
 
-    # @todo
+    # @note Rotate Left.
     # @param [Integer] operand
-    def execute_operation_rol(_operand)
-      raise ::NotImplementedError
+    def execute_operation_rol(operand)
+      value = read(operand)
+      result = ((value << 1) | registers.carry_bit) & 0xFF
+      registers.carry = value[7] == 1
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      write(operand, result)
     end
 
-    # @todo
     # @param [Integer] operand
-    def execute_operation_ror(_operand)
-      raise ::NotImplementedError
+    def execute_operation_rol_for_accumulator(_operand)
+      value = registers.accumulator
+      result = ((value << 1) | registers.carry_bit) & 0xFF
+      registers.carry = value[7] == 1
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
     end
 
-    # @todo
+    # @note Rotate Left.
     # @param [Integer] operand
-    def execute_operation_rra(_operand)
-      raise ::NotImplementedError
+    def execute_operation_ror(operand)
+      value = read(operand)
+      result = ((value >> 1) | (registers.carry_bit << 7))
+      registers.carry = value[0] == 1
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      write(operand, result)
+    end
+
+    # @param [Integer] operand
+    def execute_operation_ror_for_accumulator(_operand)
+      value = registers.accumulator
+      result = ((value >> 1) | (registers.carry_bit << 7))
+      registers.carry = value[0] == 1
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
+    end
+
+    # @param [Integer] operand
+    def execute_operation_rra(operand)
+      read_value = read(operand)
+      value = (read_value >> 1) | (registers.carry_bit << 7)
+      result = value + registers.accumulator + read_value[0]
+      registers.carry = result > 0xFF
+      registers.overflow = (registers.accumulator ^ value)[7].zero? && !(registers.accumulator ^ result)[7].zero?
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      write(operand, value)
     end
 
     # @param [Integer] operand
@@ -569,12 +618,13 @@ module Rnes
       registers.program_counter += 1
     end
 
-    # @todo
     # @param [Integer] operand
-    def execute_operation_sax(_operand)
-      raise ::NotImplementedError
+    def execute_operation_sax(operand)
+      result = registers.accumulator & registers.index_x
+      write(operand, result)
     end
 
+    # @note SuBtract with Carry.
     # @param [Integer] operand
     def execute_operation_sbc(operand)
       result = registers.accumulator - operand - 1 + registers.carry_bit
@@ -590,10 +640,9 @@ module Rnes
       registers.carry = true
     end
 
-    # @todo
     # @param [Integer] operand
     def execute_operation_sed(_operand)
-      raise ::NotImplementedError
+      registers.decimal = true
     end
 
     # @param [Integer] operand
@@ -603,19 +652,26 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_slo(operand)
-      value = read(operand)
-      registers.carry = value[7] == 1
-      result = (value << 1) & 0xFF
-      registers.accumulator |= result
-      registers.negative = registers.accumulator[7] == 1
-      registers.zero = registers.accumulator.zero?
-      write(address, result)
+      read_value = read(operand)
+      value = (read_value << 1) & 0xFF
+      result = value | registers.accumulator
+      registers.carry = read_value[7] == 1
+      registers.negative = result == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
+      write(operand, value)
     end
 
-    # @todo
     # @param [Integer] operand
-    def execute_operation_sre(_operand)
-      raise ::NotImplementedError
+    def execute_operation_sre(operand)
+      read_value = read(operand)
+      value = read_value >> 1
+      result = value ^ registers.accumulator
+      registers.carry = read_value[0] == 1
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.accumulator = result
+      write(operand, value)
     end
 
     # @param [Integer] operand
@@ -649,10 +705,12 @@ module Rnes
       registers.index_y = result
     end
 
-    # @todo
     # @param [Integer] operand
     def execute_operation_tsx(_operand)
-      raise ::NotImplementedError
+      result = registers.stack_pointer & 0xFF
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      registers.index_x = result
     end
 
     # @param [Integer] operand
