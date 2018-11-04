@@ -256,7 +256,7 @@ module Rnes
                 ((@image[base + 256 * 3 + 0].sum < 384 ? 0 : 1) << 6) |
                 ((@image[base + 256 * 3 + 1].sum < 384 ? 0 : 1) << 7)
                ) + 0x2800
-            ).chr('UTF-8')
+            ).chr('UTF-8'),
           )
         end
         puts
