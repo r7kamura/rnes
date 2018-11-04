@@ -57,7 +57,7 @@ module Rnes
 
     # @return [File]
     def log_file
-      @log_file ||= File.open(LOG_FILE_NAME, 'w')
+      @log_file ||= ::File.open(LOG_FILE_NAME, 'w')
     end
 
     # @return [String]
