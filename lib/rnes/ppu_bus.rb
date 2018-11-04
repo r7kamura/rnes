@@ -28,9 +28,9 @@ module Rnes
       when 0x3F10..0x3F1F
         # TODO: sprite palette table
       when 0x3F20..0x3FFF
-        read(address - 20) # mirror to 0x3F00..0x3F1F
+        read(address - 0x20) # mirror to 0x3F00..0x3F1F
       when 0x4000..0xFFFF
-        read(address - 4000) # mirror to 0x0000..0x3FFF
+        read(address - 0x4000) # mirror to 0x0000..0x3FFF
       else
         raise ::Rnes::Errors::InvalidPpuBusAddressError, address
       end
