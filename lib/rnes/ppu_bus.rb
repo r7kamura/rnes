@@ -41,6 +41,8 @@ module Rnes
     # @param [Integer] value
     def write(address, value)
       case address
+      when 0x0000..0x1FFF
+        @character_ram.write(address, value)
       when 0x2000..0x27FF
         @video_ram.write(address - 0x2000, value)
       when 0x2800..0x2FFF
