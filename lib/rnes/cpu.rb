@@ -32,19 +32,39 @@ module Rnes
     def tick
       operation = fetch_operation
       operand = fetch_operand_by(operation.addressing_mode)
-      case operation.name
+      execute_operation(
+        addressing_mode: operation.addressing_mode,
+        operand: operand,
+        operation_name: operation.name,
+      )
+      @branched = false
+    end
+
+    private
+
+    # @param [Integer] address
+    def branch(address)
+      @branched = true
+      registers.program_counter = address
+    end
+
+    # @param [Symbol] addressing_mode
+    # @param [Integer, nil] operand
+    # @param [Symbol] operation_name
+    def execute_operation(addressing_mode:, operand:, operation_name:)
+      case operation_name
       when :ADC
-        if operation.addressing_mode != :immediate
+        if addressing_mode != :immediate
           operand = read(operand)
         end
         execute_operation_adc(operand)
       when :AND
-        if operation.addressing_mode != :immediate
+        if addressing_mode != :immediate
           operand = read(operand)
         end
         execute_operation_and(operand)
       when :ASL
-        if operation.addressing_mode == :accumulator
+        if addressing_mode == :accumulator
           execute_operation_asl_for_accoumulator(operand)
         else
           execute_operation_asl(operand)
@@ -78,17 +98,17 @@ module Rnes
       when :CLV
         execute_operation_clv(operand)
       when :CMP
-        if operation.addressing_mode != :immediate
+        if addressing_mode != :immediate
           operand = read(operand)
         end
         execute_operation_cmp(operand)
       when :CPX
-        if operation.addressing_mode != :immediate
+        if addressing_mode != :immediate
           operand = read(operand)
         end
         execute_operation_cpx(operand)
       when :CPY
-        if operation.addressing_mode != :immediate
+        if addressing_mode != :immediate
           operand = read(operand)
         end
         execute_operation_cpy(operand)
@@ -101,7 +121,7 @@ module Rnes
       when :DEY
         execute_operation_dey(operand)
       when :EOR
-        if operation.addressing_mode != :immediate
+        if addressing_mode != :immediate
           operand = read(operand)
         end
         execute_operation_eor(operand)
@@ -120,22 +140,22 @@ module Rnes
       when :LAX
         execute_operation_lax(operand)
       when :LDA
-        if operation.addressing_mode != :immediate
+        if addressing_mode != :immediate
           operand = read(operand)
         end
         execute_operation_lda(operand)
       when :LDX
-        if operation.addressing_mode != :immediate
+        if addressing_mode != :immediate
           operand = read(operand)
         end
         execute_operation_ldx(operand)
       when :LDY
-        if operation.addressing_mode != :immediate
+        if addressing_mode != :immediate
           operand = read(operand)
         end
         execute_operation_ldy(operand)
       when :LSR
-        if operation.addressing_mode == :accumulator
+        if addressing_mode == :accumulator
           execute_operation_lsr_for_accumulator(operand)
         else
           execute_operation_lsr(operand)
@@ -147,7 +167,7 @@ module Rnes
       when :NOPI
         execute_operation_nopi(operand)
       when :ORA
-        if operation.addressing_mode != :immediate
+        if addressing_mode != :immediate
           operand = read(operand)
         end
         execute_operation_ora(operand)
@@ -162,13 +182,13 @@ module Rnes
       when :RLA
         execute_operation_rla(operand)
       when :ROL
-        if operation.addressing_mode == :accumulator
+        if addressing_mode == :accumulator
           execute_operation_rol_for_accumulator(operand)
         else
           execute_operation_rol(operand)
         end
       when :ROR
-        if operation.addressing_mode == :accumulator
+        if addressing_mode == :accumulator
           execute_operation_ror_for_accumulator(operand)
         else
           execute_operation_ror(operand)
@@ -182,7 +202,7 @@ module Rnes
       when :SAX
         execute_operation_sax(operand)
       when :SBC
-        if operation.addressing_mode != :immediate
+        if addressing_mode != :immediate
           operand = read(operand)
         end
         execute_operation_sbc(operand)
@@ -217,15 +237,6 @@ module Rnes
       else
         raise ::Rnes::Errors::UnknownOperationError, "Unknown operation: #{operation.name}"
       end
-      @branched = false
-    end
-
-    private
-
-    # @param [Integer] address
-    def branch(address)
-      @branched = true
-      registers.program_counter = address
     end
 
     # @note ADd with Carry.
