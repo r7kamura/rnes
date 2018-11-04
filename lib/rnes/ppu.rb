@@ -96,7 +96,7 @@ module Rnes
       when 0x0002
         registers.status
       else
-        raise ::Rnes::Errors::UnknownPpuAddressError, "Unknown address: #{address}"
+        raise ::Rnes::Errors::InvalidPpuAddressError, address
       end
     end
 
@@ -143,7 +143,7 @@ module Rnes
       when 0x0007
         write_to_video_ram(value)
       else
-        raise ::Rnes::Errors::UnknownPpuAddressError, "Unknown address: #{address}"
+        raise ::Rnes::Errors::InvalidPpuAddressError, address
       end
     end
 

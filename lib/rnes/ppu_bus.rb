@@ -32,7 +32,7 @@ module Rnes
       when 0x4000..0xFFFF
         read(address - 4000) # mirror to 0x0000..0x3FFF
       else
-        raise ::Rnes::Errors::InvalidPpuBusAddressError, "Invalid address: #{address}"
+        raise ::Rnes::Errors::InvalidPpuBusAddressError, address
       end
     end
 
@@ -47,7 +47,7 @@ module Rnes
       when 0x3000..0x3EFF
         @ram.write(address - 0x1000, value)
       else
-        raise ::Rnes::Errors::InvalidPpuBusAddressError, "Invalid address: #{address}"
+        raise ::Rnes::Errors::InvalidPpuBusAddressError, address
       end
     end
 

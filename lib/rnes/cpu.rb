@@ -246,7 +246,7 @@ module Rnes
       when :TYA
         execute_operation_tya(operand)
       else
-        raise ::Rnes::Errors::UnknownOperationError, "Unknown operation: #{operation_name}"
+        raise ::Rnes::Errors::InvalidOperationError, "Invalid operation: #{operation_name}"
       end
     end
 
@@ -889,7 +889,7 @@ module Rnes
       when :zero_page_y
         fetch_operand_by_zero_page_y_addressing
       else
-        raise ::Rnes::Errors::UnknownAddressingModeError, "Unknown addressing mode: #{addressing_mode}"
+        raise ::Rnes::Errors::InvalidAddressingModeError, "Invalid addressing mode: #{addressing_mode}"
       end
     end
 

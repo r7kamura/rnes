@@ -36,7 +36,7 @@ module Rnes
       when 0xC000..0xFFFF
         try_to_read_program_rom(address - offset_on_reading_program_rom_higher_region)
       else
-        raise ::Rnes::Errors::InvalidCpuBusAddressError, "Invalid address: #{address}"
+        raise ::Rnes::Errors::InvalidCpuBusAddressError, address
       end
     end
 
@@ -60,7 +60,7 @@ module Rnes
       when 0x6000..0x7FFF
         # TODO
       else
-        raise ::Rnes::Errors::InvalidCpuBusAddressError, "Invalid address: #{address}"
+        raise ::Rnes::Errors::InvalidCpuBusAddressError, address
       end
     end
 

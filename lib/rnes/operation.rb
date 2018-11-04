@@ -11,7 +11,7 @@ module Rnes
         if record
           new(record)
         else
-          raise ::Rnes::UnknownOperationCodeError, "Unknown operation code: #{operation_code}"
+          raise ::Rnes::InvalidOperationCodeError, "Invalid operation code: #{operation_code}"
         end
       end
     end
