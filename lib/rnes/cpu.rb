@@ -31,11 +31,17 @@ module Rnes
     # @todo Cycle calculation by using Rnes::Operation#cycle.
     def tick
       operation = fetch_operation
-      operand = fetch_operand(operation)
+      operand = fetch_operand_by(operation.addressing_mode)
       case operation.name
       when :ADC
+        if operation.addressing_mode != :immediate
+          operand = read(operand)
+        end
         execute_operation_adc(operand)
       when :AND
+        if operation.addressing_mode != :immediate
+          operand = read(operand)
+        end
         execute_operation_and(operand)
       when :ASL
         if operation.addressing_mode == :accumulator
@@ -72,10 +78,19 @@ module Rnes
       when :CLV
         execute_operation_clv(operand)
       when :CMP
+        if operation.addressing_mode != :immediate
+          operand = read(operand)
+        end
         execute_operation_cmp(operand)
       when :CPX
+        if operation.addressing_mode != :immediate
+          operand = read(operand)
+        end
         execute_operation_cpx(operand)
       when :CPY
+        if operation.addressing_mode != :immediate
+          operand = read(operand)
+        end
         execute_operation_cpy(operand)
       when :DCP
         execute_operation_dcp(operand)
@@ -86,6 +101,9 @@ module Rnes
       when :DEY
         execute_operation_dey(operand)
       when :EOR
+        if operation.addressing_mode != :immediate
+          operand = read(operand)
+        end
         execute_operation_eor(operand)
       when :INC
         execute_operation_inc(operand)
@@ -102,10 +120,19 @@ module Rnes
       when :LAX
         execute_operation_lax(operand)
       when :LDA
+        if operation.addressing_mode != :immediate
+          operand = read(operand)
+        end
         execute_operation_lda(operand)
       when :LDX
+        if operation.addressing_mode != :immediate
+          operand = read(operand)
+        end
         execute_operation_ldx(operand)
       when :LDY
+        if operation.addressing_mode != :immediate
+          operand = read(operand)
+        end
         execute_operation_ldy(operand)
       when :LSR
         if operation.addressing_mode == :accumulator
@@ -120,6 +147,9 @@ module Rnes
       when :NOPI
         execute_operation_nopi(operand)
       when :ORA
+        if operation.addressing_mode != :immediate
+          operand = read(operand)
+        end
         execute_operation_ora(operand)
       when :PHA
         execute_operation_pha(operand)
@@ -152,6 +182,9 @@ module Rnes
       when :SAX
         execute_operation_sax(operand)
       when :SBC
+        if operation.addressing_mode != :immediate
+          operand = read(operand)
+        end
         execute_operation_sbc(operand)
       when :SEC
         execute_operation_sec(operand)
@@ -742,120 +775,109 @@ module Rnes
       value
     end
 
-    # @param [Rnes::Operation]
-    def fetch_operand(operation)
-      value = fetch_value_by_addressing_mode(operation.addressing_mode)
-      if operation.allowing_immediate? && operation.addressing_mode != :immediate
-        read(value)
-      else
-        value
-      end
-    end
-
-    # @return [Rnes::Operation]
-    def fetch_operation
-      operation_code = fetch
-      ::Rnes::Operation.build(operation_code)
-    end
-
     # @param [Symbol] addressing_mode
-    # @return [Integer]
-    def fetch_value_by_addressing_mode(addressing_mode)
+    def fetch_operand_by(addressing_mode)
       case addressing_mode
       when :absolute
-        fetch_value_by_addressing_mode_absolute
+        fetch_operand_by_absolute_addressing
       when :absolute_x
-        fetch_value_by_addressing_mode_absolute_x
+        fetch_operand_by_absolute_x_addressing
       when :absolute_y
-        fetch_value_by_addressing_mode_absolute_y
+        fetch_operand_by_absolute_y_addressing
       when :accumulator
-        fetch_value_by_addressing_mode_accumulator
+        fetch_operand_by_accumulator_addressing
       when :immediate
-        fetch_value_by_addressing_mode_immediate
+        fetch_operand_by_immediate_addressing
       when :implied
-        fetch_value_by_addressing_mode_implied
+        fetch_operand_by_implied_addressing
       when :indirect_absolute
-        fetch_value_by_addressing_mode_indirect_absolute
+        fetch_operand_by_indirect_absolute_addressing
       when :post_indexed_indirect
-        fetch_value_by_addressing_mode_post_indexed_indirect
+        fetch_operand_by_post_indexed_indirect_addressing
       when :pre_indexed_indirect
-        fetch_value_by_addressing_mode_pre_indexed_indirect
+        fetch_operand_by_pre_indexed_indirect_addressing
       when :relative
-        fetch_value_by_addressing_mode_relative
+        fetch_operand_by_relative_addressing
       when :zero_page
-        fetch_value_by_addressing_mode_zero_page
+        fetch_operand_by_zero_page_addressing
       when :zero_page_x
-        fetch_value_by_addressing_mode_zero_page_x
+        fetch_operand_by_zero_page_x_addressing
       when :zero_page_y
-        fetch_value_by_addressing_mode_zero_page_y
+        fetch_operand_by_zero_page_y_addressing
       else
         raise ::Rnes::Errors::UnknownAddressingModeError, "Unknown addressing mode: #{addressing_mode}"
       end
     end
 
     # @return [Integer]
-    def fetch_value_by_addressing_mode_absolute
+    def fetch_operand_by_absolute_addressing
       fetch_word
     end
 
     # @return [Integer]
-    def fetch_value_by_addressing_mode_absolute_x
+    def fetch_operand_by_absolute_x_addressing
       (fetch_word + registers.index_x) & 0xFFFF
     end
 
     # @return [Integer]
-    def fetch_value_by_addressing_mode_absolute_y
+    def fetch_operand_by_absolute_y_addressing
       (fetch_word + registers.index_y) & 0xFFFF
     end
 
     # @return [nil]
-    def fetch_value_by_addressing_mode_accumulator
+    def fetch_operand_by_accumulator_addressing
     end
 
     # @return [Integer]
-    def fetch_value_by_addressing_mode_immediate
+    def fetch_operand_by_immediate_addressing
       fetch
     end
 
     # @return [nil]
-    def fetch_value_by_addressing_mode_implied
+    def fetch_operand_by_implied_addressing
     end
 
     # @return [Integer]
-    def fetch_value_by_addressing_mode_indirect_absolute
+    def fetch_operand_by_indirect_absolute_addressing
       read_word(fetch_word)
     end
 
     # @return [Integer]
-    def fetch_value_by_addressing_mode_pre_indexed_indirect
+    def fetch_operand_by_pre_indexed_indirect_addressing
       read_word((fetch + registers.index_x) & 0xFF)
     end
 
     # @return [Integer]
-    def fetch_value_by_addressing_mode_post_indexed_indirect
+    def fetch_operand_by_post_indexed_indirect_addressing
       (read_word(fetch) + registers.index_y) & 0xFF
     end
 
     # @return [Integer]
-    def fetch_value_by_addressing_mode_relative
+    def fetch_operand_by_relative_addressing
       int8 = fetch
       offset = int8[7] == 1 ? int8 - 256 : int8
       registers.program_counter + offset
     end
 
     # @return [Integer]
-    def fetch_value_by_addressing_mode_zero_page
+    def fetch_operand_by_zero_page_addressing
       fetch
     end
 
     # @return [Integer]
-    def fetch_value_by_addressing_mode_zero_page_x
+    def fetch_operand_by_zero_page_x_addressing
       (fetch + registers.index_x) & 0xFF
     end
 
     # @return [Integer]
-    def fetch_value_by_addressing_mode_zero_page_y
+    def fetch_operand_by_zero_page_y_addressing
       (fetch + registers.index_y) & 0xFF
+    end
+
+    # @return [Rnes::Operation]
+    def fetch_operation
+      operation_code = fetch
+      ::Rnes::Operation.build(operation_code)
     end
 
     # @return [Integer]

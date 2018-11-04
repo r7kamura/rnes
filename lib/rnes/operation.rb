@@ -3,20 +3,6 @@ require 'rnes/operation/records'
 
 module Rnes
   class Operation
-    NAMES_ALLOWING_IMMEDIATE_ADDRESSING_MODE = %i[
-      ADC
-      AND
-      CMP
-      CPX
-      CPY
-      EOR
-      LDA
-      LDX
-      LDY
-      ORA
-      SBC
-    ].freeze
-
     class << self
       # @param [Integer] operation_code
       # @return [Rnes::Operation]
@@ -51,11 +37,6 @@ module Rnes
       @cycle = cycle
       @full_name = full_name
       @name = name
-    end
-
-    # @return [Boolean]
-    def allowing_immediate?
-      NAMES_ALLOWING_IMMEDIATE_ADDRESSING_MODE.include?(name)
     end
 
     # @return [Hash]
