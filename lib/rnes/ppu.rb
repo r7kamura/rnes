@@ -9,6 +9,10 @@ module Rnes
 
     ADDRESS_TO_START_NAME_TABLE = 0x2000
 
+    ADDRESS_TO_START_BACKGROUND_PALETTE_TABLE = 0x3F00
+
+    ADDRESS_TO_START_SPRITE_PALETTE_TABLE = 0x3F10
+
     BLOCK_HEIGHT = 16
 
     BLOCK_WIDTH = 16
@@ -43,13 +47,6 @@ module Rnes
         end
       end
 
-      # @return [Array<Integer>]
-      def generate_empty_palette
-        ::Array.new(PALETTE_BYTESIZE).map do
-          0
-        end
-      end
-
       private
 
       # @return [Integer]
@@ -81,7 +78,6 @@ module Rnes
       @image = self.class.generate_empty_image
       @line = 0
       @mini_palette_ids_byte = 0x0
-      @palette = self.class.generate_empty_palette
       @registers = ::Rnes::PpuRegisters.new
       @sprite_line_high_byte = 0x0
       @sprite_line_low_byte = 0x0
@@ -220,6 +216,12 @@ module Rnes
       (0...VISIBLE_WINDOW_WIDTH).cover?(x) && (0...VISIBLE_WINDOW_HEIGHT).cover?(y)
     end
 
+    # @param [Integer] index
+    # @return [Integer]
+    def read_color_id_from_background_palette_table(index)
+      @bus.read(ADDRESS_TO_START_BACKGROUND_PALETTE_TABLE + index)
+    end
+
     # @return [Integer] 4-color-palette IDs of 4 blocks, as 8 bit data.
     def read_mini_palette_ids_byte
       @bus.read(ADDRESS_TO_START_ATTRIBUTE_TABLE + tile_index)
@@ -288,9 +290,8 @@ module Rnes
       mini_palette_id_memo = mini_palette_id
       8.times do |x_in_sprite|
         index_in_sprite_line_byte = 7 - x_in_sprite
-        color_id = @palette[
-          @sprite_line_low_byte[index_in_sprite_line_byte] | @sprite_line_high_byte[index_in_sprite_line_byte] << 1 | mini_palette_id_memo << 2
-        ]
+        background_palette_index = @sprite_line_low_byte[index_in_sprite_line_byte] | @sprite_line_high_byte[index_in_sprite_line_byte] << 1 | mini_palette_id_memo << 2
+        color_id = read_color_id_from_background_palette_table(background_palette_index)
         image_index = VISIBLE_WINDOW_WIDTH * y + x + x_in_sprite
         @image[image_index] = ::Rnes::Ppu::COLORS[color_id]
       end
@@ -312,7 +313,7 @@ module Rnes
 
     # @param [Integer] value
     def write_to_sprite_ram(value)
-      @sprite_ram.write(@sprite_ram_address, value)
+      @bus.write(@sprite_ram_address + ADDRESS_TO_START_SPRITE_PALETTE_TABLE, value)
       @sprite_ram_address += 1
     end
 
@@ -328,14 +329,7 @@ module Rnes
 
     # @param [Integer] value
     def write_to_video_ram(value)
-      case @video_ram_address
-      when 0x0000..0x1FFF
-        # TODO: write to character RAM
-      when 0x3F00..0x3FFF
-        @palette[@video_ram_address - 0x3F00] = value
-      else
-        @bus.write(@video_ram_address, value)
-      end
+      @bus.write(@video_ram_address, value)
       @video_ram_address += video_ram_address_offset
     end
 

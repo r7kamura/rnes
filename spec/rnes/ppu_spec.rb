@@ -22,8 +22,8 @@ RSpec.describe Rnes::Ppu do
 
     context 'on cycle 1 on line 0' do
       before do
-        # Load dummy 2 bytes palette.
-        allow(Rnes::Ppu).to receive(:generate_empty_palette).and_return(palette)
+        # Write dummy background pattern.
+        video_ram.write(0x1F01, blue_color_id)
 
         # Use sprite 1 on tile 0 (cycle 1 on line 0 renders the top line of tile 0).
         video_ram.write(0, sprite_index)
@@ -46,10 +46,6 @@ RSpec.describe Rnes::Ppu do
 
       let(:sprite_index) do
         1
-      end
-
-      let(:palette) do
-        [0, blue_color_id]
       end
 
       let(:sprite_line_high_byte) do

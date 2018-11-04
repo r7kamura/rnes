@@ -6,6 +6,7 @@ module Rnes
     attr_reader :character_ram
 
     # @param [Rnes::Ram] character_ram
+    # @param [Rnes::Ram] sprite_ram
     # @param [Rnes::Ram] video_ram
     def initialize(character_ram:, video_ram:)
       @character_ram = character_ram
@@ -21,13 +22,11 @@ module Rnes
       when 0x2000..0x27FF
         @video_ram.read(address - 0x2000)
       when 0x2800..0x2FFF
-        @video_ram.read(address - 0x0800)
+        read(address - 0x0800)
       when 0x3000..0x3EFF
-        @video_ram.read(address - 0x1000)
-      when 0x3F00..0x3E0F
-        # TODO: backgroud palette table
-      when 0x3F10..0x3F1F
-        # TODO: sprite palette table
+        read(address - 0x1000)
+      when 0x3F00..0x3F1F
+        @video_ram.read(address - 0x2000)
       when 0x3F20..0x3FFF
         read(address - 0x20) # mirror to 0x3F00..0x3F1F
       when 0x4000..0xFFFF
@@ -49,6 +48,8 @@ module Rnes
         @video_ram.write(address - 0x0800, value)
       when 0x3000..0x3EFF
         @video_ram.write(address - 0x1000, value)
+      when 0x3F00..0x3F1F
+        @video_ram.write(address - 0x2000, value)
       when 0x3F00..0xFFFF
         write(address - 0x1000, value)
       else
