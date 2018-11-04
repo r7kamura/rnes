@@ -22,7 +22,7 @@ module Rnes
 
     SPRITE_HEIGHT = 8
 
-    SPRITES_COUNT = 256
+    SPRITES_COUNT = 64
 
     TILE_HEIGHT = 8
 
