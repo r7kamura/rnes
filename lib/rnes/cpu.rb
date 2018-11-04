@@ -54,20 +54,22 @@ module Rnes
     def execute_operation(addressing_mode:, operand:, operation_name:)
       case operation_name
       when :ADC
-        if addressing_mode != :immediate
-          operand = read(operand)
+        if addressing_mode == :immediate
+          execute_operation_adc_for_immediate_addressing(operand)
+        else
+          execute_operation_adc_for_non_immediate_addressing(operand)
         end
-        execute_operation_adc(operand)
       when :AND
-        if addressing_mode != :immediate
-          operand = read(operand)
+        if addressing_mode == :immediate
+          execute_operation_and_for_immediate_addressing(operand)
+        else
+          execute_operation_and_for_non_immediate_addressing(operand)
         end
-        execute_operation_and(operand)
       when :ASL
         if addressing_mode == :accumulator
           execute_operation_asl_for_accoumulator(operand)
         else
-          execute_operation_asl(operand)
+          execute_operation_asl_for_non_accumulator(operand)
         end
       when :BCC
         execute_operation_bcc(operand)
@@ -98,20 +100,23 @@ module Rnes
       when :CLV
         execute_operation_clv(operand)
       when :CMP
-        if addressing_mode != :immediate
-          operand = read(operand)
+        if addressing_mode == :immediate
+          execute_operation_cmp_for_immediate_addressing(operand)
+        else
+          execute_operation_cmp_for_non_immediate_addressing(operand)
         end
-        execute_operation_cmp(operand)
       when :CPX
-        if addressing_mode != :immediate
-          operand = read(operand)
+        if addressing_mode == :immediate
+          execute_operation_cpx_for_immediate_addressing(operand)
+        else
+          execute_operation_cpx_for_non_immediate_addressing(operand)
         end
-        execute_operation_cpx(operand)
       when :CPY
-        if addressing_mode != :immediate
-          operand = read(operand)
+        if addressing_mode == :immediate
+          execute_operation_cpy_for_immediate_addressing(operand)
+        else
+          execute_operation_cpy_for_non_immediate_addressing(operand)
         end
-        execute_operation_cpy(operand)
       when :DCP
         execute_operation_dcp(operand)
       when :DEC
@@ -121,10 +126,11 @@ module Rnes
       when :DEY
         execute_operation_dey(operand)
       when :EOR
-        if addressing_mode != :immediate
-          operand = read(operand)
+        if addressing_mode == :immediate
+          execute_operation_eor_for_immediate_addressing(operand)
+        else
+          execute_operation_eor_for_non_immediate_addressing(operand)
         end
-        execute_operation_eor(operand)
       when :INC
         execute_operation_inc(operand)
       when :INX
@@ -140,25 +146,28 @@ module Rnes
       when :LAX
         execute_operation_lax(operand)
       when :LDA
-        if addressing_mode != :immediate
-          operand = read(operand)
+        if addressing_mode == :immediate
+          execute_operation_lda_for_immediate_addressing(operand)
+        else
+          execute_operation_lda_for_non_immediate_addressing(operand)
         end
-        execute_operation_lda(operand)
       when :LDX
-        if addressing_mode != :immediate
-          operand = read(operand)
+        if addressing_mode == :immediate
+          execute_operation_ldx_for_immediate_addressing(operand)
+        else
+          execute_operation_ldx_for_non_immediate_addressing(operand)
         end
-        execute_operation_ldx(operand)
       when :LDY
-        if addressing_mode != :immediate
-          operand = read(operand)
+        if addressing_mode == :immediate
+          execute_operation_ldy_for_immediate_addressing(operand)
+        else
+          execute_operation_ldy_for_non_immediate_addressing(operand)
         end
-        execute_operation_ldy(operand)
       when :LSR
         if addressing_mode == :accumulator
           execute_operation_lsr_for_accumulator(operand)
         else
-          execute_operation_lsr(operand)
+          execute_operation_lsr_for_non_accumulator(operand)
         end
       when :NOP
         execute_operation_nop(operand)
@@ -167,10 +176,11 @@ module Rnes
       when :NOPI
         execute_operation_nopi(operand)
       when :ORA
-        if addressing_mode != :immediate
-          operand = read(operand)
+        if addressing_mode == :immediate
+          execute_operation_ora_for_immediate_addressing(operand)
+        else
+          execute_operation_ora_for_non_immediate_addressing(operand)
         end
-        execute_operation_ora(operand)
       when :PHA
         execute_operation_pha(operand)
       when :PHP
@@ -185,13 +195,13 @@ module Rnes
         if addressing_mode == :accumulator
           execute_operation_rol_for_accumulator(operand)
         else
-          execute_operation_rol(operand)
+          execute_operation_rol_for_non_accumulator_(operand)
         end
       when :ROR
         if addressing_mode == :accumulator
           execute_operation_ror_for_accumulator(operand)
         else
-          execute_operation_ror(operand)
+          execute_operation_ror_for_non_accumulator(operand)
         end
       when :RRA
         execute_operation_rra(operand)
@@ -202,10 +212,11 @@ module Rnes
       when :SAX
         execute_operation_sax(operand)
       when :SBC
-        if addressing_mode != :immediate
-          operand = read(operand)
+        if addressing_mode == :immediate
+          execute_operation_sbc_for_immediate_addressing(operand)
+        else
+          execute_operation_sbc_for_non_immediate_addressing(operand)
         end
-        execute_operation_sbc(operand)
       when :SEC
         execute_operation_sec(operand)
       when :SED
@@ -235,13 +246,12 @@ module Rnes
       when :TYA
         execute_operation_tya(operand)
       else
-        raise ::Rnes::Errors::UnknownOperationError, "Unknown operation: #{operation.name}"
+        raise ::Rnes::Errors::UnknownOperationError, "Unknown operation: #{operation_name}"
       end
     end
 
-    # @note ADd with Carry.
     # @param [Integer] operand
-    def execute_operation_adc(operand)
+    def execute_operation_adc_for_immediate_addressing(operand)
       result = operand + registers.accumulator + registers.carry_bit
       registers.carry = result > 0xFF
       registers.negative = result[7] == 1
@@ -251,7 +261,13 @@ module Rnes
     end
 
     # @param [Integer] operand
-    def execute_operation_and(operand)
+    def execute_operation_adc_for_non_immediate_addressing(operand)
+      operand = read(operand)
+      execute_operation_adc_for_immediate_addressing(operand)
+    end
+
+    # @param [Integer] operand
+    def execute_operation_and_for_immediate_addressing(operand)
       result = operand & registers.accumulator
       registers.negative = result[7] == 1
       registers.zero = result.zero?
@@ -259,13 +275,9 @@ module Rnes
     end
 
     # @param [Integer] operand
-    def execute_operation_asl(operand)
-      value = read(operand)
-      result = (value << 1) && 0xFF
-      registers.carry = value[7] == 1
-      registers.negative = result[7] == 1
-      registers.zero = result.zero?
-      write(operand, result)
+    def execute_operation_and_for_non_immediate_addressing(operand)
+      operand = read(operand)
+      execute_operation_and_for_immediate_addressing(operand)
     end
 
     # @param [Integer] operand
@@ -276,6 +288,16 @@ module Rnes
       registers.negative = result[7] == 1
       registers.zero = result.zero?
       registers.accumulator = result
+    end
+
+    # @param [Integer] operand
+    def execute_operation_asl_for_non_accumulator(operand)
+      value = read(operand)
+      result = (value << 1) && 0xFF
+      registers.carry = value[7] == 1
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      write(operand, result)
     end
 
     # @param [Integer] operand
@@ -376,7 +398,7 @@ module Rnes
     end
 
     # @param [Integer] operand
-    def execute_operation_cmp(operand)
+    def execute_operation_cmp_for_immediate_addressing(operand)
       result = registers.accumulator - operand
       registers.carry = result >= 0
       registers.negative = result[7] == 1
@@ -384,7 +406,13 @@ module Rnes
     end
 
     # @param [Integer] operand
-    def execute_operation_cpx(operand)
+    def execute_operation_cmp_for_non_immediate_addressing(operand)
+      operand = read(operand)
+      execute_operation_cmp_for_immediate_addressing(operand)
+    end
+
+    # @param [Integer] operand
+    def execute_operation_cpx_for_immediate_addressing(operand)
       result = registers.index_x - operand
       registers.carry = result >= 0
       registers.negative = result[7] == 1
@@ -392,11 +420,23 @@ module Rnes
     end
 
     # @param [Integer] operand
-    def execute_operation_cpy(operand)
+    def execute_operation_cpx_for_non_immediate_addressing(operand)
+      operand = read(operand)
+      execute_operation_cpx_for_immediate_addressing(operand)
+    end
+
+    # @param [Integer] operand
+    def execute_operation_cpy_for_immediate_addressing(operand)
       result = registers.index_y - operand
       registers.carry = result >= 0
       registers.negative = result[7] == 1
       registers.zero = (result & 0xFF).zero?
+    end
+
+    # @param [Integer] operand
+    def execute_operation_cpy_for_non_immediate_addressing(operand)
+      operand = read(operand)
+      execute_operation_cpy_for_immediate_addressing(operand)
     end
 
     # @param [Integer] operand
@@ -433,11 +473,17 @@ module Rnes
     end
 
     # @param [Integer] operand
-    def execute_operation_eor(operand)
+    def execute_operation_eor_for_immediate_addressing(operand)
       result = (operand ^ registers.accumulator) & 0xFF
       registers.negative = result[7] == 1
       registers.zero = result.zero?
       registers.accumulator = result
+    end
+
+    # @param [Integer] operand
+    def execute_operation_eor_for_non_immediate_addressing(operand)
+      operand = read(operand)
+      execute_operation_eor_for_immediate_addressing(operand)
     end
 
     # @param [Integer] operand
@@ -497,34 +543,42 @@ module Rnes
     end
 
     # @param [Integer] operand
-    def execute_operation_lda(operand)
+    def execute_operation_lda_for_immediate_addressing(operand)
       registers.negative = operand[7] == 1
       registers.zero = operand.zero?
       registers.accumulator = operand
     end
 
     # @param [Integer] operand
-    def execute_operation_ldx(operand)
+    def execute_operation_lda_for_non_immediate_addressing(operand)
+      operand = read(operand)
+      execute_operation_lda_for_immediate_addressing(operand)
+    end
+
+    # @param [Integer] operand
+    def execute_operation_ldx_for_immediate_addressing(operand)
       registers.negative = operand[7] == 1
       registers.zero = operand.zero?
       registers.index_x = operand
     end
 
     # @param [Integer] operand
-    def execute_operation_ldy(operand)
+    def execute_operation_ldx_for_non_immediate_addressing(operand)
+      operand = read(operand)
+      execute_operation_ldx_for_immediate_addressing(operand)
+    end
+
+    # @param [Integer] operand
+    def execute_operation_ldy_for_immediate_addressing(operand)
       registers.negative = operand[7] == 1
       registers.zero = operand.zero?
       registers.index_y = operand
     end
 
     # @param [Integer] operand
-    def execute_operation_lsr(operand)
-      value = read(operand)
-      result = value >> 1
-      registers.carry = value[0] == 1
-      registers.negative = false
-      registers.zero = result.zero?
-      write(operand, result)
+    def execute_operation_ldy_for_non_immediate_addressing(operand)
+      operand = read(operand)
+      execute_operation_ldy_for_immediate_addressing(operand)
     end
 
     # @param [Integer] operand
@@ -535,6 +589,16 @@ module Rnes
       registers.negative = false
       registers.zero = result.zero?
       registers.accumulator = result
+    end
+
+    # @param [Integer] operand
+    def execute_operation_lsr_for_non_accumulator(operand)
+      value = read(operand)
+      result = value >> 1
+      registers.carry = value[0] == 1
+      registers.negative = false
+      registers.zero = result.zero?
+      write(operand, result)
     end
 
     # @param [Integer] operand
@@ -552,11 +616,17 @@ module Rnes
     end
 
     # @param [Integer] operand
-    def execute_operation_ora(operand)
+    def execute_operation_ora_for_immediate_addressing(operand)
       result = registers.accumulator | operand
       registers.negative = result[7] == 1
       registers.zero = result.zero?
       registers.accumulator = result & 0xFF
+    end
+
+    # @param [Integer] operand
+    def execute_operation_ora_for_non_immediate_addressing(operand)
+      operand = read(operand)
+      execute_operation_ora_for_immediate_addressing(operand)
     end
 
     # @param [Integer] operand
@@ -595,17 +665,6 @@ module Rnes
       write(operand, value)
     end
 
-    # @note Rotate Left.
-    # @param [Integer] operand
-    def execute_operation_rol(operand)
-      value = read(operand)
-      result = ((value << 1) | registers.carry_bit) & 0xFF
-      registers.carry = value[7] == 1
-      registers.negative = result[7] == 1
-      registers.zero = result.zero?
-      write(operand, result)
-    end
-
     # @param [Integer] operand
     def execute_operation_rol_for_accumulator(_operand)
       value = registers.accumulator
@@ -616,12 +675,11 @@ module Rnes
       registers.accumulator = result
     end
 
-    # @note Rotate Left.
     # @param [Integer] operand
-    def execute_operation_ror(operand)
+    def execute_operation_rol_for_non_accumulator(operand)
       value = read(operand)
-      result = ((value >> 1) | (registers.carry_bit << 7))
-      registers.carry = value[0] == 1
+      result = ((value << 1) | registers.carry_bit) & 0xFF
+      registers.carry = value[7] == 1
       registers.negative = result[7] == 1
       registers.zero = result.zero?
       write(operand, result)
@@ -635,6 +693,16 @@ module Rnes
       registers.negative = result[7] == 1
       registers.zero = result.zero?
       registers.accumulator = result
+    end
+
+    # @param [Integer] operand
+    def execute_operation_ror_for_non_accumulator(operand)
+      value = read(operand)
+      result = ((value >> 1) | (registers.carry_bit << 7))
+      registers.carry = value[0] == 1
+      registers.negative = result[7] == 1
+      registers.zero = result.zero?
+      write(operand, result)
     end
 
     # @param [Integer] operand
@@ -668,15 +736,20 @@ module Rnes
       write(operand, result)
     end
 
-    # @note SuBtract with Carry.
     # @param [Integer] operand
-    def execute_operation_sbc(operand)
+    def execute_operation_sbc_for_immediate_addressing(operand)
       result = registers.accumulator - operand - 1 + registers.carry_bit
       registers.overflow = ((registers.accumulator ^ result) & 0x80 != 0 && ((registers.accumulator ^ operand) & 0x80) != 0)
       registers.carry = result >= 0
       registers.negative = result[7] == 1
       registers.zero = result.zero?
       registers.accumulator = result & 0xFF
+    end
+
+    # @param [Integer] operand
+    def execute_operation_sbc_for_non_immediate_addressing(operand)
+      operand = read(operand)
+      execute_operation_sbc_for_immediate_addressing(operand)
     end
 
     # @param [Integer] operand
