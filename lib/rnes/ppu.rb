@@ -1,6 +1,7 @@
 require 'rnes/errors'
 require 'rnes/ppu_registers'
 require 'rnes/ppu/colors'
+require 'rnes/ram'
 
 module Rnes
   class Ppu
@@ -80,7 +81,8 @@ module Rnes
       @line = 0
       @mini_palette_ids_byte = 0x0
       @registers = ::Rnes::PpuRegisters.new
-      @sprite_palette_table_address = 0x00
+      @sprite_ram = ::Rnes::Ram.new(bytesize: 2**8)
+      @sprite_ram_address = 0x00
       @video_ram_address = 0x0000
       @writing_video_ram_address = false
     end
@@ -129,9 +131,9 @@ module Rnes
       when 0x0001
         registers.control2 = value
       when 0x0003
-        write_sprite_palette_table_address(value)
+        write_sprite_ram_address(value)
       when 0x0004
-        write_to_sprite_palette_table(value)
+        write_to_sprite_ram(value)
       when 0x0005
         # TODO: scroll register
       when 0x0006
@@ -238,12 +240,6 @@ module Rnes
       @bus.read(index)
     end
 
-    # @param [Integer] index
-    # @return [Integer]
-    def read_from_sprite_palette_table(index)
-      @bus.read(ADDRESS_TO_START_SPRITE_PALETTE_TABLE + index)
-    end
-
     def render_image
       puts "\e[61A\e[128D"
       60.times do |y_of_character|
@@ -308,14 +304,14 @@ module Rnes
     end
 
     # @param [Integer] address
-    def write_sprite_palette_table_address(address)
-      @sprite_palette_table_address = address
+    def write_sprite_ram_address(address)
+      @sprite_ram_address = address
     end
 
     # @param [Integer] value
-    def write_to_sprite_palette_table(value)
-      @bus.write(@sprite_palette_table_address, value)
-      @sprite_palette_table_address += 1
+    def write_to_sprite_ram(value)
+      @sprite_ram.write(@sprite_ram_address, value)
+      @sprite_ram_address += 1
     end
 
     # @param [Integer] address
