@@ -21,6 +21,9 @@ module Rnes
     class UnknownAddressingModeError < BaseError
     end
 
+    class UnknownOperationCodeError < BaseError
+    end
+
     class UnknownOperationError < BaseError
     end
 

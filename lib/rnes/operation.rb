@@ -1,3 +1,4 @@
+require 'rnes/errors'
 require 'rnes/operation/records'
 
 module Rnes
@@ -21,7 +22,11 @@ module Rnes
       # @return [Rnes::Operation]
       def build(operation_code)
         record = ::Rnes::Operation::RECORDS[operation_code]
-        new(record)
+        if record
+          new(record)
+        else
+          raise ::Rnes::UnknownOperationCodeError, "Unknown operation code: #{operation_code}"
+        end
       end
     end
 
