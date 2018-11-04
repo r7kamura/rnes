@@ -1,4 +1,3 @@
-require 'rnes/character_rom'
 require 'rnes/cpu'
 require 'rnes/cpu_bus'
 require 'rnes/cpu_registers'

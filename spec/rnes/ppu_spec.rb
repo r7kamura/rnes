@@ -1,12 +1,6 @@
 RSpec.describe Rnes::Ppu do
-  let(:character_rom) do
-    Rnes::CharacterRom.new(character_rom_bytes)
-  end
-
-  let(:character_rom_bytes) do
-    Array.new(8 * 2**10).map do
-      0
-    end
+  let(:character_ram) do
+    Rnes::Emulator.generate_character_ram
   end
 
   let(:ppu) do
@@ -14,20 +8,16 @@ RSpec.describe Rnes::Ppu do
   end
 
   let(:ppu_bus) do
-    Rnes::PpuBus.new(ram: video_ram)
+    Rnes::PpuBus.new(character_ram: character_ram, video_ram: video_ram)
   end
 
   let(:video_ram) do
-    Rnes::Ram.new
+    Rnes::Emulator.generate_video_ram
   end
 
   describe '#tick' do
     subject do
       ppu.tick
-    end
-
-    before do
-      ppu_bus.character_rom = character_rom
     end
 
     context 'on cycle 1 on line 0' do
@@ -39,8 +29,8 @@ RSpec.describe Rnes::Ppu do
         video_ram.write(0, sprite_index)
 
         # Use palette[1] color (blue color in fact) on the top line of sprite 1.
-        character_rom_bytes[16 * sprite_index] = sprite_line_low_byte
-        character_rom_bytes[16 * sprite_index + 1] = sprite_line_high_byte
+        character_ram.write(16 * sprite_index, sprite_line_low_byte)
+        character_ram.write(16 * sprite_index + 1, sprite_line_high_byte)
 
         ppu.cycle = 1
         ppu.line = 0

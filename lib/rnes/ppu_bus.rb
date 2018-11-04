@@ -2,13 +2,14 @@ require 'rnes/errors'
 
 module Rnes
   class PpuBus
-    # @param [Rnes::CharacterRom]
-    # @return [Rnes::CharacterRom]
-    attr_accessor :character_rom
+    # @return [Rnes::Ram]
+    attr_reader :character_ram
 
-    # @param [Rnes::Ram] ram
-    def initialize(ram:)
-      @ram = ram
+    # @param [Rnes::Ram] character_ram
+    # @param [Rnes::Ram] video_ram
+    def initialize(character_ram:, video_ram:)
+      @character_ram = character_ram
+      @video_ram = video_ram
     end
 
     # @param [Integer] address
@@ -16,13 +17,13 @@ module Rnes
     def read(address)
       case address
       when 0x0000..0x1FFF
-        try_to_read_character_rom(address)
+        @character_ram.read(address)
       when 0x2000..0x27FF
-        @ram.read(address - 0x2000)
+        @video_ram.read(address - 0x2000)
       when 0x2800..0x2FFF
-        @ram.read(address - 0x0800)
+        @video_ram.read(address - 0x0800)
       when 0x3000..0x3EFF
-        @ram.read(address - 0x1000)
+        @video_ram.read(address - 0x1000)
       when 0x3F00..0x3E0F
         # TODO: backgroud palette table
       when 0x3F10..0x3F1F
@@ -41,24 +42,15 @@ module Rnes
     def write(address, value)
       case address
       when 0x2000..0x27FF
-        @ram.write(address - 0x2000, value)
+        @video_ram.write(address - 0x2000, value)
       when 0x2800..0x2FFF
-        @ram.write(address - 0x0800, value)
+        @video_ram.write(address - 0x0800, value)
       when 0x3000..0x3EFF
-        @ram.write(address - 0x1000, value)
+        @video_ram.write(address - 0x1000, value)
+      when 0x3F00..0xFFFF
+        write(address - 0x1000, value)
       else
         raise ::Rnes::Errors::InvalidPpuBusAddressError, address
-      end
-    end
-
-    private
-
-    # @param [Integer] address
-    def try_to_read_character_rom(address)
-      if @character_rom
-        @character_rom.read(address)
-      else
-        raise ::Rnes::Errors::CharacterRomNotConnectedError
       end
     end
   end
