@@ -19,8 +19,6 @@ module Rnes
 
     CYCLES_PER_LINE = 341
 
-    PALETTE_BYTESIZE = 32
-
     SPRITE_RAM_BYTESIZE = 2**8
 
     SPRITES_COUNT = 64
