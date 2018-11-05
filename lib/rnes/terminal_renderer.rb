@@ -8,8 +8,29 @@ module Rnes
 
     BRIGHTNESS_SUM_THRESHOLD = 128 * 3
 
+    TEXT_HEIGHT = 61
+
+    TEXT_WIDTH = 128
+
+    ESCAPE_TO_CLEAR_TEXT = "\e[#{TEXT_HEIGHT}A\e[#{TEXT_WIDTH}D".freeze
+
+    def initialize
+      @fps = 0
+      @previous_fps = 0
+    end
+
     def render(image)
-      puts "\e[61A\e[128D#{convert_image_to_string(image)}"
+      brailles = convert_image_to_string(image)
+      fps_counter = "FPS:#{@previous_fps}"
+      puts "#{ESCAPE_TO_CLEAR_TEXT}#{fps_counter}\n#{brailles}"
+      second = ::Time.now.sec
+      if @second == second
+        @fps += 1
+      else
+        @previous_fps = @fps
+        @fps = 0
+        @second = second
+      end
     end
 
     private
@@ -31,8 +52,8 @@ module Rnes
             (rgb.sum < BRIGHTNESS_SUM_THRESHOLD ? 0 : 1) << i
           end.reduce(:|)
           (BRAILLE_BASE_CODE_POINT + offset).chr('UTF-8')
-        end.join + "\n"
-      end.join
+        end.join
+      end.join("\n")
     end
   end
 end
