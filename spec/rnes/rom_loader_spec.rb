@@ -95,15 +95,22 @@ RSpec.describe Rnes::RomLoader do
     end
   end
 
-  shared_examples 'returns empty array' do
-    it 'returns empty array' do
-      is_expected.to eq([])
+  shared_examples 'returns ROM including expected bytes' do
+    it 'returns character ROM' do
+      valid = bytes.length.times.map.all? do |index|
+        subject.read(index) == bytes[index]
+      end
+      expect(valid).to eq(true)
     end
   end
 
-  describe '#character_rom_bytes' do
+  describe '#character_rom' do
     subject do
-      rom_loader.character_rom_bytes
+      rom_loader.character_rom
+    end
+
+    let(:bytes) do
+      character_rom_bytes
     end
 
     context 'with invalid iNES header' do
@@ -115,21 +122,23 @@ RSpec.describe Rnes::RomLoader do
     context 'with 0 byte trainer, 0 byte program ROM, and 0 byte character ROM' do
       include_context 'with 0 byte trainer, 0 byte program ROM, and 0 byte character ROM'
 
-      include_examples 'returns empty array'
+      include_examples 'returns ROM including expected bytes'
     end
 
     context 'with 512 byte trainer, 16 byte program ROM, and 8 byte character ROM' do
       include_context 'with 512 byte trainer, 16 byte program ROM, and 8 byte character ROM'
 
-      it 'returns character ROM bytes' do
-        is_expected.to eq(character_rom_bytes)
-      end
+      include_examples 'returns ROM including expected bytes'
     end
   end
 
-  describe '#program_rom_bytes' do
+  describe '#program_rom' do
     subject do
-      rom_loader.program_rom_bytes
+      rom_loader.program_rom
+    end
+
+    let(:bytes) do
+      program_rom_bytes
     end
 
     context 'with invalid iNES header' do
@@ -141,21 +150,23 @@ RSpec.describe Rnes::RomLoader do
     context 'with 0 byte trainer, 0 byte program ROM, and 0 byte character ROM' do
       include_context 'with 0 byte trainer, 0 byte program ROM, and 0 byte character ROM'
 
-      include_examples 'returns empty array'
+      include_examples 'returns ROM including expected bytes'
     end
 
     context 'with 512 byte trainer, 16 byte program ROM, and 8 byte character ROM' do
       include_context 'with 512 byte trainer, 16 byte program ROM, and 8 byte character ROM'
 
-      it 'returns program ROM bytes' do
-        is_expected.to eq(program_rom_bytes)
-      end
+      include_examples 'returns ROM including expected bytes'
     end
   end
 
-  describe '#trainer_bytes' do
+  describe '#trainer_rom' do
     subject do
-      rom_loader.trainer_bytes
+      rom_loader.trainer_rom
+    end
+
+    let(:bytes) do
+      trainer_bytes
     end
 
     context 'with invalid iNES header' do
@@ -167,15 +178,13 @@ RSpec.describe Rnes::RomLoader do
     context 'with 0 byte trainer, 0 byte program ROM, and 0 byte character ROM' do
       include_context 'with 0 byte trainer, 0 byte program ROM, and 0 byte character ROM'
 
-      include_examples 'returns empty array'
+      include_examples 'returns ROM including expected bytes'
     end
 
     context 'with 512 byte trainer, 16 byte program ROM, and 8 byte character ROM' do
       include_context 'with 512 byte trainer, 16 byte program ROM, and 8 byte character ROM'
 
-      it 'returns trainer bytes' do
-        is_expected.to eq(trainer_bytes)
-      end
+      include_examples 'returns ROM including expected bytes'
     end
   end
 end

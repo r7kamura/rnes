@@ -1,5 +1,4 @@
 require 'rnes/parts_factory'
-require 'rnes/rom'
 require 'rnes/rom_loader'
 
 module Rnes
@@ -24,11 +23,8 @@ module Rnes
     # @param [Array<Integer>] rom_bytes
     def load_rom(rom_bytes)
       rom_loader = ::Rnes::RomLoader.new(rom_bytes)
-      character_rom_bytes = rom_loader.character_rom_bytes
-      character_rom_bytes.length.times do |i|
-        @ppu_bus.character_ram.write(i, character_rom_bytes[i])
-      end
-      @cpu_bus.program_rom = ::Rnes::Rom.new(bytes: rom_loader.program_rom_bytes)
+      copy(from: rom_loader.character_rom, to: @ppu_bus.character_ram)
+      @cpu_bus.program_rom = rom_loader.program_rom
       @cpu.reset
     end
 
@@ -54,6 +50,15 @@ module Rnes
     end
 
     private
+
+    # @param [Rnes::Rom] from
+    # @param [Rnes::Ram] to
+    def copy(from:, to:)
+      from.bytesize.times do |address|
+        value = from.read(address)
+        to.write(address, value)
+      end
+    end
 
     # @return [File]
     def log_file
