@@ -44,7 +44,8 @@ module Rnes
     # @return [Integer]
     attr_accessor :line
 
-    # @param [Array<Array<Integer>>]
+    # @note For debug use.
+    # @return [Array<Rnes::Image>]
     attr_reader :image
 
     # @return [Rnes::PpuRegisters]
