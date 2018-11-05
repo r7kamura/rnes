@@ -26,13 +26,9 @@ module Rnes
 
     def run
       loop do
-        tick
-      end
-    end
-
-    def run_with_logging
-      loop do
-        @logger.puts
+        if @logger
+          @logger.puts
+        end
         tick
       end
     end
