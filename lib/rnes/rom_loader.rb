@@ -10,18 +10,21 @@ module Rnes
     end
 
     # @return [Rnes::Rom]
+    # @raise [Rnes::Errors::InvalidInesFormatError]
     def character_rom
       validate!
       ::Rnes::Rom.new(bytes: character_rom_bytes)
     end
 
     # @return [Rnes::Rom]
+    # @raise [Rnes::Errors::InvalidInesFormatError]
     def program_rom
       validate!
       ::Rnes::Rom.new(bytes: program_rom_bytes)
     end
 
     # @return [Rnes::Rom]
+    # @raise [Rnes::Errors::InvalidInesFormatError]
     def trainer_rom
       validate!
       ::Rnes::Rom.new(bytes: trainer_bytes)
