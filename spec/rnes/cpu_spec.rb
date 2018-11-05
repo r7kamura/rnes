@@ -8,7 +8,18 @@ RSpec.describe Rnes::Cpu do
   end
 
   let(:cpu_bus) do
-    Rnes::CpuBus.new(ppu: ppu, ram: working_ram)
+    Rnes::CpuBus.new(
+      dma_controller: dma_controller,
+      ppu: ppu,
+      ram: working_ram,
+    )
+  end
+
+  let(:dma_controller) do
+    Rnes::DmaController.new(
+      ppu: ppu,
+      working_ram: working_ram,
+    )
   end
 
   let(:ppu) do

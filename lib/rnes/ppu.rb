@@ -21,6 +21,8 @@ module Rnes
 
     PALETTE_BYTESIZE = 32
 
+    SPRITE_RAM_BYTESIZE = 2**8
+
     SPRITES_COUNT = 64
 
     TILE_HEIGHT = 8
@@ -76,7 +78,7 @@ module Rnes
       @image = self.class.generate_empty_image
       @line = 0
       @registers = ::Rnes::PpuRegisters.new
-      @sprite_ram = ::Rnes::Ram.new(bytesize: 2**8)
+      @sprite_ram = ::Rnes::Ram.new(bytesize: SPRITE_RAM_BYTESIZE)
       @sprite_ram_address = 0x00
       @video_ram_address = 0x0000
       @writing_video_ram_address = false
@@ -115,6 +117,13 @@ module Rnes
       else
         self.cycle += 1
       end
+    end
+
+    # @param [Integer] index
+    # @param [Integer] value
+    def transfer_sprite_data(index:, value:)
+      address = (@sprite_ram_address + index) % SPRITE_RAM_BYTESIZE
+      @sprite_ram.write(address, value)
     end
 
     # @param [Integer] address
