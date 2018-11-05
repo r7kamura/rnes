@@ -1,4 +1,5 @@
 require 'rnes/parts_factory'
+require 'rnes/rom'
 require 'rnes/rom_loader'
 
 module Rnes
