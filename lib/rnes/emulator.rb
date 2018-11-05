@@ -6,12 +6,6 @@ module Rnes
   class Emulator
     LOG_FILE_NAME = 'rnes.log'.freeze
 
-    # @return [Rnes::CpuBus]
-    attr_reader :cpu_bus
-
-    # @return [Rnes::PpuBus]
-    attr_reader :ppu_bus
-
     def initialize
       parts_factory = ::Rnes::PartsFactory.new
       @cpu = parts_factory.cpu
