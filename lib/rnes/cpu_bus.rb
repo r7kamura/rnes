@@ -6,9 +6,11 @@ module Rnes
     # @return [Rnes::Rom]
     attr_accessor :program_rom
 
+    # @param [Rnes::DmaController] dma_controller
     # @param [Rnes::Ppu] ppu
     # @param [Rnes::Ram] ram
-    def initialize(ppu:, ram:)
+    def initialize(dma_controller:, ppu:, ram:)
+      @dma_controller = dma_controller
       @ppu = ppu
       @ram = ram
     end
@@ -57,7 +59,7 @@ module Rnes
       when 0x4000..0x4013, 0x4015..0x401F
         0 # TODO: I/O port for APU, etc
       when 0x4014
-        0 # TODO: DMA transfer
+        @dma_controller.request_transfer(address_hint: value)
       when 0x4020..0x5FFF
         0 # TODO: extended RAM on special mappers
       when 0x6000..0x7FFF

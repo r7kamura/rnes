@@ -1,6 +1,7 @@
 require 'rnes/cpu'
 require 'rnes/cpu_bus'
 require 'rnes/cpu_registers'
+require 'rnes/dma_controller'
 require 'rnes/emulator'
 require 'rnes/errors'
 require 'rnes/ines_header'

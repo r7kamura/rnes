@@ -1,5 +1,6 @@
 require 'rnes/cpu_bus'
 require 'rnes/cpu'
+require 'rnes/dma_controller'
 require 'rnes/ppu'
 require 'rnes/ram'
 require 'rnes/rom'
@@ -46,9 +47,15 @@ module Rnes
       @ppu = ::Rnes::Ppu.new(
         bus: @ppu_bus,
       )
-      @cpu_bus = ::Rnes::CpuBus.new(
+      working_ram = self.class.generate_working_ram
+      @dma_controller = ::Rnes::DmaController.new(
         ppu: @ppu,
-        ram: self.class.generate_working_ram,
+        working_ram: working_ram,
+      )
+      @cpu_bus = ::Rnes::CpuBus.new(
+        dma_controller: @dma_controller,
+        ppu: @ppu,
+        ram: working_ram,
       )
       @cpu = ::Rnes::Cpu.new(
         bus: @cpu_bus,
@@ -80,6 +87,7 @@ module Rnes
     end
 
     def tick
+      @dma_controller.transfer_if_requested
       @cpu.tick
       @ppu.tick
       @ppu.tick
