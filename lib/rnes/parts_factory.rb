@@ -6,6 +6,7 @@ require 'rnes/ppu'
 require 'rnes/ppu_bus'
 require 'rnes/ram'
 require 'rnes/rom'
+require 'rnes/terminal_renderer'
 
 module Rnes
   class PartsFactory
@@ -55,6 +56,7 @@ module Rnes
       @ppu ||= ::Rnes::Ppu.new(
         bus: ppu_bus,
         interrupt_line: interrupt_line,
+        renderer: renderer,
       )
     end
 
@@ -64,6 +66,11 @@ module Rnes
         character_ram: character_ram,
         video_ram: video_ram,
       )
+    end
+
+    # @return [Rnes::TerminalRenderer]
+    def renderer
+      @renderer ||= ::Rnes::TerminalRenderer.new
     end
 
     # @return [Rnes::Ram]
