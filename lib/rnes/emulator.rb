@@ -97,8 +97,12 @@ module Rnes
     def log_line
       [
         log_segment_cpu_program_counter,
+        '',
         log_segment_operation_code,
-        log_segment_operation_name,
+        log_segment_operand,
+        log_segment_operation_full_name,
+        log_segment_operand_humanized,
+        '',
         log_segment_cpu_accumulator,
         log_segment_cpu_index_x,
         log_segment_cpu_index_y,
@@ -111,32 +115,32 @@ module Rnes
 
     # @return [String]
     def log_segment_cpu_accumulator
-      format('A:0x%02X', @cpu.registers.accumulator)
+      format('A:%02X', @cpu.registers.accumulator)
     end
 
     # @return [String]
     def log_segment_cpu_index_x
-      format('X:0x%02X', @cpu.registers.index_x)
+      format('X:%02X', @cpu.registers.index_x)
     end
 
     # @return [String]
     def log_segment_cpu_index_y
-      format('Y:0x%02X', @cpu.registers.index_y)
+      format('Y:%02X', @cpu.registers.index_y)
     end
 
     # @return [String]
     def log_segment_cpu_program_counter
-      format('PC:0x%04X', @cpu.registers.program_counter)
+      format('%04X', @cpu.registers.program_counter)
     end
 
     # @return [String]
     def log_segment_cpu_stack_pointer
-      format('SP:0x%02X', @cpu.registers.stack_pointer - 0x100)
+      format('SP:%02X', @cpu.registers.stack_pointer - 0x100)
     end
 
     # @return [String]
     def log_segment_cpu_status
-      format('P:0b%08b', @cpu.registers.status)
+      format('P:%08b', @cpu.registers.status)
     end
 
     # @return [String]
@@ -145,16 +149,47 @@ module Rnes
     end
 
     # @return [String]
-    def log_segment_operation_code
+    def log_segment_operand
+      program_counter = @cpu.registers.program_counter
       operation = @cpu.read_operation
-      operation_code = ::Rnes::Operation::RECORDS.find_index(operation.to_hash)
-      format('OP:0x%02X', operation_code)
+      case operation.addressing_mode
+      when :absolute, :absolute_x, :absolute_y, :indirect_absolute, :pre_indexed_absolute, :post_indexed_absolute
+        format('%02X %02X', @cpu.bus.read(program_counter + 1), @cpu.bus.read(program_counter + 2))
+      when :immediate, :relative, :zero_page, :zero_page_x, :zero_page_y
+        format('%02X   ', @cpu.bus.read(program_counter + 1))
+      else
+        ' ' * 5
+      end
     end
 
     # @return [String]
-    def log_segment_operation_name
+    def log_segment_operand_humanized
       operation = @cpu.read_operation
-      format('%-4s', operation.name)
+      program_counter = @cpu.registers.program_counter
+      string = begin
+        case operation.addressing_mode
+        when :absolute, :absolute_x, :absolute_y, :indirect_absolute, :pre_indexed_absolute, :post_indexed_absolute
+          format('$%02X%02X', @cpu.bus.read(program_counter + 2), @cpu.bus.read(program_counter + 1))
+        when :immediate, :relative, :zero_page, :zero_page_x, :zero_oage_y
+          format('#$%02X', @cpu.bus.read(program_counter + 1))
+        else
+          ''
+        end
+      end
+      format('%-5s', string)
+    end
+
+    # @return [String]
+    def log_segment_operation_code
+      operation = @cpu.read_operation
+      operation_code = ::Rnes::Operation::RECORDS.find_index(operation.to_hash)
+      format('%02X', operation_code)
+    end
+
+    # @return [String]
+    def log_segment_operation_full_name
+      operation = @cpu.read_operation
+      format('%8s', operation.full_name)
     end
 
     # @note SL means "Scan Line".

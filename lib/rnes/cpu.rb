@@ -5,6 +5,9 @@ require 'rnes/operation'
 
 module Rnes
   class Cpu
+    # @return [Rnes::CpuBus] bus
+    attr_reader :bus
+
     # @return [Rnes::CpuRegisters]
     attr_reader :registers
 
