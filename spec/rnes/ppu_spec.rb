@@ -1,18 +1,18 @@
 RSpec.describe Rnes::Ppu do
   let(:character_ram) do
-    Rnes::Emulator.generate_character_ram
+    parts_factory.character_ram
+  end
+
+  let(:parts_factory) do
+    Rnes::PartsFactory.new
   end
 
   let(:ppu) do
-    described_class.new(bus: ppu_bus)
-  end
-
-  let(:ppu_bus) do
-    Rnes::PpuBus.new(character_ram: character_ram, video_ram: video_ram)
+    parts_factory.ppu
   end
 
   let(:video_ram) do
-    Rnes::Emulator.generate_video_ram
+    parts_factory.video_ram
   end
 
   describe '#tick' do

@@ -1,37 +1,9 @@
-require 'rnes/cpu_bus'
-require 'rnes/cpu'
-require 'rnes/dma_controller'
-require 'rnes/ppu'
-require 'rnes/ram'
-require 'rnes/rom'
+require 'rnes/parts_factory'
 require 'rnes/rom_loader'
 
 module Rnes
   class Emulator
-    CHARACTER_RAM_BYTESIZE = 2**12
-
     LOG_FILE_NAME = 'rnes.log'.freeze
-
-    VIDEO_RAM_BYTESIZE = 2**13
-
-    WORKING_RAM_BYTESIZE = 2**11
-
-    class << self
-      # @return [Rnes::Ram]
-      def generate_character_ram
-        ::Rnes::Ram.new(bytesize: CHARACTER_RAM_BYTESIZE)
-      end
-
-      # @return [Rnes::Ram]
-      def generate_video_ram
-        ::Rnes::Ram.new(bytesize: VIDEO_RAM_BYTESIZE)
-      end
-
-      # @return [Rnes::Ram]
-      def generate_working_ram
-        ::Rnes::Ram.new(bytesize: WORKING_RAM_BYTESIZE)
-      end
-    end
 
     # @return [Rnes::CpuBus]
     attr_reader :cpu_bus
@@ -40,26 +12,12 @@ module Rnes
     attr_reader :ppu_bus
 
     def initialize
-      @ppu_bus = ::Rnes::PpuBus.new(
-        character_ram: self.class.generate_character_ram,
-        video_ram: self.class.generate_video_ram,
-      )
-      @ppu = ::Rnes::Ppu.new(
-        bus: @ppu_bus,
-      )
-      working_ram = self.class.generate_working_ram
-      @dma_controller = ::Rnes::DmaController.new(
-        ppu: @ppu,
-        working_ram: working_ram,
-      )
-      @cpu_bus = ::Rnes::CpuBus.new(
-        dma_controller: @dma_controller,
-        ppu: @ppu,
-        ram: working_ram,
-      )
-      @cpu = ::Rnes::Cpu.new(
-        bus: @cpu_bus,
-      )
+      parts_factory = ::Rnes::PartsFactory.new
+      @cpu = parts_factory.cpu
+      @cpu_bus = parts_factory.cpu_bus
+      @dma_controller = parts_factory.dma_controller
+      @ppu = parts_factory.ppu
+      @ppu_bus = parts_factory.ppu_bus
     end
 
     # @param [Array<Integer>] rom_bytes

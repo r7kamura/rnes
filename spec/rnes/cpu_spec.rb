@@ -1,36 +1,14 @@
 RSpec.describe Rnes::Cpu do
-  let(:character_ram) do
-    Rnes::Emulator.generate_character_ram
-  end
-
   let(:cpu) do
-    described_class.new(bus: cpu_bus)
+    parts_factory.cpu
   end
 
   let(:cpu_bus) do
-    Rnes::CpuBus.new(
-      dma_controller: dma_controller,
-      ppu: ppu,
-      ram: working_ram,
-    )
+    parts_factory.cpu_bus
   end
 
-  let(:dma_controller) do
-    Rnes::DmaController.new(
-      ppu: ppu,
-      working_ram: working_ram,
-    )
-  end
-
-  let(:ppu) do
-    Rnes::Ppu.new(bus: ppu_bus)
-  end
-
-  let(:ppu_bus) do
-    Rnes::PpuBus.new(
-      character_ram: character_ram,
-      video_ram: video_ram,
-    )
+  let(:parts_factory) do
+    Rnes::PartsFactory.new
   end
 
   let(:program_rom) do
@@ -44,11 +22,11 @@ RSpec.describe Rnes::Cpu do
   end
 
   let(:video_ram) do
-    Rnes::Emulator.generate_video_ram
+    parts_factory.video_ram
   end
 
   let(:working_ram) do
-    Rnes::Emulator.generate_working_ram
+    parts_factory.working_ram
   end
 
   describe '#reset' do
