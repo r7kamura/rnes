@@ -205,11 +205,10 @@ module Rnes
         mini_palette_id = sprite_attribute_byte & 0b11
 
         TILE_HEIGHT.times do |y_in_character|
+          character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_character + character_address_offset
+          character_line_low_byte = read_from_character_rom(character_line_low_byte_address)
+          character_line_high_byte = read_from_character_rom(character_line_low_byte_address + 8)
           TILE_WIDTH.times do |x_in_character|
-            character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_character + character_address_offset
-            character_line_low_byte = read_from_character_rom(character_line_low_byte_address)
-            character_line_high_byte = read_from_character_rom(character_line_low_byte_address + 8)
-
             index_in_character_line_byte = TILE_WIDTH - 1 - x_in_character
             background_palette_index = character_line_low_byte[index_in_character_line_byte] | character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id << 2
             color_id = read_from_background_palette_table(background_palette_index)
