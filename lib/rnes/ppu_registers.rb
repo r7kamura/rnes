@@ -19,7 +19,7 @@ module Rnes
     end
 
     # @return [Boolean]
-    def has_background_character_address_offset_bit?
+    def has_background_bank_bit?
       @control1[4] == 1
     end
 
@@ -49,7 +49,7 @@ module Rnes
     end
 
     # @return [Boolean]
-    def has_sprite_character_address_offset_bit?
+    def has_sprite_bank_bit?
       @control1[3] == 1
     end
 

@@ -156,7 +156,7 @@ module Rnes
     end
 
     def draw_background_8pixels
-      character_address_offset = registers.has_background_character_address_offset_bit? ? 0x1000 : 0
+      character_address_offset = registers.has_background_bank_bit? ? 0x1000 : 0
       character_index = read_from_name_table(tile_index)
       character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_tile + character_address_offset
       character_line_low_byte = read_from_character_rom(character_line_low_byte_address)
@@ -191,7 +191,7 @@ module Rnes
     #      |`------- horizontal flip
     #      `-------- vertical flip
     def draw_sprites
-      character_address_offset = registers.has_sprite_character_address_offset_bit? ? 0x1000 : 0
+      character_address_offset = registers.has_sprite_bank_bit? ? 0x1000 : 0
       SPRITES_COUNT.times do |i|
         base_sprite_ram_address = i * 4
         y_for_sprite = (read_from_sprite_ram(base_sprite_ram_address) - TILE_HEIGHT)
