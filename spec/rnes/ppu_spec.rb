@@ -58,7 +58,7 @@ RSpec.describe Rnes::Ppu do
 
       it 'draws 8 pixels by using palette' do
         subject
-        expect(ppu.image[0]).to eq(blue_color)
+        expect(ppu.image.read(x: 0, y: 0)).to eq(blue_color)
       end
     end
 

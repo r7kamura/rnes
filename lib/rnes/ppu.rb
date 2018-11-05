@@ -1,4 +1,5 @@
 require 'rnes/errors'
+require 'rnes/image'
 require 'rnes/ppu_registers'
 require 'rnes/ppu/colors'
 require 'rnes/ram'
@@ -33,26 +34,6 @@ module Rnes
 
     VISIBLE_WINDOW_WIDTH = 256
 
-    class << self
-      # @return [Array<Array<Integer>>]
-      def generate_empty_image
-        ::Array.new(visible_window_area).map do
-          [
-            0, # Red
-            0, # Green
-            0, # Blue
-          ]
-        end
-      end
-
-      private
-
-      # @return [Integer]
-      def visible_window_area
-        VISIBLE_WINDOW_WIDTH * VISIBLE_WINDOW_HEIGHT
-      end
-    end
-
     # @note For debug use.
     # @param [Integer]
     # @return [Integer]
@@ -71,13 +52,15 @@ module Rnes
 
     # @param [Rnes::PpuBus] bus
     # @param [Rnes::InterruptLine] interrupt_line
-    def initialize(bus:, interrupt_line:)
+    # @param [Rnes::TerminalRenderer] renderer
+    def initialize(bus:, interrupt_line:, renderer:)
       @bus = bus
       @cycle = 0
-      @image = self.class.generate_empty_image
+      @image = ::Rnes::Image.new(height: VISIBLE_WINDOW_HEIGHT, width: VISIBLE_WINDOW_WIDTH)
       @interrupt_line = interrupt_line
       @line = 0
       @registers = ::Rnes::PpuRegisters.new
+      @renderer = renderer
       @sprite_ram = ::Rnes::Ram.new(bytesize: SPRITE_RAM_BYTESIZE)
       @sprite_ram_address = 0x00
       @video_ram_address = 0x0000
@@ -188,8 +171,11 @@ module Rnes
         index_in_character_line_byte = TILE_WIDTH - 1 - x_in_character
         background_palette_index = character_line_low_byte[index_in_character_line_byte] | character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id << 2
         color_id = read_from_background_palette_table(background_palette_index)
-        image_index = VISIBLE_WINDOW_WIDTH * y + x + x_in_character
-        @image[image_index] = ::Rnes::Ppu::COLORS[color_id]
+        @image.write(
+          value: ::Rnes::Ppu::COLORS[color_id],
+          x: x + x_in_character,
+          y: y,
+        )
       end
     end
 
@@ -228,8 +214,11 @@ module Rnes
             index_in_character_line_byte = TILE_WIDTH - 1 - x_in_character
             background_palette_index = character_line_low_byte[index_in_character_line_byte] | character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id << 2
             color_id = read_from_background_palette_table(background_palette_index)
-            image_index = VISIBLE_WINDOW_WIDTH * (y_for_sprite + y_in_character) + x_for_sprite + x_in_character
-            @image[image_index] = ::Rnes::Ppu::COLORS[color_id]
+            @image.write(
+              value: ::Rnes::Ppu::COLORS[color_id],
+              x: x_for_sprite + x_in_character,
+              y: y_for_sprite + y_in_character,
+            )
           end
         end
       end
@@ -286,27 +275,7 @@ module Rnes
     end
 
     def render_image
-      puts "\e[61A\e[128D"
-      60.times do |y_of_character|
-        128.times do |x_of_character|
-          base = y_of_character * 4 * 256 + x_of_character * 2
-          print(
-            (
-              (
-                 (@image[base + 256 * 0 + 0].sum < 384 ? 0 : 1) |
-                ((@image[base + 256 * 1 + 0].sum < 384 ? 0 : 1) << 1) |
-                ((@image[base + 256 * 2 + 0].sum < 384 ? 0 : 1) << 2) |
-                ((@image[base + 256 * 0 + 1].sum < 384 ? 0 : 1) << 3) |
-                ((@image[base + 256 * 1 + 1].sum < 384 ? 0 : 1) << 4) |
-                ((@image[base + 256 * 2 + 1].sum < 384 ? 0 : 1) << 5) |
-                ((@image[base + 256 * 3 + 0].sum < 384 ? 0 : 1) << 6) |
-                ((@image[base + 256 * 3 + 1].sum < 384 ? 0 : 1) << 7)
-               ) + 0x2800
-            ).chr('UTF-8'),
-          )
-        end
-        puts
-      end
+      @renderer.render(@image)
     end
 
     def set_v_blank
