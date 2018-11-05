@@ -55,7 +55,7 @@ module Rnes
 
     # @return [Boolean]
     def has_v_blank_irq_enabled_bit?
-      @control1[6] == 1
+      @control1[7] == 1
     end
 
     # Name table id (address)

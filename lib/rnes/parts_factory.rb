@@ -1,6 +1,7 @@
 require 'rnes/cpu_bus'
 require 'rnes/cpu'
 require 'rnes/dma_controller'
+require 'rnes/interrupt_line'
 require 'rnes/ppu'
 require 'rnes/ppu_bus'
 require 'rnes/ram'
@@ -23,6 +24,7 @@ module Rnes
     def cpu
       @cpu ||= ::Rnes::Cpu.new(
         bus: cpu_bus,
+        interrupt_line: interrupt_line,
       )
     end
 
@@ -43,10 +45,16 @@ module Rnes
       )
     end
 
+    # @return [Rnes::InterruptLine]
+    def interrupt_line
+      @interrupt_line ||= ::Rnes::InterruptLine.new
+    end
+
     # @return [Rnes::Ppu]
     def ppu
       @ppu ||= ::Rnes::Ppu.new(
         bus: ppu_bus,
+        interrupt_line: interrupt_line,
       )
     end
 

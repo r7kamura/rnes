@@ -72,10 +72,12 @@ module Rnes
     attr_reader :registers
 
     # @param [Rnes::PpuBus] bus
-    def initialize(bus:)
+    # @param [Rnes::InterruptLine] interrupt_line
+    def initialize(bus:, interrupt_line:)
       @bus = bus
       @cycle = 0
       @image = self.class.generate_empty_image
+      @interrupt_line = interrupt_line
       @line = 0
       @registers = ::Rnes::PpuRegisters.new
       @sprite_ram = ::Rnes::Ram.new(bytesize: SPRITE_RAM_BYTESIZE)
@@ -103,7 +105,7 @@ module Rnes
         self.cycle = 0
         if on_bottom_end_line?
           self.line = 0
-          clear_nmi
+          deassert_nmi
           clear_sprite_hit
           clear_v_blank
           draw_sprites
@@ -112,6 +114,9 @@ module Rnes
           self.line += 1
           if on_line_to_start_v_blank?
             set_v_blank
+            if v_blank_interrupt_enabled?
+              assert_nmi
+            end
           end
         end
       else
@@ -152,8 +157,8 @@ module Rnes
 
     private
 
-    # @todo
-    def clear_nmi
+    def assert_nmi
+      @interrupt_line.deassert_nmi
     end
 
     def clear_sprite_hit
@@ -162,6 +167,10 @@ module Rnes
 
     def clear_v_blank
       registers.toggle_in_v_blank_bit(false)
+    end
+
+    def deassert_nmi
+      @interrupt_line.deassert_nmi
     end
 
     def draw_background_8pixels
@@ -309,6 +318,11 @@ module Rnes
     # @return [Integer]
     def tile_index
       y_of_tile * (VISIBLE_WINDOW_WIDTH / TILE_WIDTH) + x_of_tile
+    end
+
+    # @return [Boolean]
+    def v_blank_interrupt_enabled?
+      @registers.has_v_blank_irq_enabled_bit?
     end
 
     # @return [Integer]
