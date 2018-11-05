@@ -19,6 +19,11 @@ module Rnes
     end
 
     # @return [Boolean]
+    def has_background_character_address_offset_bit?
+      @control1[4] == 1
+    end
+
+    # @return [Boolean]
     def has_background_enabled_bit?
       @control2[3] == 1
     end
@@ -41,6 +46,11 @@ module Rnes
     # @return [Boolean]
     def has_sprite_hit_bit?
       @status[STATUS_SPRITE_HIT_BIT_INDEX] == 1
+    end
+
+    # @return [Boolean]
+    def has_sprite_character_address_offset_bit?
+      @control1[3] == 1
     end
 
     # @return [Boolean]

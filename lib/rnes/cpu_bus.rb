@@ -54,8 +54,10 @@ module Rnes
         @ppu.write(address - 0x2000, value)
       when 0x2008..0x3FFF
         @ppu.write(address - 0x2008, value)
-      when 0x4000..0x401F
+      when 0x4000..0x4013, 0x4015..0x401F
         0 # TODO: I/O port for APU, etc
+      when 0x4014
+        0 # TODO: DMA transfer
       when 0x4020..0x5FFF
         0 # TODO: extended RAM on special mappers
       when 0x6000..0x7FFF

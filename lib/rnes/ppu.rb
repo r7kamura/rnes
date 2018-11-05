@@ -21,8 +21,6 @@ module Rnes
 
     PALETTE_BYTESIZE = 32
 
-    SPRITE_HEIGHT = 8
-
     SPRITES_COUNT = 64
 
     TILE_HEIGHT = 8
@@ -74,12 +72,9 @@ module Rnes
     # @param [Rnes::PpuBus] bus
     def initialize(bus:)
       @bus = bus
-      @character_line_high_byte = 0x0
-      @character_line_low_byte = 0x0
       @cycle = 0
       @image = self.class.generate_empty_image
       @line = 0
-      @mini_palette_ids_byte = 0x0
       @registers = ::Rnes::PpuRegisters.new
       @sprite_ram = ::Rnes::Ram.new(bytesize: 2**8)
       @sprite_ram_address = 0x00
@@ -99,8 +94,8 @@ module Rnes
     end
 
     def tick
-      if on_visible_cycle?
-        draw
+      if on_visible_cycle? && x_in_tile.zero?
+        draw_background_8pixels
       end
       if on_right_end_cycle?
         self.cycle = 0
@@ -109,6 +104,7 @@ module Rnes
           clear_nmi
           clear_sprite_hit
           clear_v_blank
+          draw_sprites
           render_image
         else
           self.line += 1
@@ -147,17 +143,6 @@ module Rnes
 
     private
 
-    # 0b11
-    #   |`- horizontal (1: right)
-    #   `-- vertical   (1: bottom)
-    # @return [Integer]
-    def block_position
-      shift = 0
-      shift |= 0b01 if drawing_right_block?
-      shift |= 0b10 if drawing_bottom_block?
-      shift
-    end
-
     # @todo
     def clear_nmi
     end
@@ -170,30 +155,69 @@ module Rnes
       registers.toggle_in_v_blank_bit(false)
     end
 
-    # @note Drawing next 8 pixels per 8 cycles.
-    def draw
-      if x_in_tile.zero?
-        @character_index = read_from_name_table(tile_index)
-        @mini_palette_ids_byte = read_from_attribute_table(tile_index)
-        @character_line_low_byte = read_from_character_rom(character_line_low_byte_address)
-        @character_line_high_byte = read_from_character_rom(character_line_high_byte_address)
-        update_eight_pixels
+    def draw_background_8pixels
+      character_address_offset = registers.has_background_character_address_offset_bit? ? 0x1000 : 0
+      character_index = read_from_name_table(tile_index)
+      character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_tile + character_address_offset
+      character_line_low_byte = read_from_character_rom(character_line_low_byte_address)
+      character_line_high_byte = read_from_character_rom(character_line_low_byte_address + 8)
+
+      block_id = 0
+      block_id |= 0b01 if (x % BLOCK_WIDTH).odd?
+      block_id |= 0b10 if (y % BLOCK_HEIGHT).odd?
+      mini_palette_ids_byte = read_from_attribute_table(tile_index)
+      mini_palette_id = (mini_palette_ids_byte >> (block_id * 2)) & 0b11
+
+      TILE_WIDTH.times do |x_in_character|
+        index_in_character_line_byte = TILE_WIDTH - 1 - x_in_character
+        background_palette_index = character_line_low_byte[index_in_character_line_byte] | character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id << 2
+        color_id = read_from_background_palette_table(background_palette_index)
+        image_index = VISIBLE_WINDOW_WIDTH * y + x + x_in_character
+        @image[image_index] = ::Rnes::Ppu::COLORS[color_id]
       end
     end
 
-    # @return [Boolean]
-    def drawing_bottom_block?
-      (y % BLOCK_HEIGHT).odd?
-    end
+    # @note
+    #   struct Sprite {
+    #     U8 y;
+    #     U8 tile;
+    #     U8 attr;
+    #     U8 x;
+    #   }
+    #
+    # attr 76543210
+    #      |||   `+- palette
+    #      ||`------ priority (0: front, 1: back)
+    #      |`------- horizontal flip
+    #      `-------- vertical flip
+    def draw_sprites
+      character_address_offset = registers.has_sprite_character_address_offset_bit? ? 0x1000 : 0
+      SPRITES_COUNT.times do |i|
+        base_sprite_ram_address = i * 4
+        y_for_sprite = (read_from_sprite_ram(base_sprite_ram_address) - TILE_HEIGHT)
+        next if y_for_sprite.negative?
+        name_table_index = read_from_sprite_ram(base_sprite_ram_address + 1)
+        sprite_attribute_byte = read_from_sprite_ram(base_sprite_ram_address + 2)
+        x_for_sprite = read_from_sprite_ram(base_sprite_ram_address + 3)
 
-    # @return [Boolean]
-    def drawing_right_block?
-      (x % BLOCK_WIDTH).odd?
-    end
+        character_index = read_from_name_table(name_table_index)
 
-    # @return [Integer] Which 4-color-palette to use (0-3)
-    def mini_palette_id
-      (@mini_palette_ids_byte >> (block_position * 2)) & 0b11
+        mini_palette_id = sprite_attribute_byte & 0b11
+
+        TILE_HEIGHT.times do |y_in_character|
+          TILE_WIDTH.times do |x_in_character|
+            character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_character + character_address_offset
+            character_line_low_byte = read_from_character_rom(character_line_low_byte_address)
+            character_line_high_byte = read_from_character_rom(character_line_low_byte_address + 8)
+
+            index_in_character_line_byte = TILE_WIDTH - 1 - x_in_character
+            background_palette_index = character_line_low_byte[index_in_character_line_byte] | character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id << 2
+            color_id = read_from_background_palette_table(background_palette_index)
+            image_index = VISIBLE_WINDOW_WIDTH * (y_for_sprite + y_in_character) + x_for_sprite + x_in_character
+            @image[image_index] = ::Rnes::Ppu::COLORS[color_id]
+          end
+        end
+      end
     end
 
     # @return [Boolean]
@@ -240,6 +264,12 @@ module Rnes
       @bus.read(index)
     end
 
+    # @param [Integer] address
+    # @return [Integer]
+    def read_from_sprite_ram(address)
+      @sprite_ram.read(address)
+    end
+
     def render_image
       puts "\e[61A\e[128D"
       60.times do |y_of_character|
@@ -269,29 +299,8 @@ module Rnes
     end
 
     # @return [Integer]
-    def character_line_high_byte_address
-      character_line_low_byte_address + 8
-    end
-
-    # @return [Integer]
-    def character_line_low_byte_address
-      @character_index * SPRITE_HEIGHT * 2 + y_in_tile
-    end
-
-    # @return [Integer]
     def tile_index
       y_of_tile * (VISIBLE_WINDOW_WIDTH / TILE_WIDTH) + x_of_tile
-    end
-
-    def update_eight_pixels
-      mini_palette_id_memo = mini_palette_id
-      8.times do |x_in_character|
-        index_in_character_line_byte = 7 - x_in_character
-        background_palette_index = @character_line_low_byte[index_in_character_line_byte] | @character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id_memo << 2
-        color_id = read_from_background_palette_table(background_palette_index)
-        image_index = VISIBLE_WINDOW_WIDTH * y + x + x_in_character
-        @image[image_index] = ::Rnes::Ppu::COLORS[color_id]
-      end
     end
 
     # @return [Integer]
