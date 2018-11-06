@@ -118,7 +118,7 @@ module Rnes
     # @return [String]
     def segment_operation_full_name
       operation = @cpu.read_operation
-      format('%9s', operation.full_name)
+      format('%-9s', operation.full_name)
     end
 
     # @note SL means "Scan Line".
