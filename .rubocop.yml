@@ -1,6 +1,9 @@
 Lint/EmptyWhen:
   Enabled: false
 
+Lint/HandleExceptions:
+  Enabled: false
+
 Metrics/AbcSize:
   Enabled: false
 
