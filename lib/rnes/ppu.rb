@@ -66,6 +66,7 @@ module Rnes
       @sprite_ram = ::Rnes::Ram.new(bytesize: SPRITE_RAM_BYTESIZE)
       @sprite_ram_address = 0x00
       @video_ram_address = 0x0000
+      @writing_to_scroll_registers = false
       @writing_video_ram_address = false
     end
 
@@ -130,7 +131,7 @@ module Rnes
       when 0x0004
         write_to_sprite_ram(value)
       when 0x0005
-        # TODO: scroll register
+        write_to_scroll_registers(value)
       when 0x0006
         write_video_ram_address(value)
       when 0x0007
@@ -315,6 +316,16 @@ module Rnes
     # @param [Integer] address
     def write_sprite_ram_address(address)
       @sprite_ram_address = address
+    end
+
+    # @param [Integer] value
+    def write_to_scroll_registers(value)
+      if @writing_to_scroll_registers
+        @registers.scroll_vertical = value
+      else
+        @registers.scroll_horizontal = value
+      end
+      @writing_to_scroll_registers = !@writing_to_scroll_registers
     end
 
     # @param [Integer] value
