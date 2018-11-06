@@ -7,10 +7,14 @@ module Rnes
     attr_accessor :program_rom
 
     # @param [Rnes::DmaController] dma_controller
+    # @param [Rnes::Keypad] keypad1
+    # @param [Rnes::Keypad] keypad2
     # @param [Rnes::Ppu] ppu
     # @param [Rnes::Ram] ram
-    def initialize(dma_controller:, ppu:, ram:)
+    def initialize(dma_controller:, keypad1:, keypad2:, ppu:, ram:)
       @dma_controller = dma_controller
+      @keypad1 = keypad1
+      @keypad2 = keypad2
       @ppu = ppu
       @ram = ram
     end
@@ -28,6 +32,10 @@ module Rnes
         @ppu.read(address - 0x2000)
       when 0x2008..0x3FFF
         @ppu.read(address - 0x2008)
+      when 0x4016
+        @keypad1.read
+      when 0x4017
+        @keypad2.read
       when 0x4000..0x401F
         0 # TODO: I/O port for APU, etc
       when 0x4020..0x5FFF
@@ -56,10 +64,14 @@ module Rnes
         @ppu.write(address - 0x2000, value)
       when 0x2008..0x3FFF
         @ppu.write(address - 0x2008, value)
-      when 0x4000..0x4013, 0x4015..0x401F
-        0 # TODO: I/O port for APU, etc
       when 0x4014
         @dma_controller.request_transfer(address_hint: value)
+      when 0x4016
+        @keypad1.write(value)
+      when 0x4017
+        @keypad2.write(value)
+      when 0x4000..0x401F
+        0 # TODO: I/O port for APU, etc
       when 0x4020..0x5FFF
         0 # TODO: extended RAM on special mappers
       when 0x6000..0x7FFF

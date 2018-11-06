@@ -25,6 +25,27 @@ Pass ROM file path to `rnes` executable.
 rnes <path-to-rom-file>
 ```
 
+## Controls
+
+```
+.------------------------------.
+| [I]      |                   |
+|  _|W|_   .__________________ |
+| |A( )D|    N  M     ,    .   |
+|   |S|    ( _  _ )  (_)  (_)  |
+.______________________________.
+
+Up     = W
+Left   = A
+Down   = S
+Right  = D
+Select = N
+Start  = M
+B      = ,
+A      = .
+
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/r7kamura/rnes.
