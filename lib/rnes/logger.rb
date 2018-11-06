@@ -36,6 +36,8 @@ module Rnes
         segment_cpu_index_x,
         segment_cpu_index_y,
         segment_cpu_status,
+        segment_ppu_control1,
+        segment_ppu_control2,
         segment_cpu_stack_pointer,
         segment_cycle,
         segment_ppu_line,
@@ -119,6 +121,16 @@ module Rnes
     def segment_operation_full_name
       operation = @cpu.read_operation
       format('%-10s', operation.full_name)
+    end
+
+    # @return [String]
+    def segment_ppu_control1
+      format('CTRL1:%08b', @ppu.registers.control1)
+    end
+
+    # @return [String]
+    def segment_ppu_control2
+      format('CTRL2:%08b', @ppu.registers.control2)
     end
 
     # @note SL means "Scan Line".
