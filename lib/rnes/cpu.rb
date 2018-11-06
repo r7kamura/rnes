@@ -517,15 +517,15 @@ module Rnes
     end
 
     # @param [Integer] operand
-    def execute_operation_isb(_operand)
+    def execute_operation_isb(operand)
       value = (read(operand) + 1) & 0xFF
-      result = (~value & 0xFF) + @registers.accumulator + @registers.carry
+      result = (~value & 0xFF) + @registers.accumulator + @registers.carry_bit
       @registers.overflow = (@registers.accumulator ^ value)[7].zero? && !(@registers.accumulator ^ result)[7].zero?
       @registers.carry = result > 0xFF
       @registers.negative = result[7] == 1
       @registers.zero = result.zero?
       @registers.accumulator = result & 0xFF
-      write(address, value)
+      write(operand, value)
     end
 
     # @param [Integer] operand
