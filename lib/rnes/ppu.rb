@@ -75,6 +75,8 @@ module Rnes
       case address
       when 0x0002
         registers.status
+      when 0x0007
+        read_from_video_ram
       else
         raise ::Rnes::Errors::InvalidPpuAddressError, address
       end
@@ -265,9 +267,16 @@ module Rnes
     end
 
     # @param [Integer] index
-    # @return [Index]
+    # @return [Integer]
     def read_from_character_rom(index)
       @bus.read(index)
+    end
+
+    # @return [Integer]
+    def read_from_video_ram
+      value = @bus.read(@video_ram_address)
+      @video_ram_address += video_ram_address_offset
+      value
     end
 
     # @param [Integer] address
