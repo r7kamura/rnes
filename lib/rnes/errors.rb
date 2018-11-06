@@ -39,5 +39,8 @@ module Rnes
 
     class ProgramRomNotConnectedError < BaseError
     end
+
+    class StackPointerOverflowError < BaseError
+    end
   end
 end
