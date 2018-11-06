@@ -48,6 +48,7 @@ module Rnes
     # @return [Array<Rnes::Image>]
     attr_reader :image
 
+    # @note For debug use.
     # @return [Rnes::PpuRegisters]
     attr_reader :registers
 
