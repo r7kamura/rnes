@@ -141,7 +141,7 @@ module Rnes
     private
 
     def assert_nmi
-      @interrupt_line.deassert_nmi
+      @interrupt_line.assert_nmi
     end
 
     def clear_sprite_hit
