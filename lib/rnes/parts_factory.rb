@@ -2,6 +2,7 @@ require 'rnes/cpu_bus'
 require 'rnes/cpu'
 require 'rnes/dma_controller'
 require 'rnes/interrupt_line'
+require 'rnes/keypad'
 require 'rnes/ppu'
 require 'rnes/ppu_bus'
 require 'rnes/ram'
@@ -33,6 +34,8 @@ module Rnes
     def cpu_bus
       @cpu_bus ||= ::Rnes::CpuBus.new(
         dma_controller: dma_controller,
+        keypad1: keypad1,
+        keypad2: keypad2,
         ppu: ppu,
         ram: working_ram,
       )
@@ -49,6 +52,16 @@ module Rnes
     # @return [Rnes::InterruptLine]
     def interrupt_line
       @interrupt_line ||= ::Rnes::InterruptLine.new
+    end
+
+    # @return [Rnes::Keypad]
+    def keypad1
+      @keypad1 ||= ::Rnes::Keypad.new
+    end
+
+    # @return [Rnes::Keypad]
+    def keypad2
+      @keypad2 ||= ::Rnes::Keypad.new
     end
 
     # @return [Rnes::Ppu]

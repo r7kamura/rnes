@@ -1,3 +1,4 @@
+require 'io/console'
 require 'rnes/logger'
 require 'rnes/parts_factory'
 require 'rnes/rom_loader'
@@ -11,6 +12,8 @@ module Rnes
       @cpu = parts_factory.cpu
       @cpu_bus = parts_factory.cpu_bus
       @dma_controller = parts_factory.dma_controller
+      @keypad1 = parts_factory.keypad1
+      @keypad2 = parts_factory.keypad2
       @ppu = parts_factory.ppu
       @ppu_bus = parts_factory.ppu_bus
       @logger = ::Rnes::Logger.new(cpu: @cpu, path: LOG_FILE_NAME, ppu: @ppu)
@@ -25,11 +28,13 @@ module Rnes
     end
 
     def run
-      loop do
-        if @logger
-          @logger.puts
+      $stdin.noecho do
+        loop do
+          if @logger
+            @logger.puts
+          end
+          tick
         end
-        tick
       end
     end
 
@@ -39,6 +44,8 @@ module Rnes
       @ppu.tick
       @ppu.tick
       @ppu.tick
+      @keypad1.check
+      @keypad2.check
     end
 
     private
