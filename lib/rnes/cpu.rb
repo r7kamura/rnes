@@ -33,7 +33,7 @@ module Rnes
       @registers.program_counter = read_word(0xFFFC)
     end
 
-    # @todo Cycle calculation by using Rnes::Operation#cycle.
+    # @return [Integer]
     def tick
       handle_interrupts
       operation = fetch_operation
@@ -44,6 +44,7 @@ module Rnes
         operation_name: operation.name,
       )
       @branched = false
+      operation.cycle
     end
 
     private
@@ -57,6 +58,7 @@ module Rnes
     # @param [Symbol] addressing_mode
     # @param [Integer, nil] operand
     # @param [Symbol] operation_name
+    # @return [Integer]
     def execute_operation(addressing_mode:, operand:, operation_name:)
       case operation_name
       when :ADC

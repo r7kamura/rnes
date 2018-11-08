@@ -40,10 +40,9 @@ module Rnes
 
     def tick
       @dma_controller.transfer_if_requested
-      @cpu.tick
-      @ppu.tick
-      @ppu.tick
-      @ppu.tick
+      (@cpu.tick * 3).times do
+        @ppu.tick
+      end
       @keypad1.check
       @keypad2.check
     end
