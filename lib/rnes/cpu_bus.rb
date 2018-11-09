@@ -76,6 +76,7 @@ module Rnes
         0 # TODO: extended RAM on special mappers
       when 0x6000..0x7FFF
         0 # TODO: battery-backed-up RAM
+      when 0x8000..0xFFFF
       else
         raise ::Rnes::Errors::InvalidCpuBusAddressError, address
       end
