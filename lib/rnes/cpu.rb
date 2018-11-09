@@ -1009,10 +1009,10 @@ module Rnes
     def pop
       if @registers.stack_pointer < 0x1FF
         @registers.stack_pointer += 1
-        read(@registers.stack_pointer)
       else
-        raise ::Rnes::Errors::StackPointerOverflowError
+        @registers.stack_pointer = 0x100
       end
+      read(@registers.stack_pointer)
     end
 
     # @return [Integer]
@@ -1023,11 +1023,11 @@ module Rnes
     # @param [Integer] value
     # @raise [Rnes::Errors::StackPointerOverflowError]
     def push(value)
+      write(@registers.stack_pointer, value)
       if @registers.stack_pointer > 0x100
-        write(@registers.stack_pointer, value)
         @registers.stack_pointer -= 1
       else
-        raise ::Rnes::Errors::StackPointerOverflowError
+        @registers.stack_pointer = 0x1FF
       end
     end
 
