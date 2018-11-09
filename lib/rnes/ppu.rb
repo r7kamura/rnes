@@ -34,6 +34,12 @@ module Rnes
 
     WINDOW_WIDTH = 256
 
+    TILES_COUNT_IN_HORIZONTAL_LINE = WINDOW_WIDTH / TILE_WIDTH
+
+    TILES_COUNT_IN_VERTICAL_LINE = WINDOW_HEIGHT / TILE_HEIGHT
+
+    TILES_COUNT_IN_WINDOW = TILES_COUNT_IN_HORIZONTAL_LINE * TILES_COUNT_IN_VERTICAL_LINE
+
     # @note For debug use.
     # @param [Integer]
     # @return [Integer]
@@ -294,9 +300,29 @@ module Rnes
       registers.set_in_v_blank_bit
     end
 
-    # @return [Integer]
+    # +-----------+-----------+
+    # | 0(0x0000) | 1(0x0400) |
+    # +-----------+-----------+
+    # | 2(0x0800) | 3(0x0C00) |
+    # +-----------+-----------+
+    # @return [Integer] Integer from 0x0000 to 0x0FC0.
     def tile_index
-      y_of_tile * (WINDOW_WIDTH / TILE_WIDTH) + x_of_tile
+      tile_index_in_window + tile_index_paging_offset
+    end
+
+    # @return [Integer] Integer from 0x0000 to 0x03C0.
+    def tile_index_in_window
+      (y_of_tile % TILES_COUNT_IN_VERTICAL_LINE) * TILES_COUNT_IN_HORIZONTAL_LINE + x_of_tile % TILES_COUNT_IN_HORIZONTAL_LINE
+    end
+
+    # @return [Integer] Integer from 0 to 3.
+    def tile_index_page
+      x_of_tile / TILES_COUNT_IN_HORIZONTAL_LINE + y_of_tile / TILES_COUNT_IN_VERTICAL_LINE * 2
+    end
+
+    # @return [Integer] 0x0000, 0x0400, 0x0800, or 0x0C00.
+    def tile_index_paging_offset
+      tile_index_page * 0x0400
     end
 
     # @return [Boolean]
@@ -362,7 +388,7 @@ module Rnes
 
     # @return [Integer]
     def x_of_tile
-      x / TILE_WIDTH
+      (x + @registers.scroll_x) / TILE_WIDTH
     end
 
     # @return [Integer]
@@ -377,7 +403,7 @@ module Rnes
 
     # @return [Integer]
     def y_of_tile
-      y / TILE_HEIGHT
+      (y + @registers.scroll_y) / TILE_HEIGHT
     end
   end
 end
