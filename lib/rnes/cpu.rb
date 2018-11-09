@@ -339,7 +339,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_bmi(operand)
-      unless @registers.negative?
+      if @registers.negative?
         branch(operand)
       end
     end
