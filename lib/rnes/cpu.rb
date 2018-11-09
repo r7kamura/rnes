@@ -657,7 +657,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_plp(_operand)
-      @registers.status = pop
+      @registers.status = pop & 0b11101111
       @registers.reserved = true
     end
 
