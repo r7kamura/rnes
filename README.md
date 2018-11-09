@@ -11,7 +11,7 @@ A NES emulator written in Ruby.
 
 ## Installation
 
-Install rnes as a gem.
+Install rnes as a gem (or clone this repository and run `exe/rnes` executable).
 
 ```sh
 gem install rnes
@@ -22,7 +22,7 @@ gem install rnes
 Pass ROM file path to `rnes` executable.
 
 ```sh
-rnes <path-to-rom-file>
+rnes <FILE>
 ```
 
 ## Controls
