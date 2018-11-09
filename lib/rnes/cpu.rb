@@ -721,6 +721,7 @@ module Rnes
       @registers.overflow = (@registers.accumulator ^ value)[7].zero? && !(@registers.accumulator ^ result)[7].zero?
       @registers.negative = result[7] == 1
       @registers.zero = result.zero?
+      @registers.accumulator = result & 0xFF
       write(operand, value)
     end
 
