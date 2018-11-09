@@ -264,7 +264,7 @@ module Rnes
       @registers.carry = result > 0xFF
       @registers.negative = result[7] == 1
       @registers.overflow = (@registers.accumulator ^ operand)[7].zero? && !(@registers.accumulator ^ result)[7].zero?
-      @registers.zero = result.zero?
+      @registers.zero = (result & 0xFF).zero?
       @registers.accumulator = result & 0xFF
     end
 
@@ -750,7 +750,7 @@ module Rnes
       @registers.overflow = ((@registers.accumulator ^ result) & 0x80 != 0 && ((@registers.accumulator ^ operand) & 0x80) != 0)
       @registers.carry = result >= 0
       @registers.negative = result[7] == 1
-      @registers.zero = result.zero?
+      @registers.zero = (result & 0xFF).zero?
       @registers.accumulator = result & 0xFF
     end
 
