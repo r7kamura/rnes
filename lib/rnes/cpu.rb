@@ -203,7 +203,7 @@ module Rnes
         if addressing_mode == :accumulator
           execute_operation_rol_for_accumulator(operand)
         else
-          execute_operation_rol_for_non_accumulator_(operand)
+          execute_operation_rol_for_non_accumulator(operand)
         end
       when :ROR
         if addressing_mode == :accumulator
