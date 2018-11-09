@@ -929,9 +929,13 @@ module Rnes
     def fetch_operand_by_implied_addressing
     end
 
+    # @note The address must not overlap a page boundary as a bug in the original 6502 prevents it from being fetched properly.
     # @return [Integer]
     def fetch_operand_by_indirect_absolute_addressing
-      read_word(fetch_word)
+      address = fetch_word
+      low = read(address)
+      high = read((address & 0xFF00) | ((address + 1) & 0xFF))
+      low + (high << 8)
     end
 
     # @return [Integer]
