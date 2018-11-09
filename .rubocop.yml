@@ -1,3 +1,6 @@
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
 Lint/EmptyWhen:
   Enabled: false
 
@@ -31,13 +34,10 @@ Metrics/PerceivedComplexity:
 Naming/PredicateName:
   Enabled: false
 
-Style/Documentation:
-  Enabled: false
-
-Layout/EmptyLineAfterGuardClause:
-  Enabled: false
-
 Naming/UncommunicativeMethodParamName:
+  Enabled: false
+
+Style/Documentation:
   Enabled: false
 
 Style/EmptyMethod:
