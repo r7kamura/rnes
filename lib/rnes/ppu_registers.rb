@@ -13,11 +13,11 @@ module Rnes
 
     # @param [Integer]
     # @return [Integer]
-    attr_accessor :scroll_horizontal
+    attr_accessor :scroll_x
 
     # @param [Integer]
     # @return [Integer]
-    attr_accessor :scroll_vertical
+    attr_accessor :scroll_y
 
     # @param [Integer]
     # @return [Integer]
@@ -26,8 +26,8 @@ module Rnes
     def initialize
       @control1 = 0x0
       @control2 = 0x0
-      @scroll_horizontal = 0x0
-      @scroll_vertical = 0x0
+      @scroll_x = 0x0
+      @scroll_y = 0x0
       @status = 0x0
     end
 

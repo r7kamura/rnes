@@ -321,9 +321,9 @@ module Rnes
     # @param [Integer] value
     def write_to_scroll_registers(value)
       if @writing_to_scroll_registers
-        @registers.scroll_vertical = value
+        @registers.scroll_y = value
       else
-        @registers.scroll_horizontal = value
+        @registers.scroll_x = value
       end
       @writing_to_scroll_registers = !@writing_to_scroll_registers
     end
