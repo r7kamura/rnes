@@ -664,7 +664,7 @@ module Rnes
     # @param [Integer] operand
     def execute_operation_rla(operand)
       value = (read(operand) << 1) + @registers.carry_bit
-      result = (result & @registers.accumulator) & 0xFF
+      result = (value & @registers.accumulator) & 0xFF
       @registers.carry = value[8] == 1
       @registers.negative = result[7] == 1
       @registers.zero = result.zero?
