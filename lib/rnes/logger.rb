@@ -36,8 +36,6 @@ module Rnes
         segment_cpu_index_x,
         segment_cpu_index_y,
         segment_cpu_status,
-        segment_ppu_control1,
-        segment_ppu_control2,
         segment_cpu_stack_pointer,
         segment_cycle,
         segment_ppu_line,
@@ -71,7 +69,7 @@ module Rnes
 
     # @return [String]
     def segment_cpu_status
-      format('P:%08b', @cpu.registers.status)
+      format('P:%02X', @cpu.registers.status)
     end
 
     # @return [String]
@@ -84,9 +82,9 @@ module Rnes
       program_counter = @cpu.registers.program_counter
       operation = @cpu.read_operation
       case operation.addressing_mode
-      when :absolute, :absolute_x, :absolute_y, :indirect_absolute, :pre_indexed_absolute, :post_indexed_absolute
+      when :absolute, :absolute_x, :absolute_y, :indirect_absolute
         format('%02X %02X', @cpu.bus.read(program_counter + 1), @cpu.bus.read(program_counter + 2))
-      when :immediate, :relative, :zero_page, :zero_page_x, :zero_page_y
+      when :immediate, :relative, :zero_page, :zero_page_x, :zero_page_y, :pre_indexed_indirect, :post_indexed_indirect
         format('%02X   ', @cpu.bus.read(program_counter + 1))
       else
         ' ' * 5
@@ -121,16 +119,6 @@ module Rnes
     def segment_operation_full_name
       operation = @cpu.read_operation
       format('%-10s', operation.full_name)
-    end
-
-    # @return [String]
-    def segment_ppu_control1
-      format('CTRL1:%08b', @ppu.registers.control1)
-    end
-
-    # @return [String]
-    def segment_ppu_control2
-      format('CTRL2:%08b', @ppu.registers.control2)
     end
 
     # @note SL means "Scan Line".
