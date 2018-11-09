@@ -83,7 +83,7 @@ module Rnes
       end
     end
 
-    def tick
+    def step
       if on_visible_cycle? && x_in_tile.zero?
         draw_background_8pixels
       end

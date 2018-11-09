@@ -34,7 +34,7 @@ module Rnes
     end
 
     # @return [Integer]
-    def tick
+    def step
       handle_interrupts
       operation = fetch_operation
       operand = fetch_operand_by(operation.addressing_mode)

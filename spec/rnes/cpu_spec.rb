@@ -55,9 +55,9 @@ RSpec.describe Rnes::Cpu do
     end
   end
 
-  describe '#tick' do
+  describe '#step' do
     subject do
-      cpu.tick
+      cpu.step
     end
 
     before do

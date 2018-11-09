@@ -15,9 +15,9 @@ RSpec.describe Rnes::Ppu do
     parts_factory.video_ram
   end
 
-  describe '#tick' do
+  describe '#step' do
     subject do
-      ppu.tick
+      ppu.step
     end
 
     context 'on cycle 1 on line 0' do

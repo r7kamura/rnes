@@ -33,15 +33,15 @@ module Rnes
           if @logger
             @logger.puts
           end
-          tick
+          step
         end
       end
     end
 
-    def tick
+    def step
       @dma_controller.transfer_if_requested
-      (@cpu.tick * 3).times do
-        @ppu.tick
+      (@cpu.step * 3).times do
+        @ppu.step
       end
       @keypad1.check
       @keypad2.check

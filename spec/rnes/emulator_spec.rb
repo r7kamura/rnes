@@ -40,16 +40,16 @@ RSpec.describe Rnes::Emulator do
     ines_header_bytes + program_rom_bytes + character_rom_bytes
   end
 
-  describe '#tick' do
+  describe '#step' do
     subject do
-      emulator.tick
+      emulator.step
     end
 
     before do
       emulator.load_rom(rom_bytes)
     end
 
-    it 'ticks CPU and PPU' do
+    it 'steps CPU and PPU' do
       expect { subject }.not_to raise_error
     end
   end
