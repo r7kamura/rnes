@@ -30,9 +30,9 @@ module Rnes
 
     V_BLANK_HEIGHT = 21
 
-    VISIBLE_WINDOW_HEIGHT = 240
+    WINDOW_HEIGHT = 240
 
-    VISIBLE_WINDOW_WIDTH = 256
+    WINDOW_WIDTH = 256
 
     # @note For debug use.
     # @param [Integer]
@@ -58,7 +58,7 @@ module Rnes
     def initialize(bus:, interrupt_line:, renderer:)
       @bus = bus
       @cycle = 0
-      @image = ::Rnes::Image.new(height: VISIBLE_WINDOW_HEIGHT, width: VISIBLE_WINDOW_WIDTH)
+      @image = ::Rnes::Image.new(height: WINDOW_HEIGHT, width: WINDOW_WIDTH)
       @interrupt_line = interrupt_line
       @line = 0
       @registers = ::Rnes::PpuRegisters.new
@@ -231,12 +231,12 @@ module Rnes
 
     # @return [Boolean]
     def on_bottom_end_line?
-      line == VISIBLE_WINDOW_HEIGHT + V_BLANK_HEIGHT
+      line == WINDOW_HEIGHT + V_BLANK_HEIGHT
     end
 
     # @return [Boolean]
     def on_line_to_start_v_blank?
-      line == VISIBLE_WINDOW_HEIGHT
+      line == WINDOW_HEIGHT
     end
 
     # @return [Boolean]
@@ -246,7 +246,7 @@ module Rnes
 
     # @return [Boolean]
     def on_visible_cycle?
-      (0...VISIBLE_WINDOW_WIDTH).cover?(x) && (0...VISIBLE_WINDOW_HEIGHT).cover?(y)
+      (0...WINDOW_WIDTH).cover?(x) && (0...WINDOW_HEIGHT).cover?(y)
     end
 
     # @param [Integer] index
@@ -296,7 +296,7 @@ module Rnes
 
     # @return [Integer]
     def tile_index
-      y_of_tile * (VISIBLE_WINDOW_WIDTH / TILE_WIDTH) + x_of_tile
+      y_of_tile * (WINDOW_WIDTH / TILE_WIDTH) + x_of_tile
     end
 
     # @return [Boolean]
