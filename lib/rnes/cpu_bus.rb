@@ -71,11 +71,11 @@ module Rnes
       when 0x4017
         @keypad2.write(value)
       when 0x4000..0x401F
-        0 # TODO: I/O port for APU, etc
+        # TODO: I/O port for APU, etc
       when 0x4020..0x5FFF
-        0 # TODO: extended RAM on special mappers
+        # TODO: extended RAM on special mappers
       when 0x6000..0x7FFF
-        0 # TODO: battery-backed-up RAM
+        # TODO: battery-backed-up RAM
       when 0x8000..0xFFFF
       else
         raise ::Rnes::Errors::InvalidCpuBusAddressError, address
