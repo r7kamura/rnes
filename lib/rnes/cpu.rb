@@ -644,8 +644,7 @@ module Rnes
 
     # @param [Integer] operand
     def execute_operation_php(_operand)
-      @registers.break = true
-      push(@registers.status)
+      push(@registers.status | 0x10)
     end
 
     # @param [Integer] operand
