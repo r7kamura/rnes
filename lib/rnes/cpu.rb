@@ -945,7 +945,7 @@ module Rnes
 
     # @return [Integer]
     def fetch_operand_by_post_indexed_indirect_addressing
-      (read_word(fetch) + @registers.index_y) & 0xFF
+      (read_word(fetch) + @registers.index_y) & 0xFFFF
     end
 
     # @return [Integer]
