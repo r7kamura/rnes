@@ -16,6 +16,7 @@ module Rnes
     def initialize(bus:, interrupt_line:)
       @branched = false
       @bus = bus
+      @crossed = false
       @interrupt_line = interrupt_line
       @registers = ::Rnes::CpuRegisters.new
     end
@@ -43,8 +44,10 @@ module Rnes
         operand: operand,
         operation_name: operation.name,
       )
+      cycles_count = operation.cycle + (@branched ? 1 : 0) + (@crossed ? 1 : 0)
       @branched = false
-      operation.cycle
+      @crossed = false
+      cycles_count
     end
 
     private
@@ -908,12 +911,18 @@ module Rnes
 
     # @return [Integer]
     def fetch_operand_by_absolute_x_addressing
-      (fetch_word + @registers.index_x) & 0xFFFF
+      base_address = fetch_word
+      address = (base_address + @registers.index_x) & 0xFFFF
+      @crossed = (address & 0xFF00) != (@registers.index_x & 0xFF00)
+      address
     end
 
     # @return [Integer]
     def fetch_operand_by_absolute_y_addressing
-      (fetch_word + @registers.index_y) & 0xFFFF
+      base_address = fetch_word
+      address = (base_address + @registers.index_y) & 0xFFFF
+      @crossed = (address & 0xFF00) != (@registers.index_y & 0xFF00)
+      address
     end
 
     # @return [nil]
@@ -940,19 +949,27 @@ module Rnes
 
     # @return [Integer]
     def fetch_operand_by_pre_indexed_indirect_addressing
-      read_word_with_wrap_around((fetch + @registers.index_x) & 0xFF)
+      base_address = (fetch + @registers.index_x) & 0xFF
+      address = read_word_with_wrap_around(base_address)
+      @crossed = (address & 0xFF00) != (base_address & 0xFF00)
+      address
     end
 
     # @return [Integer]
     def fetch_operand_by_post_indexed_indirect_addressing
-      (read_word_with_wrap_around(fetch) + @registers.index_y) & 0xFFFF
+      base_address = fetch
+      address = (read_word_with_wrap_around(base_address) + @registers.index_y) & 0xFFFF
+      @crossed = (address & 0xFF00) != (base_address & 0xFF00)
+      address
     end
 
     # @return [Integer]
     def fetch_operand_by_relative_addressing
       int8 = fetch
       offset = int8 >= 0x80 ? int8 - 256 : int8
-      @registers.program_counter + offset
+      address = @registers.program_counter + offset
+      @crossed = (address & 0xFF00) != (@registers.program_counter & 0xFF00)
+      address
     end
 
     # @return [Integer]
