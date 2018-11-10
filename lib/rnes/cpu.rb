@@ -940,12 +940,12 @@ module Rnes
 
     # @return [Integer]
     def fetch_operand_by_pre_indexed_indirect_addressing
-      read_word((fetch + @registers.index_x) & 0xFF)
+      read_word_with_wrap_around((fetch + @registers.index_x) & 0xFF)
     end
 
     # @return [Integer]
     def fetch_operand_by_post_indexed_indirect_addressing
-      (read_word(fetch) + @registers.index_y) & 0xFFFF
+      (read_word_with_wrap_around(fetch) + @registers.index_y) & 0xFFFF
     end
 
     # @return [Integer]
@@ -1051,6 +1051,13 @@ module Rnes
     # @return [Integer]
     def read_word(address)
       read(address) | read((address + 1) & 0xFFFF) << 8
+    end
+
+    # @param [Integer] byte Unsigned integer from 0x00 to 0xFF.
+    def read_word_with_wrap_around(byte)
+      low = read(byte)
+      high = read((byte + 1) & 0xFF)
+      low + (high << 8)
     end
 
     # @param [Integer] address
