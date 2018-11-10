@@ -81,6 +81,10 @@ module Rnes
     # @return [Integer]
     def read(address)
       case address
+      when 0x0000
+        @registers.control1
+      when 0x0001
+        @registers.control2
       when 0x0002
         @writing_to_scroll_registers = false
         value = registers.status
