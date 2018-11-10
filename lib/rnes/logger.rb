@@ -29,6 +29,7 @@ module Rnes
         '',
         segment_operation_code,
         segment_operand,
+        '',
         segment_operation_full_name,
         segment_operand_humanized,
         '',
@@ -74,7 +75,7 @@ module Rnes
 
     # @return [String]
     def segment_cycle
-      format('CYC:%03d', @ppu.cycle)
+      format('CYC:%3d', @ppu.cycle)
     end
 
     # @return [String]
@@ -105,7 +106,7 @@ module Rnes
           ''
         end
       end
-      format('%-5s', string)
+      format('%-19s', string)
     end
 
     # @return [String]
