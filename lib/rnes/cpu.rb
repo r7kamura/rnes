@@ -291,7 +291,7 @@ module Rnes
     # @param [Integer] operand
     def execute_operation_asl_for_accoumulator(_operand)
       value = @registers.accumulator
-      result = (value << 1) && 0xFF
+      result = (value << 1) & 0xFF
       @registers.carry = value[7] == 1
       @registers.negative = result[7] == 1
       @registers.zero = result.zero?
@@ -301,7 +301,7 @@ module Rnes
     # @param [Integer] operand
     def execute_operation_asl_for_non_accumulator(operand)
       value = read(operand)
-      result = (value << 1) && 0xFF
+      result = (value << 1) & 0xFF
       @registers.carry = value[7] == 1
       @registers.negative = result[7] == 1
       @registers.zero = result.zero?
