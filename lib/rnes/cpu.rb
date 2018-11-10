@@ -781,7 +781,7 @@ module Rnes
       value = (read_value << 1) & 0xFF
       result = value | @registers.accumulator
       @registers.carry = read_value[7] == 1
-      @registers.negative = result == 1
+      @registers.negative = result[7] == 1
       @registers.zero = result.zero?
       @registers.accumulator = result
       write(operand, value)
