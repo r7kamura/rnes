@@ -28,7 +28,7 @@ module Rnes
       when 0x3F00..0x3F1F
         @video_ram.read(address - 0x2000)
       when 0x3F20..0x3FFF
-        read(address - 0x20)
+        read(address - 0x0020)
       when 0x4000..0xFFFF
         read(address - 0x4000)
       else
@@ -45,13 +45,15 @@ module Rnes
       when 0x2000..0x27FF
         @video_ram.write(address - 0x2000, value)
       when 0x2800..0x2FFF
-        @video_ram.write(address - 0x0800, value)
+        write(address - 0x0800, value)
       when 0x3000..0x3EFF
-        @video_ram.write(address - 0x1000, value)
+        write(address - 0x1000, value)
       when 0x3F00..0x3F1F
         @video_ram.write(address - 0x2000, value)
-      when 0x3F00..0xFFFF
-        write(address - 0x1000, value)
+      when 0x3F00..0x3FFF
+        write(address - 0x0020, value)
+      when 0x4000..0xFFFF
+        write(address - 0x4000, value)
       else
         raise ::Rnes::Errors::InvalidPpuBusAddressError, address
       end
