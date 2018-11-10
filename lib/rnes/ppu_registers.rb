@@ -66,6 +66,11 @@ module Rnes
       @control1[7] == 1
     end
 
+    # @param [Boolean] boolean
+    def in_v_blank=(boolean)
+      toggle_status_bit(STATUS_IN_V_BLANK_BIT_INDEX, boolean)
+    end
+
     # Name table id (address)
     # +------------+------------|
     # | 0 (0x2000) | 1 (0x2400) |
@@ -89,11 +94,6 @@ module Rnes
     # @param [Boolean] boolean
     def sprite_hit=(boolean)
       toggle_status_bit(STATUS_SPRITE_HIT_BIT_INDEX, boolean)
-    end
-
-    # @param [Boolean] boolean
-    def toggle_in_v_blank_bit(boolean)
-      toggle_status_bit(STATUS_IN_V_BLANK_BIT_INDEX, boolean)
     end
 
     private

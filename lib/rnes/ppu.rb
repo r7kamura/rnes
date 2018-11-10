@@ -175,7 +175,7 @@ module Rnes
     end
 
     def clear_v_blank
-      registers.toggle_in_v_blank_bit(false)
+      registers.in_v_blank = false
     end
 
     def deassert_nmi

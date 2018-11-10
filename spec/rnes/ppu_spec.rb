@@ -93,7 +93,7 @@ RSpec.describe Rnes::Ppu do
       before do
         ppu.cycle = 340
         ppu.line = 261
-        ppu.registers.toggle_in_v_blank_bit(true)
+        ppu.registers.in_v_blank = true
         ppu.registers.sprite_hit = true
         allow(ppu).to receive(:render_image)
       end
