@@ -912,17 +912,15 @@ module Rnes
     # @return [Integer]
     def fetch_operand_by_absolute_x_addressing
       base_address = fetch_word
-      address = (base_address + @registers.index_x) & 0xFFFF
-      @crossed = (address & 0xFF00) != (@registers.index_x & 0xFF00)
-      address
+      @crossed = (base_address & 0xFF00) != ((base_address + @registers.index_x) & 0xFF00)
+      (base_address + @registers.index_x) & 0xFFFF
     end
 
     # @return [Integer]
     def fetch_operand_by_absolute_y_addressing
       base_address = fetch_word
-      address = (base_address + @registers.index_y) & 0xFFFF
-      @crossed = (address & 0xFF00) != (@registers.index_y & 0xFF00)
-      address
+      @crossed = (base_address & 0xFF00) != ((base_address + @registers.index_y) & 0xFF00)
+      (base_address + @registers.index_y) & 0xFFFF
     end
 
     # @return [nil]
