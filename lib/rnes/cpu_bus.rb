@@ -30,7 +30,7 @@ module Rnes
       when 0x2000..0x2007
         @ppu.read(address - 0x2000)
       when 0x2008..0x3FFF
-        @ppu.read(address - 0x2008)
+        read(address - 0x0008)
       when 0x4016
         @keypad1.read
       when 0x4017
@@ -61,7 +61,7 @@ module Rnes
       when 0x2000..0x2007
         @ppu.write(address - 0x2000, value)
       when 0x2008..0x3FFF
-        @ppu.write(address - 0x2008, value)
+        write(address - 0x0008, value)
       when 0x4014
         @dma_controller.request_transfer(address_hint: value)
       when 0x4016
