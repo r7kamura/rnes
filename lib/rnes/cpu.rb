@@ -669,7 +669,7 @@ module Rnes
       @registers.negative = result[7] == 1
       @registers.zero = result.zero?
       @registers.accumulator = result
-      write(operand, value)
+      write(operand, value & 0xFF)
     end
 
     # @param [Integer] operand
