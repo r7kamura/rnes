@@ -32,13 +32,13 @@ module Rnes
     end
 
     # @return [Boolean]
-    def has_background_bank_bit?
-      @control1[4] == 1
+    def background_enabled?
+      @control2[3] == 1
     end
 
     # @return [Boolean]
-    def has_background_enabled_bit?
-      @control2[3] == 1
+    def has_background_bank_bit?
+      @control1[4] == 1
     end
 
     # @return [Boolean]
@@ -49,11 +49,6 @@ module Rnes
     # @return [Boolean]
     def has_large_video_ram_address_offset_bit?
       @control1[4] == 1
-    end
-
-    # @return [Boolean]
-    def has_sprite_enabled_bit?
-      @control2[4] == 1
     end
 
     # @return [Boolean]
@@ -86,14 +81,19 @@ module Rnes
       @status |= (1 << STATUS_IN_V_BLANK_BIT_INDEX)
     end
 
-    # @param [Boolean] boolean
-    def toggle_in_v_blank_bit(boolean)
-      toggle_status_bit(STATUS_IN_V_BLANK_BIT_INDEX, boolean)
+    # @return [Boolean]
+    def sprite_enabled?
+      @control2[4] == 1
     end
 
     # @param [Boolean] boolean
-    def toggle_sprite_hit_bit(boolean)
+    def sprite_hit=(boolean)
       toggle_status_bit(STATUS_SPRITE_HIT_BIT_INDEX, boolean)
+    end
+
+    # @param [Boolean] boolean
+    def toggle_in_v_blank_bit(boolean)
+      toggle_status_bit(STATUS_IN_V_BLANK_BIT_INDEX, boolean)
     end
 
     private

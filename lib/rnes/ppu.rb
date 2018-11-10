@@ -114,6 +114,7 @@ module Rnes
           render_image
         else
           self.line += 1
+          check_sprite_hit
           if on_line_to_start_v_blank?
             set_v_blank
             if v_blank_interrupt_enabled?
@@ -163,8 +164,14 @@ module Rnes
       @interrupt_line.assert_nmi
     end
 
+    def check_sprite_hit
+      if read_from_sprite_ram(0) == y && @registers.background_enabled? && @registers.sprite_enabled?
+        registers.sprite_hit = true
+      end
+    end
+
     def clear_sprite_hit
-      registers.toggle_sprite_hit_bit(false)
+      registers.sprite_hit = false
     end
 
     def clear_v_blank
