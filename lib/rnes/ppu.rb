@@ -82,7 +82,10 @@ module Rnes
     def read(address)
       case address
       when 0x0002
-        registers.status
+        @writing_to_scroll_registers = false
+        value = registers.status
+        clear_v_blank
+        value
       when 0x0004
         read_from_sprite_ram(@sprite_ram_address)
       when 0x0007
