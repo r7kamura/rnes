@@ -19,7 +19,6 @@ module Rnes
       @ram = ram
     end
 
-    # @todo
     # @param [Integer]
     # @return [Integer]
     def read(address)
@@ -51,7 +50,6 @@ module Rnes
       end
     end
 
-    # @todo
     # @param [Integer] address
     # @param [Integer] value
     def write(address, value)
