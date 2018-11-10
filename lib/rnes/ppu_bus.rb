@@ -28,9 +28,9 @@ module Rnes
       when 0x3F00..0x3F1F
         @video_ram.read(address - 0x2000)
       when 0x3F20..0x3FFF
-        read(address - 0x20) # mirror to 0x3F00..0x3F1F
+        read(address - 0x20)
       when 0x4000..0xFFFF
-        read(address - 0x4000) # mirror to 0x0000..0x3FFF
+        read(address - 0x4000)
       else
         raise ::Rnes::Errors::InvalidPpuBusAddressError, address
       end
