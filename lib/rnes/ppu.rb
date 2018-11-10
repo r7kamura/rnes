@@ -71,7 +71,7 @@ module Rnes
       @renderer = renderer
       @sprite_ram = ::Rnes::Ram.new(bytesize: SPRITE_RAM_BYTESIZE)
       @sprite_ram_address = 0x00
-      @video_ram_address = 0x0000
+      @requested_video_ram_data_address = 0x0000
       @writing_to_scroll_registers = false
       @writing_video_ram_address = false
     end
@@ -85,7 +85,7 @@ module Rnes
       when 0x0004
         read_from_sprite_ram(@sprite_ram_address)
       when 0x0007
-        read_from_video_ram
+        read_requested_video_ram_data
       else
         raise ::Rnes::Errors::InvalidPpuAddressError, address
       end
@@ -169,21 +169,21 @@ module Rnes
 
     def draw_background_8pixels
       character_address_offset = registers.has_background_bank_bit? ? 0x1000 : 0
-      character_index = read_from_name_table(tile_index)
+      character_index = read_character_index(tile_index)
       character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_tile + character_address_offset
-      character_line_low_byte = read_from_character_rom(character_line_low_byte_address)
-      character_line_high_byte = read_from_character_rom(character_line_low_byte_address + 8)
+      character_line_low_byte = read_character_data(character_line_low_byte_address)
+      character_line_high_byte = read_character_data(character_line_low_byte_address + 8)
 
       block_id = 0
       block_id |= 0b01 if (x % BLOCK_WIDTH).odd?
       block_id |= 0b10 if (y % BLOCK_HEIGHT).odd?
-      mini_palette_ids_byte = read_from_attribute_table(tile_index)
+      mini_palette_ids_byte = read_object_attribute(tile_index)
       mini_palette_id = (mini_palette_ids_byte >> (block_id * 2)) & 0b11
 
       TILE_WIDTH.times do |x_in_character|
         index_in_character_line_byte = TILE_WIDTH - 1 - x_in_character
         background_palette_index = character_line_low_byte[index_in_character_line_byte] | character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id << 2
-        color_id = read_from_background_palette_table(background_palette_index)
+        color_id = read_color_id(background_palette_index)
         @image.write(
           value: ::Rnes::Ppu::COLORS[color_id],
           x: x + x_in_character,
@@ -215,18 +215,18 @@ module Rnes
         sprite_attribute_byte = read_from_sprite_ram(base_sprite_ram_address + 2)
         x_for_sprite = read_from_sprite_ram(base_sprite_ram_address + 3)
 
-        character_index = read_from_name_table(name_table_index)
+        character_index = read_character_index(name_table_index)
 
         mini_palette_id = sprite_attribute_byte & 0b11
 
         TILE_HEIGHT.times do |y_in_character|
           character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_character + character_address_offset
-          character_line_low_byte = read_from_character_rom(character_line_low_byte_address)
-          character_line_high_byte = read_from_character_rom(character_line_low_byte_address + 8)
+          character_line_low_byte = read_character_data(character_line_low_byte_address)
+          character_line_high_byte = read_character_data(character_line_low_byte_address + 8)
           TILE_WIDTH.times do |x_in_character|
             index_in_character_line_byte = TILE_WIDTH - 1 - x_in_character
             background_palette_index = character_line_low_byte[index_in_character_line_byte] | character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id << 2
-            color_id = read_from_background_palette_table(background_palette_index)
+            color_id = read_color_id(background_palette_index)
             @image.write(
               value: ::Rnes::Ppu::COLORS[color_id],
               x: x_for_sprite + x_in_character,
@@ -258,40 +258,46 @@ module Rnes
     end
 
     # @param [Integer] index
-    # @return [Integer] 4-color-palette IDs of 4 blocks, as 8 bit data.
-    def read_from_attribute_table(index)
-      @bus.read(ADDRESS_TO_START_ATTRIBUTE_TABLE + index)
+    # @return [Integer]
+    def read_character_data(index)
+      read_from_video_ram(index)
     end
 
     # @param [Integer] index
     # @return [Integer]
-    def read_from_name_table(index)
-      @bus.read(ADDRESS_TO_START_NAME_TABLE + index)
+    def read_character_index(index)
+      read_from_video_ram(ADDRESS_TO_START_NAME_TABLE + index)
     end
 
     # @param [Integer] index
     # @return [Integer]
-    def read_from_background_palette_table(index)
-      @bus.read(ADDRESS_TO_START_BACKGROUND_PALETTE_TABLE + index)
-    end
-
-    # @param [Integer] index
-    # @return [Integer]
-    def read_from_character_rom(index)
-      @bus.read(index)
-    end
-
-    # @return [Integer]
-    def read_from_video_ram
-      value = @bus.read(@video_ram_address)
-      @video_ram_address += video_ram_address_offset
-      value
+    def read_color_id(index)
+      read_from_video_ram(ADDRESS_TO_START_BACKGROUND_PALETTE_TABLE + index)
     end
 
     # @param [Integer] address
     # @return [Integer]
     def read_from_sprite_ram(address)
       @sprite_ram.read(address)
+    end
+
+    # @param [Integer] address
+    # @return [Integer]
+    def read_from_video_ram(address)
+      @bus.read(address)
+    end
+
+    # @param [Integer] index
+    # @return [Integer] 4-color-palette IDs of 4 blocks, as 8 bit data.
+    def read_object_attribute(index)
+      read_from_video_ram(ADDRESS_TO_START_ATTRIBUTE_TABLE + index)
+    end
+
+    # @return [Integer]
+    def read_requested_video_ram_data
+      value = read_from_video_ram(@requested_video_ram_data_address)
+      @requested_video_ram_data_address += video_ram_address_offset
+      value
     end
 
     def render_image
@@ -365,17 +371,17 @@ module Rnes
     # @param [Integer] address
     def write_video_ram_address(address)
       if @writing_video_ram_address
-        @video_ram_address |= address
+        @requested_video_ram_data_address |= address
       else
-        @video_ram_address = address << 8
+        @requested_video_ram_data_address = address << 8
       end
       @writing_video_ram_address = !@writing_video_ram_address
     end
 
     # @param [Integer] value
     def write_to_video_ram(value)
-      @bus.write(@video_ram_address, value)
-      @video_ram_address += video_ram_address_offset
+      @bus.write(@requested_video_ram_data_address, value)
+      @requested_video_ram_data_address += video_ram_address_offset
     end
 
     # @return [Integer]
