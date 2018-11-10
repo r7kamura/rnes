@@ -297,8 +297,13 @@ module Rnes
 
     # @return [Integer]
     def read_requested_video_ram_data
-      value = @video_ram_reading_buffer
-      @video_ram_reading_buffer = @bus.read(@requested_video_ram_data_address)
+      if (0x3F00..0x3F1F).cover?(@requested_video_ram_data_address % 0x4000)
+        value = @bus.read(@requested_video_ram_data_address)
+        @video_ram_reading_buffer = @bus.read(@requested_video_ram_data_address - 0x1000)
+      else
+        value = @video_ram_reading_buffer
+        @video_ram_reading_buffer = @bus.read(@requested_video_ram_data_address)
+      end
       @requested_video_ram_data_address += video_ram_address_offset
       value
     end
