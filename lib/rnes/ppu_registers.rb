@@ -9,7 +9,7 @@ module Rnes
 
     # @param [Integer]
     # @return [Integer]
-    attr_accessor :control2
+    attr_accessor :mask
 
     # @param [Integer]
     # @return [Integer]
@@ -25,7 +25,7 @@ module Rnes
 
     def initialize
       @control1 = 0x0
-      @control2 = 0x0
+      @mask = 0x0
       @scroll_x = 0x0
       @scroll_y = 0x0
       @status = 0x0
@@ -33,7 +33,7 @@ module Rnes
 
     # @return [Boolean]
     def background_enabled?
-      @control2[3] == 1
+      @mask[3] == 1
     end
 
     # @return [Boolean]
@@ -88,7 +88,7 @@ module Rnes
 
     # @return [Boolean]
     def sprite_enabled?
-      @control2[4] == 1
+      @mask[4] == 1
     end
 
     # @param [Boolean] boolean

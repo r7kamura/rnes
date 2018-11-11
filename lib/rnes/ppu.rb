@@ -84,7 +84,7 @@ module Rnes
       when 0x0000
         @registers.control1
       when 0x0001
-        @registers.control2
+        @registers.mask
       when 0x0002
         @writing_to_scroll_registers = false
         value = registers.status
@@ -142,7 +142,7 @@ module Rnes
       when 0x0000
         registers.control1 = value
       when 0x0001
-        registers.control2 = value
+        registers.mask = value
       when 0x0003
         write_sprite_ram_address(value)
       when 0x0004
