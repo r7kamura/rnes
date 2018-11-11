@@ -361,7 +361,7 @@ module Rnes
     # @return [Integer]
     def video_ram_address_offset
       if registers.horizontal_increment?
-        32
+        TILES_COUNT_IN_HORIZONTAL_LINE
       else
         1
       end
