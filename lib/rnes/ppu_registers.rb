@@ -73,7 +73,7 @@ module Rnes
 
     # @return [Boolean]
     def horizontal_increment?
-      @control[4] == 1
+      @control[2] == 1
     end
 
     # @param [Boolean] boolean
