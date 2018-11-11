@@ -86,7 +86,7 @@ module Rnes
       when 0x0004
         read_from_sprite_ram(@registers.sprite_ram_address)
       when 0x0007
-        read_requested_video_ram_data
+        read_from_video_ram_for_cpu
       else
         raise ::Rnes::Errors::InvalidPpuAddressError, address
       end
@@ -139,13 +139,13 @@ module Rnes
       when 0x0003
         @registers.sprite_ram_address = value
       when 0x0004
-        write_to_sprite_ram_via_ppu_read(value)
+        write_to_sprite_ram_for_cpu(value)
       when 0x0005
         @registers.scroll = value
       when 0x0006
         @registers.video_ram_address = value
       when 0x0007
-        write_to_video_ram(value)
+        write_to_video_ram_for_cpu(value)
       else
         raise ::Rnes::Errors::InvalidPpuAddressError, address
       end
@@ -319,7 +319,7 @@ module Rnes
     end
 
     # @return [Integer]
-    def read_requested_video_ram_data
+    def read_from_video_ram_for_cpu
       if (0x3F00..0x3F1F).cover?(@registers.video_ram_address % 0x4000)
         value = @bus.read(@registers.video_ram_address)
         @video_ram_reading_buffer = @bus.read(@registers.video_ram_address - 0x1000)
@@ -379,13 +379,13 @@ module Rnes
     end
 
     # @param [Integer] value
-    def write_to_sprite_ram_via_ppu_read(value)
+    def write_to_sprite_ram_for_cpu(value)
       @sprite_ram.write(@registers.sprite_ram_address, value)
       @registers.sprite_ram_address += 1
     end
 
     # @param [Integer] value
-    def write_to_video_ram(value)
+    def write_to_video_ram_for_cpu(value)
       @bus.write(@registers.video_ram_address, value)
       @registers.increment_video_ram_address(video_ram_address_offset)
     end
