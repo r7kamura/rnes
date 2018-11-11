@@ -169,6 +169,24 @@ module Rnes
       ADDRESS_TO_START_NAME_TABLE + @registers.base_name_table_id * 0x400
     end
 
+    # @return [Integer]
+    def base_background_pattern_table_address
+      if registers.background_pattern_table_address_bank?
+        0x1000
+      else
+        0x0000
+      end
+    end
+
+    # @return [Integer]
+    def base_sprite_pattern_table_address
+      if registers.sprite_pattern_table_address_bank?
+        0x1000
+      else
+        0x0000
+      end
+    end
+
     def check_sprite_hit
       if read_from_sprite_ram(0) == y && @registers.background_enabled? && @registers.sprite_enabled?
         registers.sprite_hit = true
@@ -188,9 +206,9 @@ module Rnes
     end
 
     def draw_background_8pixels
-      character_address_offset = registers.has_background_bank_bit? ? 0x1000 : 0
+      base_pattern_table_address = base_background_pattern_table_address
       character_index = read_character_index(tile_index)
-      character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_tile + character_address_offset
+      character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_tile + base_pattern_table_address
       character_line_low_byte = read_character_data(character_line_low_byte_address)
       character_line_high_byte = read_character_data(character_line_low_byte_address + TILE_HEIGHT)
 
@@ -226,7 +244,7 @@ module Rnes
     #      |`------- horizontal flip
     #      `-------- vertical flip
     def draw_sprites
-      character_address_offset = registers.has_sprite_bank_bit? ? 0x1000 : 0
+      base_pattern_table_address = base_sprite_pattern_table_address
       SPRITES_COUNT.times do |i|
         base_sprite_ram_address = i * 4
         y_for_sprite = (read_from_sprite_ram(base_sprite_ram_address) - TILE_HEIGHT)
@@ -240,7 +258,7 @@ module Rnes
         mini_palette_id = sprite_attribute_byte & 0b11
 
         TILE_HEIGHT.times do |y_in_character|
-          character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_character + character_address_offset
+          character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_character + base_pattern_table_address
           character_line_low_byte = read_character_data(character_line_low_byte_address)
           character_line_high_byte = read_character_data(character_line_low_byte_address + TILE_HEIGHT)
           TILE_WIDTH.times do |x_in_character|

@@ -36,6 +36,11 @@ module Rnes
       @mask[3] == 1
     end
 
+    # @return [Boolean]
+    def background_pattern_table_address_bank?
+      @control[4] == 1
+    end
+
     # +------------+------------|
     # | 0 (0x2000) | 1 (0x2400) |
     # +------------+------------|
@@ -47,11 +52,6 @@ module Rnes
     end
 
     # @return [Boolean]
-    def has_background_bank_bit?
-      @control[4] == 1
-    end
-
-    # @return [Boolean]
     def has_in_v_blank_bit?
       @status[STATUS_IN_V_BLANK_BIT_INDEX] == 1
     end
@@ -59,11 +59,6 @@ module Rnes
     # @return [Boolean]
     def has_sprite_hit_bit?
       @status[STATUS_SPRITE_HIT_BIT_INDEX] == 1
-    end
-
-    # @return [Boolean]
-    def has_sprite_bank_bit?
-      @control[3] == 1
     end
 
     # @return [Boolean]
@@ -93,6 +88,11 @@ module Rnes
     # @param [Boolean] boolean
     def sprite_hit=(boolean)
       toggle_status_bit(STATUS_SPRITE_HIT_BIT_INDEX, boolean)
+    end
+
+    # @return [Boolean]
+    def sprite_pattern_table_address_bank?
+      @control[3] == 1
     end
 
     private
