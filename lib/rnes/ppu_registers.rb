@@ -36,6 +36,16 @@ module Rnes
       @mask[3] == 1
     end
 
+    # +------------+------------|
+    # | 0 (0x2000) | 1 (0x2400) |
+    # +------------+------------|
+    # | 2 (0x2800) | 3 (0x2C00) |
+    # +------------+------------|
+    # @return [Integer] An integer from 0 to 3.
+    def base_name_table_id
+      @status & 0b11
+    end
+
     # @return [Boolean]
     def has_background_bank_bit?
       @control[4] == 1
@@ -69,17 +79,6 @@ module Rnes
     # @param [Boolean] boolean
     def in_v_blank=(boolean)
       toggle_status_bit(STATUS_IN_V_BLANK_BIT_INDEX, boolean)
-    end
-
-    # Name table id (address)
-    # +------------+------------|
-    # | 0 (0x2000) | 1 (0x2400) |
-    # +------------+------------|
-    # | 2 (0x2800) | 3 (0x2C00) |
-    # +------------+------------|
-    # @return [Integer] An integer from 0 to 3.
-    def name_table_id
-      @status & 0b11
     end
 
     def set_in_v_blank_bit
