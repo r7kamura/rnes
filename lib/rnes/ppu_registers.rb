@@ -5,7 +5,7 @@ module Rnes
 
     # @param [Integer]
     # @return [Integer]
-    attr_accessor :control1
+    attr_accessor :control
 
     # @param [Integer]
     # @return [Integer]
@@ -24,7 +24,7 @@ module Rnes
     attr_accessor :status
 
     def initialize
-      @control1 = 0x0
+      @control = 0x0
       @mask = 0x0
       @scroll_x = 0x0
       @scroll_y = 0x0
@@ -38,7 +38,7 @@ module Rnes
 
     # @return [Boolean]
     def has_background_bank_bit?
-      @control1[4] == 1
+      @control[4] == 1
     end
 
     # @return [Boolean]
@@ -48,7 +48,7 @@ module Rnes
 
     # @return [Boolean]
     def has_large_video_ram_address_offset_bit?
-      @control1[4] == 1
+      @control[4] == 1
     end
 
     # @return [Boolean]
@@ -58,12 +58,12 @@ module Rnes
 
     # @return [Boolean]
     def has_sprite_bank_bit?
-      @control1[3] == 1
+      @control[3] == 1
     end
 
     # @return [Boolean]
     def has_v_blank_irq_enabled_bit?
-      @control1[7] == 1
+      @control[7] == 1
     end
 
     # @param [Boolean] boolean

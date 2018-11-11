@@ -82,7 +82,7 @@ module Rnes
     def read(address)
       case address
       when 0x0000
-        @registers.control1
+        @registers.control
       when 0x0001
         @registers.mask
       when 0x0002
@@ -140,7 +140,7 @@ module Rnes
     def write(address, value)
       case address
       when 0x0000
-        registers.control1 = value
+        registers.control = value
       when 0x0001
         registers.mask = value
       when 0x0003
