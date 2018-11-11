@@ -164,6 +164,11 @@ module Rnes
       @interrupt_line.assert_nmi
     end
 
+    # @return [Integer]
+    def base_name_table_address
+      ADDRESS_TO_START_NAME_TABLE + @registers.base_name_table_id * 0x400
+    end
+
     def check_sprite_hit
       if read_from_sprite_ram(0) == y && @registers.background_enabled? && @registers.sprite_enabled?
         registers.sprite_hit = true
@@ -281,7 +286,7 @@ module Rnes
     # @param [Integer] index
     # @return [Integer]
     def read_character_index(index)
-      @bus.read(ADDRESS_TO_START_NAME_TABLE + index)
+      @bus.read(base_name_table_address + index)
     end
 
     # @param [Integer] index
