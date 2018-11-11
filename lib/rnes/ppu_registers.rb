@@ -12,24 +12,34 @@ module Rnes
     # @return [Integer]
     attr_accessor :mask
 
-    # @param [Integer]
     # @return [Integer]
-    attr_accessor :scroll_x
+    attr_accessor :sprite_ram_address
+
+    # @return [Integer]
+    attr_reader :scroll_x
+
+    # @return [Integer]
+    attr_reader :scroll_y
+
+    # @return [Integer]
+    attr_reader :video_ram_address
 
     # @param [Integer]
-    # @return [Integer]
-    attr_accessor :scroll_y
-
-    # @param [Integer]
-    # @return [Integer]
-    attr_accessor :status
+    attr_writer :status
 
     def initialize
       @control = 0x0
       @mask = 0x0
+      @status = 0x0
+
       @scroll_x = 0x0
       @scroll_y = 0x0
-      @status = 0x0
+
+      @sprite_ram_address = 0x00
+      @video_ram_address = 0x0000
+
+      @address_latch = false
+      @scroll_latch = false
     end
 
     # @return [Boolean]
@@ -92,6 +102,11 @@ module Rnes
       toggle_status_bit(STATUS_IN_V_BLANK_BIT_INDEX, boolean)
     end
 
+    # @param [Integer] offset
+    def increment_video_ram_address(offset)
+      @video_ram_address += offset
+    end
+
     # @return [Boolean]
     def leftmost_background_shown?
       @mask[1] == 1
@@ -105,6 +120,16 @@ module Rnes
     # @param [Boolean] boolean
     def overflow=(boolean)
       toggle_status_bit(STATUS_OVERFLOW_BIT_INDEX, boolean)
+    end
+
+    # @param [Integer] value
+    def scroll=(value)
+      if @scroll_latch
+        @scroll_y = value
+      else
+        @scroll_x = value
+      end
+      @scroll_latch = !@scroll_latch
     end
 
     # @return [Boolean]
@@ -130,6 +155,25 @@ module Rnes
     # @return [Boolean]
     def sprite_size_doubled?
       @control[4] == 1
+    end
+
+    # @return [Integer]
+    def status
+      value = @status
+      self.in_v_blank = false
+      @address_latch = false
+      @scroll_latch = false
+      value
+    end
+
+    # @param [Integer] value
+    def video_ram_address=(value)
+      if @address_latch
+        @video_ram_address |= value
+      else
+        @video_ram_address = value << 8
+      end
+      @address_latch = !@address_latch
     end
 
     private

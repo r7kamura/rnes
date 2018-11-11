@@ -70,11 +70,7 @@ module Rnes
       @registers = ::Rnes::PpuRegisters.new
       @renderer = renderer
       @sprite_ram = ::Rnes::Ram.new(bytesize: SPRITE_RAM_BYTESIZE)
-      @sprite_ram_address = 0x00
-      @requested_video_ram_data_address = 0x0000
       @video_ram_reading_buffer = 0x00
-      @writing_to_scroll_registers = false
-      @writing_video_ram_address = false
     end
 
     # @param [Integer] address
@@ -86,12 +82,9 @@ module Rnes
       when 0x0001
         @registers.mask
       when 0x0002
-        @writing_to_scroll_registers = false
-        value = registers.status
-        clear_v_blank
-        value
+        @registers.status
       when 0x0004
-        read_from_sprite_ram(@sprite_ram_address)
+        read_from_sprite_ram(@registers.sprite_ram_address)
       when 0x0007
         read_requested_video_ram_data
       else
@@ -130,7 +123,7 @@ module Rnes
     # @param [Integer] index
     # @param [Integer] value
     def transfer_sprite_data(index:, value:)
-      address = (@sprite_ram_address + index) % SPRITE_RAM_BYTESIZE
+      address = (@registers.sprite_ram_address + index) % SPRITE_RAM_BYTESIZE
       @sprite_ram.write(address, value)
     end
 
@@ -140,17 +133,17 @@ module Rnes
     def write(address, value)
       case address
       when 0x0000
-        registers.control = value
+        @registers.control = value
       when 0x0001
-        registers.mask = value
+        @registers.mask = value
       when 0x0003
-        write_sprite_ram_address(value)
+        @registers.sprite_ram_address = value
       when 0x0004
         write_to_sprite_ram_via_ppu_read(value)
       when 0x0005
-        write_to_scroll_registers(value)
+        @registers.scroll = value
       when 0x0006
-        write_video_ram_address(value)
+        @registers.video_ram_address = value
       when 0x0007
         write_to_video_ram(value)
       else
@@ -327,14 +320,14 @@ module Rnes
 
     # @return [Integer]
     def read_requested_video_ram_data
-      if (0x3F00..0x3F1F).cover?(@requested_video_ram_data_address % 0x4000)
-        value = @bus.read(@requested_video_ram_data_address)
-        @video_ram_reading_buffer = @bus.read(@requested_video_ram_data_address - 0x1000)
+      if (0x3F00..0x3F1F).cover?(@registers.video_ram_address % 0x4000)
+        value = @bus.read(@registers.video_ram_address)
+        @video_ram_reading_buffer = @bus.read(@registers.video_ram_address - 0x1000)
       else
         value = @video_ram_reading_buffer
-        @video_ram_reading_buffer = @bus.read(@requested_video_ram_data_address)
+        @video_ram_reading_buffer = @bus.read(@registers.video_ram_address)
       end
-      @requested_video_ram_data_address += video_ram_address_offset
+      @registers.increment_video_ram_address(video_ram_address_offset)
       value
     end
 
@@ -385,41 +378,16 @@ module Rnes
       end
     end
 
-    # @param [Integer] address
-    def write_sprite_ram_address(address)
-      @sprite_ram_address = address
-    end
-
-    # @param [Integer] value
-    def write_to_scroll_registers(value)
-      if @writing_to_scroll_registers
-        @registers.scroll_y = value
-      else
-        @registers.scroll_x = value
-      end
-      @writing_to_scroll_registers = !@writing_to_scroll_registers
-    end
-
     # @param [Integer] value
     def write_to_sprite_ram_via_ppu_read(value)
-      @sprite_ram.write(@sprite_ram_address, value)
-      @sprite_ram_address += 1
-    end
-
-    # @param [Integer] address
-    def write_video_ram_address(address)
-      if @writing_video_ram_address
-        @requested_video_ram_data_address |= address
-      else
-        @requested_video_ram_data_address = address << 8
-      end
-      @writing_video_ram_address = !@writing_video_ram_address
+      @sprite_ram.write(@registers.sprite_ram_address, value)
+      @registers.sprite_ram_address += 1
     end
 
     # @param [Integer] value
     def write_to_video_ram(value)
-      @bus.write(@requested_video_ram_data_address, value)
-      @requested_video_ram_data_address += video_ram_address_offset
+      @bus.write(@registers.video_ram_address, value)
+      @registers.increment_video_ram_address(video_ram_address_offset)
     end
 
     # @return [Integer]
