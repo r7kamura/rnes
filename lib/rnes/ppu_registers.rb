@@ -106,10 +106,6 @@ module Rnes
       @mask[2] == 1
     end
 
-    def set_in_v_blank_bit
-      @status |= (1 << STATUS_IN_V_BLANK_BIT_INDEX)
-    end
-
     # @return [Boolean]
     def sprite_enabled?
       @mask[4] == 1

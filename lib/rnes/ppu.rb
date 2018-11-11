@@ -343,7 +343,7 @@ module Rnes
     end
 
     def set_v_blank
-      registers.set_in_v_blank_bit
+      registers.in_v_blank = true
     end
 
     # +-----------+-----------+
