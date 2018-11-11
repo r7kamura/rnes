@@ -1,7 +1,7 @@
 module Rnes
   class PpuRegisters
     STATUS_IN_V_BLANK_BIT_INDEX = 7
-    STATUS_SPRITE_HIT_BIT_INDEX = 5
+    STATUS_SPRITE_HIT_BIT_INDEX = 6
 
     # @param [Integer]
     # @return [Integer]
