@@ -70,11 +70,7 @@ module Rnes
       @registers = ::Rnes::PpuRegisters.new
       @renderer = renderer
       @sprite_ram = ::Rnes::Ram.new(bytesize: SPRITE_RAM_BYTESIZE)
-      @sprite_ram_address = 0x00
-      @requested_video_ram_data_address = 0x0000
       @video_ram_reading_buffer = 0x00
-      @writing_to_scroll_registers = false
-      @writing_video_ram_address = false
     end
 
     # @param [Integer] address
@@ -82,16 +78,13 @@ module Rnes
     def read(address)
       case address
       when 0x0000
-        @registers.control1
+        @registers.control
       when 0x0001
-        @registers.control2
+        @registers.mask
       when 0x0002
-        @writing_to_scroll_registers = false
-        value = registers.status
-        clear_v_blank
-        value
+        @registers.status
       when 0x0004
-        read_from_sprite_ram(@sprite_ram_address)
+        read_from_sprite_ram(@registers.sprite_ram_address)
       when 0x0007
         read_requested_video_ram_data
       else
@@ -130,7 +123,7 @@ module Rnes
     # @param [Integer] index
     # @param [Integer] value
     def transfer_sprite_data(index:, value:)
-      address = (@sprite_ram_address + index) % SPRITE_RAM_BYTESIZE
+      address = (@registers.sprite_ram_address + index) % SPRITE_RAM_BYTESIZE
       @sprite_ram.write(address, value)
     end
 
@@ -140,17 +133,17 @@ module Rnes
     def write(address, value)
       case address
       when 0x0000
-        registers.control1 = value
+        @registers.control = value
       when 0x0001
-        registers.control2 = value
+        @registers.mask = value
       when 0x0003
-        write_sprite_ram_address(value)
+        @registers.sprite_ram_address = value
       when 0x0004
         write_to_sprite_ram_via_ppu_read(value)
       when 0x0005
-        write_to_scroll_registers(value)
+        @registers.scroll = value
       when 0x0006
-        write_video_ram_address(value)
+        @registers.video_ram_address = value
       when 0x0007
         write_to_video_ram(value)
       else
@@ -162,6 +155,29 @@ module Rnes
 
     def assert_nmi
       @interrupt_line.assert_nmi
+    end
+
+    # @return [Integer]
+    def base_name_table_address
+      ADDRESS_TO_START_NAME_TABLE + @registers.base_name_table_id * 0x400
+    end
+
+    # @return [Integer]
+    def base_background_pattern_table_address
+      if registers.background_pattern_table_address_banked?
+        0x1000
+      else
+        0x0000
+      end
+    end
+
+    # @return [Integer]
+    def base_sprite_pattern_table_address
+      if registers.sprite_pattern_table_address_banked?
+        0x1000
+      else
+        0x0000
+      end
     end
 
     def check_sprite_hit
@@ -183,9 +199,9 @@ module Rnes
     end
 
     def draw_background_8pixels
-      character_address_offset = registers.has_background_bank_bit? ? 0x1000 : 0
+      base_pattern_table_address = base_background_pattern_table_address
       character_index = read_character_index(tile_index)
-      character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_tile + character_address_offset
+      character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_tile + base_pattern_table_address
       character_line_low_byte = read_character_data(character_line_low_byte_address)
       character_line_high_byte = read_character_data(character_line_low_byte_address + TILE_HEIGHT)
 
@@ -221,7 +237,7 @@ module Rnes
     #      |`------- horizontal flip
     #      `-------- vertical flip
     def draw_sprites
-      character_address_offset = registers.has_sprite_bank_bit? ? 0x1000 : 0
+      base_pattern_table_address = base_sprite_pattern_table_address
       SPRITES_COUNT.times do |i|
         base_sprite_ram_address = i * 4
         y_for_sprite = (read_from_sprite_ram(base_sprite_ram_address) - TILE_HEIGHT)
@@ -235,7 +251,7 @@ module Rnes
         mini_palette_id = sprite_attribute_byte & 0b11
 
         TILE_HEIGHT.times do |y_in_character|
-          character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_character + character_address_offset
+          character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_character + base_pattern_table_address
           character_line_low_byte = read_character_data(character_line_low_byte_address)
           character_line_high_byte = read_character_data(character_line_low_byte_address + TILE_HEIGHT)
           TILE_WIDTH.times do |x_in_character|
@@ -281,7 +297,7 @@ module Rnes
     # @param [Integer] index
     # @return [Integer]
     def read_character_index(index)
-      @bus.read(ADDRESS_TO_START_NAME_TABLE + index)
+      @bus.read(base_name_table_address + index)
     end
 
     # @param [Integer] index
@@ -304,14 +320,14 @@ module Rnes
 
     # @return [Integer]
     def read_requested_video_ram_data
-      if (0x3F00..0x3F1F).cover?(@requested_video_ram_data_address % 0x4000)
-        value = @bus.read(@requested_video_ram_data_address)
-        @video_ram_reading_buffer = @bus.read(@requested_video_ram_data_address - 0x1000)
+      if (0x3F00..0x3F1F).cover?(@registers.video_ram_address % 0x4000)
+        value = @bus.read(@registers.video_ram_address)
+        @video_ram_reading_buffer = @bus.read(@registers.video_ram_address - 0x1000)
       else
         value = @video_ram_reading_buffer
-        @video_ram_reading_buffer = @bus.read(@requested_video_ram_data_address)
+        @video_ram_reading_buffer = @bus.read(@registers.video_ram_address)
       end
-      @requested_video_ram_data_address += video_ram_address_offset
+      @registers.increment_video_ram_address(video_ram_address_offset)
       value
     end
 
@@ -320,7 +336,7 @@ module Rnes
     end
 
     def set_v_blank
-      registers.set_in_v_blank_bit
+      registers.in_v_blank = true
     end
 
     # +-----------+-----------+
@@ -355,48 +371,23 @@ module Rnes
 
     # @return [Integer]
     def video_ram_address_offset
-      if registers.has_large_video_ram_address_offset_bit?
-        32
+      if registers.horizontal_increment?
+        TILES_COUNT_IN_HORIZONTAL_LINE
       else
         1
       end
     end
 
-    # @param [Integer] address
-    def write_sprite_ram_address(address)
-      @sprite_ram_address = address
-    end
-
-    # @param [Integer] value
-    def write_to_scroll_registers(value)
-      if @writing_to_scroll_registers
-        @registers.scroll_y = value
-      else
-        @registers.scroll_x = value
-      end
-      @writing_to_scroll_registers = !@writing_to_scroll_registers
-    end
-
     # @param [Integer] value
     def write_to_sprite_ram_via_ppu_read(value)
-      @sprite_ram.write(@sprite_ram_address, value)
-      @sprite_ram_address += 1
-    end
-
-    # @param [Integer] address
-    def write_video_ram_address(address)
-      if @writing_video_ram_address
-        @requested_video_ram_data_address |= address
-      else
-        @requested_video_ram_data_address = address << 8
-      end
-      @writing_video_ram_address = !@writing_video_ram_address
+      @sprite_ram.write(@registers.sprite_ram_address, value)
+      @registers.sprite_ram_address += 1
     end
 
     # @param [Integer] value
     def write_to_video_ram(value)
-      @bus.write(@requested_video_ram_data_address, value)
-      @requested_video_ram_data_address += video_ram_address_offset
+      @bus.write(@registers.video_ram_address, value)
+      @registers.increment_video_ram_address(video_ram_address_offset)
     end
 
     # @return [Integer]

@@ -85,7 +85,7 @@ RSpec.describe Rnes::Ppu do
         subject
         expect(ppu.cycle).to eq(0)
         expect(ppu.line).to eq(240)
-        expect(ppu.registers).to have_in_v_blank_bit
+        expect(ppu.registers).to be_in_v_blank
       end
     end
 
@@ -103,8 +103,8 @@ RSpec.describe Rnes::Ppu do
         expect(ppu.cycle).to eq(0)
         expect(ppu.line).to eq(0)
         expect(ppu).to have_received(:render_image)
-        expect(ppu.registers).not_to have_in_v_blank_bit
-        expect(ppu.registers).not_to have_sprite_hit_bit
+        expect(ppu.registers).not_to be_in_v_blank
+        expect(ppu.registers).not_to be_sprite_hit
       end
     end
   end
