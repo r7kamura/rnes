@@ -43,7 +43,7 @@ module Rnes
     # +------------+------------|
     # @return [Integer] An integer from 0 to 3.
     def base_name_table_id
-      @status & 0b11
+      @control & 0b11
     end
 
     # @return [Boolean]
