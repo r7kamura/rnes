@@ -58,6 +58,9 @@ module Rnes
     # @return [Rnes::PpuRegisters]
     attr_reader :registers
 
+    # @param [Boolean]
+    attr_writer :vertical_mirroring
+
     # @param [Rnes::PpuBus] bus
     # @param [Rnes::InterruptLine] interrupt_line
     # @param [Rnes::TerminalRenderer] renderer
@@ -72,6 +75,7 @@ module Rnes
       @sprite_ram = ::Rnes::Ram.new(bytesize: SPRITE_RAM_BYTESIZE)
       @sprite_ram_address = 0x00
       @requested_video_ram_data_address = 0x0000
+      @vertical_mirroring = false
       @video_ram_reading_buffer = 0x00
       @writing_to_scroll_registers = false
       @writing_video_ram_address = false
@@ -340,7 +344,9 @@ module Rnes
 
     # @return [Integer] Integer from 0 to 3.
     def tile_index_page
-      x_of_tile / TILES_COUNT_IN_HORIZONTAL_LINE + y_of_tile / TILES_COUNT_IN_VERTICAL_LINE * 2
+      page = x_of_tile / TILES_COUNT_IN_HORIZONTAL_LINE + y_of_tile / TILES_COUNT_IN_VERTICAL_LINE * 2
+      page -= 1 if @vertical_mirroring && page.odd?
+      page
     end
 
     # @return [Integer] 0x0000, 0x0400, 0x0800, or 0x0C00.

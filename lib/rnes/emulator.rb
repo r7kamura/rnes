@@ -22,6 +22,7 @@ module Rnes
     # @param [Array<Integer>] rom_bytes
     def load_rom(rom_bytes)
       rom_loader = ::Rnes::RomLoader.new(rom_bytes)
+      @ppu.vertical_mirroring = rom_loader.vertical_mirroring?
       copy(from: rom_loader.character_rom, to: @ppu_bus.character_ram)
       @cpu_bus.program_rom = rom_loader.program_rom
       @cpu.reset

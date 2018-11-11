@@ -30,6 +30,11 @@ module Rnes
       ::Rnes::Rom.new(bytes: trainer_bytes)
     end
 
+    # @return [Boolean]
+    def vertical_mirroring?
+      ines_header.has_vertical_mirroring_bit?
+    end
+
     private
 
     # @return [Array<Integer>]
