@@ -67,7 +67,7 @@ module Rnes
     end
 
     # @return [Boolean]
-    def display_grayscaled?
+    def color_greyscaled?
       @mask[0] == 1
     end
 
