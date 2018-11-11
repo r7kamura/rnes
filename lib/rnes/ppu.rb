@@ -171,7 +171,7 @@ module Rnes
 
     # @return [Integer]
     def base_background_pattern_table_address
-      if registers.background_pattern_table_address_bank?
+      if registers.background_pattern_table_address_banked?
         0x1000
       else
         0x0000
@@ -180,7 +180,7 @@ module Rnes
 
     # @return [Integer]
     def base_sprite_pattern_table_address
-      if registers.sprite_pattern_table_address_bank?
+      if registers.sprite_pattern_table_address_banked?
         0x1000
       else
         0x0000

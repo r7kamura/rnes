@@ -37,7 +37,7 @@ module Rnes
     end
 
     # @return [Boolean]
-    def background_pattern_table_address_bank?
+    def background_pattern_table_address_banked?
       @control[4] == 1
     end
 
@@ -91,7 +91,7 @@ module Rnes
     end
 
     # @return [Boolean]
-    def sprite_pattern_table_address_bank?
+    def sprite_pattern_table_address_banked?
       @control[3] == 1
     end
 
