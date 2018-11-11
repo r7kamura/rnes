@@ -52,6 +52,26 @@ module Rnes
     end
 
     # @return [Boolean]
+    def color_blue_emphasized?
+      @mask[7] == 1
+    end
+
+    # @return [Boolean]
+    def color_green_emphasized?
+      @mask[6] == 1
+    end
+
+    # @return [Boolean]
+    def color_red_emphasized?
+      @mask[5] == 1
+    end
+
+    # @return [Boolean]
+    def display_grayscaled?
+      @mask[0] == 1
+    end
+
+    # @return [Boolean]
     def has_in_v_blank_bit?
       @status[STATUS_IN_V_BLANK_BIT_INDEX] == 1
     end
@@ -74,6 +94,16 @@ module Rnes
     # @param [Boolean] boolean
     def in_v_blank=(boolean)
       toggle_status_bit(STATUS_IN_V_BLANK_BIT_INDEX, boolean)
+    end
+
+    # @return [Boolean]
+    def leftmost_background_shown?
+      @mask[1] == 1
+    end
+
+    # @return [Boolean]
+    def leftmost_sprite_shown?
+      @mask[2] == 1
     end
 
     def set_in_v_blank_bit
