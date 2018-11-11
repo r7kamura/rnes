@@ -28,6 +28,7 @@ module Rnes
     end
 
     def run
+      allow_break_less_input
       $stdin.noecho do
         loop do
           if @logger
@@ -36,6 +37,8 @@ module Rnes
           step
         end
       end
+    ensure
+      disallow_break_less_input
     end
 
     def step
@@ -48,6 +51,14 @@ module Rnes
     end
 
     private
+
+    def allow_break_less_input
+      `stty -icanon min 1 time 0`
+    end
+
+    def disallow_break_less_input
+      `stty icanon`
+    end
 
     # @param [Rnes::Rom] from
     # @param [Rnes::Ram] to
