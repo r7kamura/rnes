@@ -73,16 +73,6 @@ module Rnes
     end
 
     # @return [Boolean]
-    def has_in_v_blank_bit?
-      @status[STATUS_IN_V_BLANK_BIT_INDEX] == 1
-    end
-
-    # @return [Boolean]
-    def has_sprite_hit_bit?
-      @status[STATUS_SPRITE_HIT_BIT_INDEX] == 1
-    end
-
-    # @return [Boolean]
     def has_v_blank_irq_enabled_bit?
       @control[7] == 1
     end
@@ -90,6 +80,11 @@ module Rnes
     # @return [Boolean]
     def horizontal_increment?
       @control[2] == 1
+    end
+
+    # @return [Boolean]
+    def in_v_blank?
+      @status[STATUS_IN_V_BLANK_BIT_INDEX] == 1
     end
 
     # @param [Boolean] boolean
@@ -115,6 +110,11 @@ module Rnes
     # @return [Boolean]
     def sprite_enabled?
       @mask[4] == 1
+    end
+
+    # @return [Boolean]
+    def sprite_hit?
+      @status[STATUS_SPRITE_HIT_BIT_INDEX] == STATUS_SPRITE_HIT_BIT_INDEX
     end
 
     # @param [Boolean] boolean
