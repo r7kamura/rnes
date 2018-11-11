@@ -2,6 +2,7 @@ module Rnes
   class PpuRegisters
     STATUS_IN_V_BLANK_BIT_INDEX = 7
     STATUS_SPRITE_HIT_BIT_INDEX = 6
+    STATUS_OVERFLOW_BIT_INDEX = 5
 
     # @param [Integer]
     # @return [Integer]
@@ -104,6 +105,11 @@ module Rnes
     # @return [Boolean]
     def leftmost_sprite_shown?
       @mask[2] == 1
+    end
+
+    # @param [Boolean] boolean
+    def overflow=(boolean)
+      toggle_status_bit(STATUS_OVERFLOW_BIT_INDEX, boolean)
     end
 
     # @return [Boolean]
