@@ -187,7 +187,7 @@ module Rnes
       character_index = read_character_index(tile_index)
       character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_tile + character_address_offset
       character_line_low_byte = read_character_data(character_line_low_byte_address)
-      character_line_high_byte = read_character_data(character_line_low_byte_address + 8)
+      character_line_high_byte = read_character_data(character_line_low_byte_address + TILE_HEIGHT)
 
       block_id = 0
       block_id |= 0b01 if (x % BLOCK_WIDTH).odd?
@@ -237,7 +237,7 @@ module Rnes
         TILE_HEIGHT.times do |y_in_character|
           character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_character + character_address_offset
           character_line_low_byte = read_character_data(character_line_low_byte_address)
-          character_line_high_byte = read_character_data(character_line_low_byte_address + 8)
+          character_line_high_byte = read_character_data(character_line_low_byte_address + TILE_HEIGHT)
           TILE_WIDTH.times do |x_in_character|
             index_in_character_line_byte = TILE_WIDTH - 1 - x_in_character
             background_palette_index = character_line_low_byte[index_in_character_line_byte] | character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id << 2
