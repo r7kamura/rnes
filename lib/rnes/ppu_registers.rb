@@ -95,6 +95,11 @@ module Rnes
       @control[3] == 1
     end
 
+    # @return [Boolean]
+    def sprite_size_doubled?
+      @control[4] == 1
+    end
+
     private
 
     # @param [Integer] index
