@@ -360,7 +360,7 @@ module Rnes
 
     # @return [Integer]
     def video_ram_address_offset
-      if registers.has_large_video_ram_address_offset_bit?
+      if registers.horizontal_increment?
         32
       else
         1

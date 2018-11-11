@@ -57,11 +57,6 @@ module Rnes
     end
 
     # @return [Boolean]
-    def has_large_video_ram_address_offset_bit?
-      @control[4] == 1
-    end
-
-    # @return [Boolean]
     def has_sprite_hit_bit?
       @status[STATUS_SPRITE_HIT_BIT_INDEX] == 1
     end
@@ -74,6 +69,11 @@ module Rnes
     # @return [Boolean]
     def has_v_blank_irq_enabled_bit?
       @control[7] == 1
+    end
+
+    # @return [Boolean]
+    def horizontal_increment?
+      @control[4] == 1
     end
 
     # @param [Boolean] boolean
