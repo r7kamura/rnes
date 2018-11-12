@@ -1,12 +1,12 @@
 ## 0.1.1 - 2018-11-12
 
-### Changed
-
-- Improve logger format for compatibility with nestest.log.
-
 ### Added
 
 - Allow break-less input on key input.
+
+### Changed
+
+- Improve logger format for compatibility with nestest.log.
 
 ### Fixed
 
