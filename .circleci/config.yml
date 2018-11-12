@@ -4,6 +4,9 @@ jobs:
     steps:
       - checkout
       - run:
+          command: gem install bundler -v 1.17.1
+          name: gem install bundler -v 1.17.1
+      - run:
           command: bundle install
           name: bundle install
       - run:
@@ -13,6 +16,9 @@ jobs:
     machine: true
     steps:
       - checkout
+      - run:
+          command: gem install bundler -v 1.17.1
+          name: gem install bundler -v 1.17.1
       - run:
           command: bundle install
           name: bundle install
