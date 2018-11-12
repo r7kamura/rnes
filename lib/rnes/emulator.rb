@@ -5,9 +5,8 @@ require 'rnes/rom_loader'
 
 module Rnes
   class Emulator
-    LOG_FILE_NAME = 'rnes.log'.freeze
-
-    def initialize
+    # @param [String] log_file_path
+    def initialize(log_file_path: nil)
       parts_factory = ::Rnes::PartsFactory.new
       @cpu = parts_factory.cpu
       @cpu_bus = parts_factory.cpu_bus
@@ -16,7 +15,9 @@ module Rnes
       @keypad2 = parts_factory.keypad2
       @ppu = parts_factory.ppu
       @ppu_bus = parts_factory.ppu_bus
-      @logger = ::Rnes::Logger.new(cpu: @cpu, path: LOG_FILE_NAME, ppu: @ppu)
+      if log_file_path
+        @logger = ::Rnes::Logger.new(cpu: @cpu, path: log_file_path, ppu: @ppu)
+      end
     end
 
     # @param [Array<Integer>] rom_bytes

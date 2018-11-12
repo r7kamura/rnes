@@ -22,7 +22,7 @@ gem install rnes
 Pass ROM file path to `rnes` executable.
 
 ```sh
-rnes <FILE>
+Usage: rnes [options] <FILE>
 ```
 
 ## Controls
