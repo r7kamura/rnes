@@ -249,6 +249,8 @@ module Rnes
         character_index = read_character_index(name_table_index)
 
         mini_palette_id = sprite_attribute_byte & 0b11
+        reversed_horizontally = sprite_attribute_byte[6] == 1
+        reversed_vertically = sprite_attribute_byte[7] == 1
 
         TILE_HEIGHT.times do |y_in_character|
           character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_character + base_pattern_table_address
@@ -258,6 +260,8 @@ module Rnes
             index_in_character_line_byte = TILE_WIDTH - 1 - x_in_character
             background_palette_index = character_line_low_byte[index_in_character_line_byte] | character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id << 2
             color_id = read_color_id(background_palette_index)
+            y_in_character = TILE_HEIGHT - 1 - y_in_character if reversed_vertically
+            x_in_character = TILE_WIDTH - 1 - x_in_character if reversed_horizontally
             @image.write(
               value: ::Rnes::Ppu::COLORS[color_id],
               x: x_for_sprite + x_in_character,
