@@ -384,7 +384,7 @@ module Rnes
     # @param [Integer] value
     def write_to_sprite_ram_for_cpu(value)
       @sprite_ram.write(@registers.sprite_ram_address, value)
-      @registers.sprite_ram_address += 1
+      @registers.sprite_ram_address = (@registers.sprite_ram_address + 1) & 0xFF
     end
 
     # @param [Integer] value
