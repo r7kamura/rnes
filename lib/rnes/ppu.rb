@@ -204,10 +204,10 @@ module Rnes
 
     def draw_background_8pixels
       base_pattern_table_address = base_background_pattern_table_address
-      character_index = read_character_index(tile_index)
-      character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_tile + base_pattern_table_address
-      character_line_low_byte = read_character_data(character_line_low_byte_address)
-      character_line_high_byte = read_character_data(character_line_low_byte_address + TILE_HEIGHT)
+      pattern_index = read_pattern_index(tile_index)
+      pattern_line_low_byte_address = TILE_HEIGHT * 2 * pattern_index + y_in_tile + base_pattern_table_address
+      pattern_line_low_byte = read_pattern_data(pattern_line_low_byte_address)
+      pattern_line_high_byte = read_pattern_data(pattern_line_low_byte_address + TILE_HEIGHT)
 
       block_id = 0
       block_id |= 0b01 if (x % BLOCK_WIDTH).odd?
@@ -215,13 +215,13 @@ module Rnes
       mini_palette_ids_byte = read_object_attribute(tile_index)
       mini_palette_id = (mini_palette_ids_byte >> (block_id * 2)) & 0b11
 
-      TILE_WIDTH.times do |x_in_character|
-        index_in_character_line_byte = TILE_WIDTH - 1 - x_in_character
-        background_palette_index = character_line_low_byte[index_in_character_line_byte] | character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id << 2
+      TILE_WIDTH.times do |x_in_pattern|
+        index_in_pattern_line_byte = TILE_WIDTH - 1 - x_in_pattern
+        background_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | pattern_line_high_byte[index_in_pattern_line_byte] << 1 | mini_palette_id << 2
         color_id = read_color_id(background_palette_index)
         @image.write(
           value: ::Rnes::Ppu::COLORS[color_id],
-          x: x + x_in_character,
+          x: x + x_in_pattern,
           y: y,
         )
       end
@@ -249,26 +249,26 @@ module Rnes
         sprite_attribute_byte = read_from_sprite_ram(base_sprite_ram_address + 2)
         x_for_sprite = read_from_sprite_ram(base_sprite_ram_address + 3)
 
-        character_index = read_character_index(name_table_index)
+        pattern_index = read_pattern_index(name_table_index)
 
         mini_palette_id = sprite_attribute_byte & 0b11
         reversed_horizontally = sprite_attribute_byte[6] == 1
         reversed_vertically = sprite_attribute_byte[7] == 1
 
-        TILE_HEIGHT.times do |y_in_character|
-          character_line_low_byte_address = TILE_HEIGHT * 2 * character_index + y_in_character + base_pattern_table_address
-          character_line_low_byte = read_character_data(character_line_low_byte_address)
-          character_line_high_byte = read_character_data(character_line_low_byte_address + TILE_HEIGHT)
-          TILE_WIDTH.times do |x_in_character|
-            index_in_character_line_byte = TILE_WIDTH - 1 - x_in_character
-            background_palette_index = character_line_low_byte[index_in_character_line_byte] | character_line_high_byte[index_in_character_line_byte] << 1 | mini_palette_id << 2
+        TILE_HEIGHT.times do |y_in_pattern|
+          pattern_line_low_byte_address = TILE_HEIGHT * 2 * pattern_index + y_in_pattern + base_pattern_table_address
+          pattern_line_low_byte = read_pattern_data(pattern_line_low_byte_address)
+          pattern_line_high_byte = read_pattern_data(pattern_line_low_byte_address + TILE_HEIGHT)
+          TILE_WIDTH.times do |x_in_pattern|
+            index_in_pattern_line_byte = TILE_WIDTH - 1 - x_in_pattern
+            background_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | pattern_line_high_byte[index_in_pattern_line_byte] << 1 | mini_palette_id << 2
             color_id = read_color_id(background_palette_index)
-            y_in_character = TILE_HEIGHT - 1 - y_in_character if reversed_vertically
-            x_in_character = TILE_WIDTH - 1 - x_in_character if reversed_horizontally
+            y_in_pattern = TILE_HEIGHT - 1 - y_in_pattern if reversed_vertically
+            x_in_pattern = TILE_WIDTH - 1 - x_in_pattern if reversed_horizontally
             @image.write(
               value: ::Rnes::Ppu::COLORS[color_id],
-              x: x_for_sprite + x_in_character,
-              y: y_for_sprite + y_in_character,
+              x: x_for_sprite + x_in_pattern,
+              y: y_for_sprite + y_in_pattern,
             )
           end
         end
@@ -302,18 +302,6 @@ module Rnes
 
     # @param [Integer] index
     # @return [Integer]
-    def read_character_data(index)
-      @bus.read(index)
-    end
-
-    # @param [Integer] index
-    # @return [Integer]
-    def read_character_index(index)
-      @bus.read(base_name_table_address + index)
-    end
-
-    # @param [Integer] index
-    # @return [Integer]
     def read_color_id(index)
       @bus.read(ADDRESS_TO_START_BACKGROUND_PALETTE_TABLE + index)
     end
@@ -322,12 +310,6 @@ module Rnes
     # @return [Integer]
     def read_from_sprite_ram(address)
       @sprite_ram.read(address)
-    end
-
-    # @param [Integer] index
-    # @return [Integer] 4-color-palette IDs of 4 blocks, as 8 bit data.
-    def read_object_attribute(index)
-      @bus.read(ADDRESS_TO_START_ATTRIBUTE_TABLE + index)
     end
 
     # @return [Integer]
@@ -341,6 +323,24 @@ module Rnes
       end
       @registers.increment_video_ram_address(video_ram_address_offset)
       value
+    end
+
+    # @param [Integer] index
+    # @return [Integer] 4-color-palette IDs of 4 blocks, as 8 bit data.
+    def read_object_attribute(index)
+      @bus.read(ADDRESS_TO_START_ATTRIBUTE_TABLE + index)
+    end
+
+    # @param [Integer] index
+    # @return [Integer]
+    def read_pattern_data(index)
+      @bus.read(index)
+    end
+
+    # @param [Integer] index
+    # @return [Integer]
+    def read_pattern_index(index)
+      @bus.read(base_name_table_address + index)
     end
 
     def render_image
