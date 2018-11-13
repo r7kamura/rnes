@@ -203,11 +203,10 @@ module Rnes
     end
 
     def draw_background_8pixels
-      base_pattern_table_address = base_background_pattern_table_address
       pattern_index = read_pattern_index(tile_index)
-      pattern_line_low_byte_address = TILE_HEIGHT * 2 * pattern_index + y_in_tile + base_pattern_table_address
-      pattern_line_low_byte = read_pattern_data(pattern_line_low_byte_address)
-      pattern_line_high_byte = read_pattern_data(pattern_line_low_byte_address + TILE_HEIGHT)
+      pattern_line_low_byte_address = TILE_HEIGHT * 2 * pattern_index + y_in_tile
+      pattern_line_low_byte = read_background_pattern_line(pattern_line_low_byte_address)
+      pattern_line_high_byte = read_background_pattern_line(pattern_line_low_byte_address + TILE_HEIGHT)
 
       block_id = 0
       block_id |= 0b01 if (x % BLOCK_WIDTH).odd?
@@ -241,7 +240,6 @@ module Rnes
     #      |`------- horizontal flip
     #      `-------- vertical flip
     def draw_sprites
-      base_pattern_table_address = base_sprite_pattern_table_address
       0.step(SPRITES_COUNT - 1, 4) do |base_sprite_ram_address|
         y_for_sprite = (read_from_sprite_ram(base_sprite_ram_address) - TILE_HEIGHT)
         next if y_for_sprite.negative?
@@ -256,9 +254,9 @@ module Rnes
         reversed_vertically = sprite_attribute_byte[7] == 1
 
         TILE_HEIGHT.times do |y_in_pattern|
-          pattern_line_low_byte_address = TILE_HEIGHT * 2 * pattern_index + y_in_pattern + base_pattern_table_address
-          pattern_line_low_byte = read_pattern_data(pattern_line_low_byte_address)
-          pattern_line_high_byte = read_pattern_data(pattern_line_low_byte_address + TILE_HEIGHT)
+          pattern_line_low_byte_address = TILE_HEIGHT * 2 * pattern_index + y_in_pattern
+          pattern_line_low_byte = read_sprite_pattern_line(pattern_line_low_byte_address)
+          pattern_line_high_byte = read_sprite_pattern_line(pattern_line_low_byte_address + TILE_HEIGHT)
           TILE_WIDTH.times do |x_in_pattern|
             index_in_pattern_line_byte = TILE_WIDTH - 1 - x_in_pattern
             background_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | pattern_line_high_byte[index_in_pattern_line_byte] << 1 | mini_palette_id << 2
@@ -300,6 +298,12 @@ module Rnes
       PALETTE_ADDRESS_RANGE.cover?(@registers.video_ram_address % 0x4000)
     end
 
+    # @param [Integer] index.
+    # @return [Integer]
+    def read_background_pattern_line(index)
+      read_pattern_line(base_background_pattern_table_address + index)
+    end
+
     # @param [Integer] index
     # @return [Integer]
     def read_color_id(index)
@@ -333,8 +337,14 @@ module Rnes
 
     # @param [Integer] index
     # @return [Integer]
-    def read_pattern_data(index)
+    def read_pattern_line(index)
       @bus.read(index)
+    end
+
+    # @param [Integer] index.
+    # @return [Integer]
+    def read_sprite_pattern_line(index)
+      read_pattern_line(base_sprite_pattern_table_address + index)
     end
 
     # @param [Integer] index
