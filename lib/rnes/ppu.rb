@@ -6,6 +6,8 @@ require 'rnes/ram'
 
 module Rnes
   class Ppu
+    ADDRESS_TO_FINISH_SPRITE_PALETTE_TABLE = 0x3F1F
+
     ADDRESS_TO_START_ATTRIBUTE_TABLE = 0x23C0
 
     ADDRESS_TO_START_NAME_TABLE = 0x2000
@@ -19,6 +21,8 @@ module Rnes
     BLOCK_WIDTH = 16
 
     CYCLES_PER_LINE = 341
+
+    PALETTE_ADDRESS_RANGE = ADDRESS_TO_START_BACKGROUND_PALETTE_TABLE..ADDRESS_TO_FINISH_SPRITE_PALETTE_TABLE
 
     SPRITE_RAM_BYTESIZE = 2**8
 
@@ -291,6 +295,11 @@ module Rnes
       (0...WINDOW_WIDTH).cover?(x) && (0...WINDOW_HEIGHT).cover?(y)
     end
 
+    # @return [Boolean]
+    def palette_data_requested?
+      PALETTE_ADDRESS_RANGE.cover?(@registers.video_ram_address % 0x4000)
+    end
+
     # @param [Integer] index
     # @return [Integer]
     def read_character_data(index)
@@ -323,7 +332,7 @@ module Rnes
 
     # @return [Integer]
     def read_from_video_ram_for_cpu
-      if (0x3F00..0x3F1F).cover?(@registers.video_ram_address % 0x4000)
+      if palette_data_requested?
         value = @bus.read(@registers.video_ram_address)
         @video_ram_reading_buffer = @bus.read(@registers.video_ram_address - 0x1000)
       else
