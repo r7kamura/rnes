@@ -5,6 +5,10 @@
 - Add CLI options and help message.
 - Add PPU sprite reverse.
 
+### Fixed
+
+- Fix PPU sprites rendering.
+
 ## 0.1.1 - 2018-11-12
 
 ### Added
