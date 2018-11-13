@@ -184,6 +184,19 @@ module Rnes
       end
     end
 
+    # +---+---+
+    # | 0 | 1 |
+    # +---+---+
+    # | 2 | 3 |
+    # +---+---+
+    # @return [Integer] Integer from 0 to 3.
+    def block_id
+      value = 0
+      value |= 0b01 if (x % BLOCK_WIDTH).odd?
+      value |= 0b10 if (y % BLOCK_HEIGHT).odd?
+      value
+    end
+
     def check_sprite_hit
       if read_from_sprite_ram(0) == y && @registers.background_enabled? && @registers.sprite_enabled?
         registers.sprite_hit = true
@@ -208,15 +221,12 @@ module Rnes
       pattern_line_low_byte = read_background_pattern_line(pattern_line_low_byte_address)
       pattern_line_high_byte = read_background_pattern_line(pattern_line_low_byte_address + TILE_HEIGHT)
 
-      block_id = 0
-      block_id |= 0b01 if (x % BLOCK_WIDTH).odd?
-      block_id |= 0b10 if (y % BLOCK_HEIGHT).odd?
       mini_palette_ids_byte = read_object_attribute(tile_index)
       mini_palette_id = (mini_palette_ids_byte >> (block_id * 2)) & 0b11
 
       TILE_WIDTH.times do |x_in_pattern|
         index_in_pattern_line_byte = TILE_WIDTH - 1 - x_in_pattern
-        background_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | pattern_line_high_byte[index_in_pattern_line_byte] << 1 | mini_palette_id << 2
+        background_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | (pattern_line_high_byte[index_in_pattern_line_byte] << 1) | (mini_palette_id << 2)
         color_id = read_color_id(background_palette_index)
         @image.write(
           value: ::Rnes::Ppu::COLORS[color_id],
