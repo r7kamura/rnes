@@ -8,6 +8,7 @@
 ### Fixed
 
 - Fix PPU sprites rendering.
+- Fix PPU sprite pattern addressing.
 
 ## 0.1.1 - 2018-11-12
 
