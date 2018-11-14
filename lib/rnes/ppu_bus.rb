@@ -6,7 +6,6 @@ module Rnes
     attr_reader :character_ram
 
     # @param [Rnes::Ram] character_ram
-    # @param [Rnes::Ram] sprite_ram
     # @param [Rnes::Ram] video_ram
     def initialize(character_ram:, video_ram:)
       @character_ram = character_ram
