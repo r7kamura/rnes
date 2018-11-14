@@ -216,12 +216,12 @@ module Rnes
     end
 
     def draw_background_8pixels
-      pattern_index = read_pattern_index(tile_index)
+      pattern_index = read_pattern_index(background_pattern_index)
       pattern_line_low_byte_address = TILE_HEIGHT * 2 * pattern_index + y_in_tile
       pattern_line_low_byte = read_background_pattern_line(pattern_line_low_byte_address)
       pattern_line_high_byte = read_background_pattern_line(pattern_line_low_byte_address + TILE_HEIGHT)
 
-      mini_palette_ids_byte = read_object_attribute(tile_index)
+      mini_palette_ids_byte = read_object_attribute(background_pattern_index)
       mini_palette_id = (mini_palette_ids_byte >> (block_id * 2)) & 0b11
 
       TILE_WIDTH.times do |x_in_pattern|
@@ -375,23 +375,23 @@ module Rnes
     # | 2(0x0800) | 3(0x0C00) |
     # +-----------+-----------+
     # @return [Integer] Integer from 0x0000 to 0x0FC0.
-    def tile_index
-      tile_index_in_window + tile_index_paging_offset
+    def background_pattern_index
+      background_pattern_index_in_window + background_pattern_index_paging_offset
     end
 
     # @return [Integer] Integer from 0x0000 to 0x03C0.
-    def tile_index_in_window
+    def background_pattern_index_in_window
       (y_of_tile % TILES_COUNT_IN_VERTICAL_LINE) * TILES_COUNT_IN_HORIZONTAL_LINE + x_of_tile % TILES_COUNT_IN_HORIZONTAL_LINE
     end
 
     # @return [Integer] Integer from 0 to 3.
-    def tile_index_page
+    def background_pattern_index_page
       x_of_tile / TILES_COUNT_IN_HORIZONTAL_LINE + y_of_tile / TILES_COUNT_IN_VERTICAL_LINE * 2
     end
 
     # @return [Integer] 0x0000, 0x0400, 0x0800, or 0x0C00.
-    def tile_index_paging_offset
-      tile_index_page * 0x0400
+    def background_pattern_index_paging_offset
+      background_pattern_index_page * 0x0400
     end
 
     # @return [Boolean]
