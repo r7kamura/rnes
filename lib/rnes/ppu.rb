@@ -38,6 +38,12 @@ module Rnes
 
     WINDOW_WIDTH = 256
 
+    ENCODED_ATTRIBUTES_HEIGHT = BLOCK_HEIGHT * 2
+
+    ENCODED_ATTRIBUTES_WIDTH = BLOCK_WIDTH * 2
+
+    ENCODED_ATTRIBUTES_COUNT_IN_HORIZONTAL_LINE = WINDOW_WIDTH / ENCODED_ATTRIBUTES_WIDTH
+
     TILES_COUNT_IN_HORIZONTAL_LINE = WINDOW_WIDTH / TILE_WIDTH
 
     TILES_COUNT_IN_VERTICAL_LINE = WINDOW_HEIGHT / TILE_HEIGHT
@@ -190,11 +196,13 @@ module Rnes
     # | 2 | 3 |
     # +---+---+
     # @return [Integer] Integer from 0 to 3.
-    def block_id
-      value = 0
-      value |= 0b01 if (x % BLOCK_WIDTH).odd?
-      value |= 0b10 if (y % BLOCK_HEIGHT).odd?
-      value
+    def block_id_in_encoded_attributes
+      (x_of_block.even? ? 0 : 1) + (y_of_block.even? ? 0 : 2)
+    end
+
+    # @return [Integer] Integer from 0 to 63.
+    def object_attribute_index
+      y_of_encoded_attributes * ENCODED_ATTRIBUTES_COUNT_IN_HORIZONTAL_LINE + x_of_encoded_attributes
     end
 
     def check_sprite_hit
@@ -221,8 +229,8 @@ module Rnes
       pattern_line_low_byte = read_background_pattern_line(pattern_line_low_byte_address)
       pattern_line_high_byte = read_background_pattern_line(pattern_line_low_byte_address + TILE_HEIGHT)
 
-      mini_palette_ids_byte = read_object_attribute(background_pattern_index)
-      mini_palette_id = (mini_palette_ids_byte >> (block_id * 2)) & 0b11
+      mini_palette_ids_byte = read_object_attribute(object_attribute_index)
+      mini_palette_id = (mini_palette_ids_byte >> (block_id_in_encoded_attributes * 2)) & 0b11
 
       TILE_WIDTH.times do |x_in_pattern|
         index_in_pattern_line_byte = TILE_WIDTH - 1 - x_in_pattern
@@ -431,6 +439,16 @@ module Rnes
     end
 
     # @return [Integer]
+    def x_of_block
+      x / BLOCK_WIDTH
+    end
+
+    # @return [Integer]
+    def x_of_encoded_attributes
+      x / ENCODED_ATTRIBUTES_WIDTH
+    end
+
+    # @return [Integer]
     def x_of_tile
       (x + @registers.scroll_x) / TILE_WIDTH
     end
@@ -443,6 +461,16 @@ module Rnes
     # @return [Integer]
     def y_in_tile
       y % TILE_HEIGHT
+    end
+
+    # @return [Integer]
+    def y_of_block
+      y / BLOCK_HEIGHT
+    end
+
+    # @return [Integer]
+    def y_of_encoded_attributes
+      y / ENCODED_ATTRIBUTES_HEIGHT
     end
 
     # @return [Integer]
