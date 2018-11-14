@@ -435,22 +435,27 @@ module Rnes
 
     # @return [Integer]
     def x_in_tile
-      x % TILE_WIDTH
+      x_with_scroll % TILE_WIDTH
     end
 
     # @return [Integer]
     def x_of_block
-      x / BLOCK_WIDTH
+      x_with_scroll / BLOCK_WIDTH
     end
 
     # @return [Integer]
     def x_of_encoded_attributes
-      x / ENCODED_ATTRIBUTES_WIDTH
+      x_with_scroll / ENCODED_ATTRIBUTES_WIDTH
     end
 
     # @return [Integer]
     def x_of_tile
-      (x + @registers.scroll_x) / TILE_WIDTH
+      x_with_scroll / TILE_WIDTH
+    end
+
+    # @return [Integer]
+    def x_with_scroll
+      x + @registers.scroll_x
     end
 
     # @return [Integer]
@@ -460,22 +465,27 @@ module Rnes
 
     # @return [Integer]
     def y_in_tile
-      y % TILE_HEIGHT
+      y_with_scroll % TILE_HEIGHT
     end
 
     # @return [Integer]
     def y_of_block
-      y / BLOCK_HEIGHT
+      y_with_scroll / BLOCK_HEIGHT
     end
 
     # @return [Integer]
     def y_of_encoded_attributes
-      y / ENCODED_ATTRIBUTES_HEIGHT
+      y_with_scroll / ENCODED_ATTRIBUTES_HEIGHT
     end
 
     # @return [Integer]
     def y_of_tile
-      (y + @registers.scroll_y) / TILE_HEIGHT
+      y_with_scroll / TILE_HEIGHT
+    end
+
+    # @return [Integer]
+    def y_with_scroll
+      y + @registers.scroll_y
     end
   end
 end
