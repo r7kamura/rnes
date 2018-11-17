@@ -44,6 +44,8 @@ module Rnes
 
     ENCODED_ATTRIBUTES_COUNT_IN_HORIZONTAL_LINE = WINDOW_WIDTH / ENCODED_ATTRIBUTES_WIDTH
 
+    ENCODED_ATTRIBUTES_COUNT_IN_VERTICAL_LINE = 256 / ENCODED_ATTRIBUTES_HEIGHT
+
     TILES_COUNT_IN_HORIZONTAL_LINE = WINDOW_WIDTH / TILE_WIDTH
 
     TILES_COUNT_IN_VERTICAL_LINE = WINDOW_HEIGHT / TILE_HEIGHT
@@ -202,7 +204,9 @@ module Rnes
 
     # @return [Integer] Integer from 0 to 63.
     def object_attribute_index
-      y_of_encoded_attributes * ENCODED_ATTRIBUTES_COUNT_IN_HORIZONTAL_LINE + x_of_encoded_attributes
+      (y_of_encoded_attributes % ENCODED_ATTRIBUTES_COUNT_IN_VERTICAL_LINE) * ENCODED_ATTRIBUTES_COUNT_IN_HORIZONTAL_LINE +
+        x_of_encoded_attributes % ENCODED_ATTRIBUTES_COUNT_IN_HORIZONTAL_LINE +
+        background_pattern_index_paging_offset
     end
 
     def check_sprite_hit
