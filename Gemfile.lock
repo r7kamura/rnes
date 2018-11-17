@@ -52,8 +52,8 @@ DEPENDENCIES
   pry
   rake (~> 10.0)
   rnes!
-  rspec (= 3.7.0)
-  rubocop (= 0.60.0)
+  rspec
+  rubocop
 
 BUNDLED WITH
    1.17.1
