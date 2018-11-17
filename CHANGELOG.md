@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.2.0 - 2018-11-17
+
 ### Added
 
 - Add CLI options and help message.
