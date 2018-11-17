@@ -37,6 +37,7 @@ module Rnes
 
       @sprite_ram_address = 0x00
       @video_ram_address = 0x0000
+      @video_ram_address_high_bufffer = 0x00
 
       @address_latch = false
       @scroll_latch = false
@@ -169,9 +170,10 @@ module Rnes
     # @param [Integer] value
     def video_ram_address=(value)
       if @address_latch
-        @video_ram_address |= value
+        @video_ram_address = value + (@video_ram_address_high_bufffer << 8)
+        @video_ram_address_high_bufffer = 0x00
       else
-        @video_ram_address = value << 8
+        @video_ram_address_high_bufffer = value
       end
       @address_latch = !@address_latch
     end
