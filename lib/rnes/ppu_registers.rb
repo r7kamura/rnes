@@ -37,10 +37,9 @@ module Rnes
 
       @sprite_ram_address = 0x00
       @video_ram_address = 0x0000
-      @video_ram_address_high_bufffer = 0x00
 
-      @address_latch = false
-      @scroll_latch = false
+      @buffer = 0x00
+      @latch = false
     end
 
     # @return [Boolean]
@@ -125,12 +124,13 @@ module Rnes
 
     # @param [Integer] value
     def scroll=(value)
-      if @scroll_latch
+      if @latch
+        @scroll_x = @buffer
         @scroll_y = value
       else
-        @scroll_x = value
+        @buffer = value
       end
-      @scroll_latch = !@scroll_latch
+      toggle_latch
     end
 
     # @return [Boolean]
@@ -162,23 +162,25 @@ module Rnes
     def status
       value = @status
       self.in_v_blank = false
-      @address_latch = false
-      @scroll_latch = false
+      @latch = false
       value
     end
 
     # @param [Integer] value
     def video_ram_address=(value)
-      if @address_latch
-        @video_ram_address = value + (@video_ram_address_high_bufffer << 8)
-        @video_ram_address_high_bufffer = 0x00
+      if @latch
+        @video_ram_address = value + (@buffer << 8)
       else
-        @video_ram_address_high_bufffer = value
+        @buffer = value
       end
-      @address_latch = !@address_latch
+      toggle_latch
     end
 
     private
+
+    def toggle_latch
+      @latch = !@latch
+    end
 
     # @param [Integer] index
     # @param [Boolean] boolean
