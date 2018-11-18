@@ -226,12 +226,12 @@ module Rnes
       pattern_line_low_byte = read_background_pattern_line(pattern_line_low_byte_address)
       pattern_line_high_byte = read_background_pattern_line(pattern_line_low_byte_address + TILE_HEIGHT)
 
-      mini_palette_ids_byte = read_object_attribute(object_attribute_index)
-      mini_palette_id = (mini_palette_ids_byte >> (block_id_in_encoded_attributes * 2)) & 0b11
+      palette_ids_byte = read_object_attribute(object_attribute_index)
+      palette_id = (palette_ids_byte >> (block_id_in_encoded_attributes * 2)) & 0b11
 
       TILE_WIDTH.times do |x_in_pattern|
         index_in_pattern_line_byte = TILE_WIDTH - 1 - x_in_pattern
-        background_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | (pattern_line_high_byte[index_in_pattern_line_byte] << 1) | (mini_palette_id << 2)
+        background_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | (pattern_line_high_byte[index_in_pattern_line_byte] << 1) | (palette_id << 2)
         color_id = read_color_id(background_palette_index)
         @image.write(
           value: ::Rnes::Ppu::COLORS[color_id],
@@ -261,7 +261,7 @@ module Rnes
         sprite_attribute_byte = read_from_sprite_ram(base_sprite_ram_address + 2)
         x_for_sprite = read_from_sprite_ram(base_sprite_ram_address + 3)
 
-        mini_palette_id = sprite_attribute_byte & 0b11
+        palette_id = sprite_attribute_byte & 0b11
         reversed_horizontally = sprite_attribute_byte[6] == 1
         reversed_vertically = sprite_attribute_byte[7] == 1
 
@@ -271,7 +271,7 @@ module Rnes
           pattern_line_high_byte = read_sprite_pattern_line(pattern_line_low_byte_address + TILE_HEIGHT)
           TILE_WIDTH.times do |x_in_pattern|
             index_in_pattern_line_byte = TILE_WIDTH - 1 - x_in_pattern
-            background_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | pattern_line_high_byte[index_in_pattern_line_byte] << 1 | mini_palette_id << 2
+            background_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | pattern_line_high_byte[index_in_pattern_line_byte] << 1 | palette_id << 2
             if background_palette_index % 4 != 0
               color_id = read_color_id(background_palette_index)
               y_in_pattern = TILE_HEIGHT - 1 - y_in_pattern if reversed_vertically
