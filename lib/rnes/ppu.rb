@@ -272,14 +272,16 @@ module Rnes
           TILE_WIDTH.times do |x_in_pattern|
             index_in_pattern_line_byte = TILE_WIDTH - 1 - x_in_pattern
             background_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | pattern_line_high_byte[index_in_pattern_line_byte] << 1 | mini_palette_id << 2
-            color_id = read_color_id(background_palette_index)
-            y_in_pattern = TILE_HEIGHT - 1 - y_in_pattern if reversed_vertically
-            x_in_pattern = TILE_WIDTH - 1 - x_in_pattern if reversed_horizontally
-            @image.write(
-              value: ::Rnes::Ppu::COLORS[color_id],
-              x: x_for_sprite + x_in_pattern,
-              y: y_for_sprite + y_in_pattern,
-            )
+            if background_palette_index % 4 != 0
+              color_id = read_color_id(background_palette_index)
+              y_in_pattern = TILE_HEIGHT - 1 - y_in_pattern if reversed_vertically
+              x_in_pattern = TILE_WIDTH - 1 - x_in_pattern if reversed_horizontally
+              @image.write(
+                value: ::Rnes::Ppu::COLORS[color_id],
+                x: x_for_sprite + x_in_pattern,
+                y: y_for_sprite + y_in_pattern,
+              )
+            end
           end
         end
       end
