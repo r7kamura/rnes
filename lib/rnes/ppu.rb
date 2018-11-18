@@ -271,7 +271,7 @@ module Rnes
           pattern_line_high_byte = read_sprite_pattern_line(pattern_line_low_byte_address + TILE_HEIGHT)
           TILE_WIDTH.times do |x_in_pattern|
             index_in_pattern_line_byte = TILE_WIDTH - 1 - x_in_pattern
-            sprite_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | pattern_line_high_byte[index_in_pattern_line_byte] << 1 | palette_id << 2
+            sprite_palette_index = pattern_line_low_byte[index_in_pattern_line_byte] | (pattern_line_high_byte[index_in_pattern_line_byte] << 1) | (palette_id << 2)
             if sprite_palette_index % 4 != 0
               color_id = read_color_id(sprite_palette_index)
               y_in_pattern = TILE_HEIGHT - 1 - y_in_pattern if reversed_vertically
