@@ -263,8 +263,7 @@ module Rnes
     #      `-------- vertical flip
     def draw_sprites
       0.step(SPRITES_COUNT - 1, 4) do |base_sprite_ram_address|
-        y_for_sprite = (read_from_sprite_ram(base_sprite_ram_address) - TILE_HEIGHT)
-        next if y_for_sprite.negative?
+        y_for_sprite = read_from_sprite_ram(base_sprite_ram_address)
         pattern_index = read_from_sprite_ram(base_sprite_ram_address + 1)
         sprite_attribute_byte = read_from_sprite_ram(base_sprite_ram_address + 2)
         x_for_sprite = read_from_sprite_ram(base_sprite_ram_address + 3)

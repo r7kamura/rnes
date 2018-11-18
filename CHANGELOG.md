@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+- Fix PPU unnecessary vertical offset on rendering sprites.
+
 ## 0.2.0 - 2018-11-17
 
 ### Added
