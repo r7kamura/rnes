@@ -202,13 +202,6 @@ module Rnes
       (x_of_block.even? ? 0 : 1) + (y_of_block.even? ? 0 : 2)
     end
 
-    # @return [Integer] Integer from 0 to 63.
-    def object_attribute_index
-      (y_of_encoded_attributes % ENCODED_ATTRIBUTES_COUNT_IN_VERTICAL_LINE) * ENCODED_ATTRIBUTES_COUNT_IN_HORIZONTAL_LINE +
-        x_of_encoded_attributes % ENCODED_ATTRIBUTES_COUNT_IN_HORIZONTAL_LINE +
-        background_pattern_index_paging_offset
-    end
-
     def check_sprite_hit
       if read_from_sprite_ram(0) == y && @registers.background_enabled? && @registers.sprite_enabled?
         registers.sprite_hit = true
@@ -290,6 +283,13 @@ module Rnes
           end
         end
       end
+    end
+
+    # @return [Integer] Integer from 0 to 63.
+    def object_attribute_index
+      (y_of_encoded_attributes % ENCODED_ATTRIBUTES_COUNT_IN_VERTICAL_LINE) * ENCODED_ATTRIBUTES_COUNT_IN_HORIZONTAL_LINE +
+        x_of_encoded_attributes % ENCODED_ATTRIBUTES_COUNT_IN_HORIZONTAL_LINE +
+        background_pattern_index_paging_offset
     end
 
     # @return [Boolean]
