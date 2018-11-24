@@ -49,6 +49,9 @@ Style/GuardClause:
 Style/IfUnlessModifier:
   Enabled: false
 
+Style/Next:
+  Enabled: false
+
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: comma
 
