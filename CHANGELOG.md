@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.2.1 - 2018-11-24
 
-### Added
+### Changed
 
 - Decrease terminal renderer brightness threshold for better visibility.
 
