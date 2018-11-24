@@ -24,10 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add CLI options and help message.
-- Add PPU sprite reverse.
 
 ### Fixed
 
+- Fix PPU sprite reverse.
 - Fix PPU sprites rendering.
 - Fix PPU sprite pattern addressing.
 - Fix PPU background pattern attribute addressing.
