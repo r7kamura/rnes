@@ -5,6 +5,12 @@ require 'rnes/operation'
 
 module Rnes
   class Cpu
+    INTERRUPTION_VECTOR_FOR_IRQ_OR_BRK = 0xFFFE
+
+    INTERRUPTION_VECTOR_FOR_NMI = 0xFFFA
+
+    INTERRUPTION_VECTOR_FOR_RESET = 0xFFFC
+
     # @return [Rnes::CpuBus] bus
     attr_reader :bus
 
@@ -31,7 +37,7 @@ module Rnes
 
     def reset
       @registers.reset
-      @registers.program_counter = read_word(0xFFFC)
+      @registers.program_counter = read_word(INTERRUPTION_VECTOR_FOR_RESET)
     end
 
     # @return [Integer]
@@ -369,7 +375,7 @@ module Rnes
       push(@registers.status)
       unless @registers.interrupt?
         @registers.interrupt = true
-        @registers.program_counter = read_word(0xFFFE)
+        @registers.program_counter = read_word(INTERRUPTION_VECTOR_FOR_IRQ_OR_BRK)
       end
       @registers.program_counter -= 1
     end
@@ -1011,7 +1017,7 @@ module Rnes
       push_word(@registers.program_counter)
       push(@registers.status)
       @registers.interrupt = true
-      @registers.program_counter = read_word(0xFFFE)
+      @registers.program_counter = read_word(INTERRUPTION_VECTOR_FOR_IRQ_OR_BRK)
     end
 
     def handle_nmi
@@ -1020,7 +1026,7 @@ module Rnes
       push_word(@registers.program_counter)
       push(@registers.status)
       @registers.interrupt = true
-      @registers.program_counter = read_word(0xFFFA)
+      @registers.program_counter = read_word(INTERRUPTION_VECTOR_FOR_NMI)
     end
 
     # @return [Integer]
